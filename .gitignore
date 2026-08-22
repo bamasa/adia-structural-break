@@ -1,0 +1,22 @@
+# --- Competition data -------------------------------------------------------
+# 200 MB of parquet, fetched by `crunch setup`. Never committed; the workspace
+# directory the CLI creates is likewise local.
+/data/
+/structural-break-real-time-*/
+/prediction/
+*.parquet
+
+# --- Python -----------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# --- Secrets ----------------------------------------------------------------
+# The setup token is single-use and short-lived, but it is still a credential.
+.env
+*.token
