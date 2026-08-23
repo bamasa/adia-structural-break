@@ -94,9 +94,20 @@ for sid, part in x.groupby(level="id"):
     z_online = np.asarray(
         [norm.clip(norm.standardise(float(v), i)) for i, v in enumerate(online)]
     )
+    z_hist = np.asarray(
+        [norm.clip(norm.standardise(float(v), -len(hist) + i)) for i, v in enumerate(hist)]
+    )
     tau = int(labels.argmax()) if labels.max() > 0 else None
+    # Where the model itself calls the break: the first step at which the score
+    # crosses half of its own maximum on this series. A display convention, not
+    # part of the metric -- the metric never asks for a point -- but a figure
+    # without it leaves the reader guessing where the purple line "decided".
+    peak = float(scores.max())
+    crossed = np.flatnonzero(scores >= 0.5 * peak) if peak > 0 else []
+    detected = int(crossed[0]) if len(crossed) else None
     records[int(sid)] = dict(
-        hist=hist, online=online, z=z_online, scores=scores, labels=labels, tau=tau,
+        hist=hist, online=online, z=z_online, z_hist=z_hist, scores=scores,
+        labels=labels, tau=tau, detected=detected,
         slope=norm.slope, sd=norm.sd, rho=norm.rho, kurt=norm.kurtosis,
     )
 print(f"scored {len(records)} series")""")
@@ -133,6 +144,7 @@ print(f"clean:  median final score {clean.false_alarm.median():.3f}")""")
 code('''def show(sid, title_extra=""):
     r = records[sid]
     hist, online, z, scores, tau = r["hist"], r["online"], r["z"], r["scores"], r["tau"]
+    z_hist, detected = r["z_hist"], r["detected"]
     n_h = len(hist)
     fig, axes = plt.subplots(3, 1, figsize=(11, 6.5), sharex=True,
                              gridspec_kw=dict(height_ratios=[2, 1.4, 1.4]))
@@ -143,8 +155,10 @@ code('''def show(sid, title_extra=""):
     axes[0].plot(t_on, online, lw=0.8, color="#1a73e8",
                  label="онлайн-часть (приходит по одной точке)")
     axes[0].set_ylabel("сырой ряд")
+    axes[1].plot(t_hist[-600:], z_hist[-600:], lw=0.6, color="#9aa0a6",
+                 label="история после нормировки (для сравнения масштаба)")
     axes[1].plot(t_on, z, lw=0.8, color="#188038",
-                 label="после нормировки: минус тренд, минус масштаб, обрезка выбросов")
+                 label="онлайн после нормировки: минус тренд, минус масштаб, обрезка выбросов")
     axes[1].axhline(0, color="grey", lw=0.5)
     axes[1].set_ylabel("нормированный")
     axes[2].plot(t_on, scores, lw=1.4, color="#7b1fa2",
@@ -158,6 +172,10 @@ code('''def show(sid, title_extra=""):
         if tau is not None:
             ax.axvline(tau, color="#d93025", lw=1.2, ls="--",
                        label="ИСТИННЫЙ слом (разметка)" if k == 0 else None)
+        if detected is not None:
+            ax.axvline(detected, color="#f9ab00", lw=1.6, alpha=0.9,
+                       label="МОДЕЛЬ решила: слом был (первое пересечение половины"
+                             " своего максимума)" if k == 0 else None)
         ax.legend(loc="upper left", fontsize=8, frameon=True, framealpha=0.85)
     q = table.loc[sid]
     status = f"break at {tau}" if tau is not None else "no break"
