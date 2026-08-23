@@ -188,6 +188,22 @@ at once, on vastly more examples than 10,000 — and the inspection notebook
 says the weakness is discrimination between series, which more training
 signal addresses directly.
 
-**Kill condition, stated now:** grouped CV against the 41-channel combiner; if
-adding (or replacing with) the classifier does not clear 0.5682 by more than
-the fold spread (~0.006), it is not submitted.
+**Kill condition, stated before the build:** grouped CV against the 41-channel
+combiner; if adding (or replacing with) the classifier does not clear 0.5682 by
+more than the fold spread (~0.006), it is not submitted.
+
+**Result: killed — and the shape of the failure is the lesson.** The
+augmentation worked exactly as intended at the window level: 313,119 windows
+(controlled break offsets at 15–85% of the view, stride thinning at 1/2/4,
+negatives from histories), and the classifier's held-out window AUC rose from
+0.5315 to **0.5687** — nearly double the learnable signal of the 006 network.
+As a standalone TS-AUC channel it reaches 0.5353, also better.
+
+And the combiner got *worse*: 41 channels 0.5682, 47 channels 0.5627, behind on
+every fold. Six new channels correlated with the forty already there diluted
+the trees' signal rather than adding to it. A feature can be genuinely better
+in isolation and still carry nothing the ensemble does not already have — the
+same verdict the retrospective scans met, now measured on a channel that cost a
+full augmentation pipeline to build. The pipeline stays (augment.py); the next
+use of it should target what the inspection notebook says is actually missing —
+cross-sectional discrimination — rather than another within-series channel.

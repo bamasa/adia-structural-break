@@ -138,20 +138,27 @@ code('''def show(sid, title_extra=""):
                              gridspec_kw=dict(height_ratios=[2, 1.4, 1.4]))
     t_hist = np.arange(-n_h, 0)
     t_on = np.arange(len(online))
-    axes[0].plot(t_hist[-600:], hist[-600:], lw=0.6, color="#9aa0a6")
-    axes[0].plot(t_on, online, lw=0.8, color="#1a73e8")
-    axes[0].set_ylabel("raw")
-    axes[1].plot(t_on, z, lw=0.8, color="#188038")
+    axes[0].plot(t_hist[-600:], hist[-600:], lw=0.6, color="#9aa0a6",
+                 label="история (слома нет по условию)")
+    axes[0].plot(t_on, online, lw=0.8, color="#1a73e8",
+                 label="онлайн-часть (приходит по одной точке)")
+    axes[0].set_ylabel("сырой ряд")
+    axes[1].plot(t_on, z, lw=0.8, color="#188038",
+                 label="после нормировки: минус тренд, минус масштаб, обрезка выбросов")
     axes[1].axhline(0, color="grey", lw=0.5)
-    axes[1].set_ylabel("normalised")
-    axes[2].plot(t_on, scores, lw=1.4, color="#d93025")
+    axes[1].set_ylabel("нормированный")
+    axes[2].plot(t_on, scores, lw=1.4, color="#7b1fa2",
+                 label="счёт модели: уверенность, что слом уже был (0..1)")
     axes[2].set_ylim(-0.02, 1.02)
-    axes[2].set_ylabel("model score")
-    axes[2].set_xlabel("online step (history at negative t)")
-    for ax in axes:
-        ax.axvline(0, color="grey", lw=1.0, alpha=0.6)
+    axes[2].set_ylabel("счёт модели")
+    axes[2].set_xlabel("шаг онлайн-части (история — при отрицательных t)")
+    for k, ax in enumerate(axes):
+        ax.axvline(0, color="grey", lw=1.0, alpha=0.6,
+                   label="граница история/онлайн" if k == 0 else None)
         if tau is not None:
-            ax.axvline(tau, color="#d93025", lw=1.2, ls="--")
+            ax.axvline(tau, color="#d93025", lw=1.2, ls="--",
+                       label="ИСТИННЫЙ слом (разметка)" if k == 0 else None)
+        ax.legend(loc="upper left", fontsize=8, frameon=True, framealpha=0.85)
     q = table.loc[sid]
     status = f"break at {tau}" if tau is not None else "no break"
     metric = (f"within-series AUC {q.quality:.3f}" if tau is not None
@@ -204,7 +211,7 @@ xpos = np.arange(len(frame))
 ax.bar(xpos - 0.18, frame["low half"], width=0.36, label="low half", color="#9aa0a6")
 ax.bar(xpos + 0.18, frame["high half"], width=0.36, label="high half", color="#1a73e8")
 ax.set_xticks(xpos, frame.index, rotation=20)
-ax.set_ylabel("median within-series AUC (broken series)")
+ax.set_ylabel("медианный AUC внутри ряда; выше = лучше отделяет до/после")
 ax.axhline(0.5, color="#d93025", lw=0.8, ls="--")
 ax.legend(frameon=False)
 ax.set_title("Where the detector is strong and where it is blind")

@@ -63,9 +63,11 @@ Full history with hypotheses and kill conditions: [`docs/experiments.md`](docs/e
 Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 40-channel models were scored). Field tail ≈ 0.62, top ≈ 0.652.
 
-Planned next — 007, a window-level break classifier on augmented cuts, kill
-condition already stated in the log: beat 0.5682 by more than the fold spread
-or stay unsubmitted.
+| — | 007: window classifier on 313k augmented cuts | 0.5627 vs 0.5682 | **killed by pre-stated condition**: window AUC nearly doubled (0.5315 → 0.5687), yet as channels it dilutes the combiner — better in isolation, redundant in ensemble |
+
+The augmentation pipeline (`augment.py`) survives its first product; the next
+target, per the inspection notebook, is cross-sectional discrimination — clean
+series carrying high scores — not another within-series channel.
 
 ## Reproducing
 
