@@ -1,0 +1,86 @@
+"""Build a self-contained main.py for the platform from the library sources.
+
+The platform wants one file; the repository wants one source of truth. Copying
+code into submissions by hand is how the two drift apart — the drift is
+invisible until a cloud run disagrees with a local one, and the disagreement
+costs a submission slot to discover. So the submission is *assembled*: library
+modules concatenated in dependency order, their internal imports and module
+docstrings stripped, the competition interface appended. The library stays the
+only place code is edited.
+"""
+
+from __future__ import annotations
+
+import re
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+SRC = ROOT / "src" / "structural_break"
+
+#: Dependency order matters: later modules use earlier names.
+MODULES = ["features.py", "detectors.py", "retrospective.py", "retro2.py", "multiscale.py"]
+
+HEADER = '''"""{title}
+
+Assembled from the library by scripts/assemble_submission.py — edits belong in
+src/structural_break/, never here.
+
+{description}
+"""
+
+from __future__ import annotations
+
+import math
+import os
+from dataclasses import dataclass, field
+from typing import Iterable, List, Optional, Tuple
+
+import joblib
+import numpy as np
+
+#: One worker per pair of cores. Left unset, the platform runs a single worker
+#: on a sixteen-core machine, and quota is billed in wall-clock hours.
+INFER_PARALLELISM = 8
+
+'''
+
+
+def strip(module: str) -> str:
+    text = (SRC / module).read_text()
+    text = re.sub(r'^""".*?"""\n', "", text, count=1, flags=re.S)
+    lines = []
+    in_import = False
+    for line in text.split("\n"):
+        if in_import:
+            # A parenthesised import runs until its closing bracket, and every
+            # continuation line is part of it — the first version dropped only
+            # the opening line and left an orphaned indented block behind.
+            if ")" in line:
+                in_import = False
+            continue
+        if line.startswith("from __future__") or line.startswith("import "):
+            continue
+        if line.startswith("from ") and " import " in line:
+            if "(" in line and ")" not in line:
+                in_import = True
+            continue
+        lines.append(line)
+    return "\n".join(lines).strip() + "\n"
+
+
+def assemble(title: str, description: str, interface: str) -> str:
+    parts = [HEADER.format(title=title, description=description)]
+    for module in MODULES:
+        parts.append(f"# --- {module} " + "-" * (60 - len(module)) + "\n")
+        parts.append(strip(module))
+    parts.append(interface)
+    return "\n\n".join(parts)
+
+
+if __name__ == "__main__":
+    target = Path(sys.argv[1])
+    interface = Path(sys.argv[2]).read_text()
+    meta = Path(sys.argv[3]).read_text().split("\n---\n")
+    target.write_text(assemble(meta[0].strip(), meta[1].strip(), interface))
+    print(f"assembled -> {target}")

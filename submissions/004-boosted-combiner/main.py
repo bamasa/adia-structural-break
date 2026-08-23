@@ -59,6 +59,12 @@ from typing import Iterable, List, Optional, Tuple
 import joblib
 import numpy as np
 
+#: One worker per pair of cores. Left unset, the platform runs a single worker
+#: on a sixteen-core machine, and quota is billed in wall-clock hours -- the
+#: first cloud run of this submission also crashed on a missing lightgbm,
+#: because no requirements.txt was shipped. Both fixed here.
+INFER_PARALLELISM = 8
+
 # ---------------------------------------------------------------------------
 # Normalisation
 # ---------------------------------------------------------------------------
