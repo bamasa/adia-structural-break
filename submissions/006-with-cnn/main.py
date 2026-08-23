@@ -24,6 +24,7 @@ from dataclasses import dataclass, field
 from typing import Iterable, List, Optional, Tuple
 
 import joblib
+import json
 import numpy as np
 
 #: One worker per pair of cores. Left unset, the platform runs a single worker
