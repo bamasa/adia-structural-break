@@ -253,3 +253,13 @@ Six channels: three detector families on the rank view, peak and current.
 **Kill condition, stated before the run:** grouped 5-fold CV over the
 41-channel base on the same folds; adopted only if better on most folds (and
 re-checked over the 50-channel base before entering a submission).
+
+**Result: killed at the second gate — and the pair of numbers is the story.**
+Over the 41-channel base the rank view helps: 0.5684 vs 0.5662, ahead on 4
+folds of 5. Over the 50-channel base it does not: 0.5707 vs 0.5719, three
+narrow wins (+0.002 and less) against one loss of −0.0074. The false alarms
+the rank view was built to suppress are the same ones the reverting channels
+of 008 already recant, and what remains of it is dilution. Same verdict as the
+retro scans and 007, with a sharper mechanism this time: two fixes for one
+disease do not stack. The module stays (rankview.py) — it is the better of the
+two fixes for any future channel set that lacks 008's.
