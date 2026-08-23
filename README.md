@@ -64,6 +64,7 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 40-channel models were scored). Field tail ≈ 0.62, top ≈ 0.652.
 
 | — | 007: window classifier on 313k augmented cuts | 0.5627 vs 0.5682 | **killed by pre-stated condition**: window AUC nearly doubled (0.5315 → 0.5687), yet as channels it dilutes the combiner — better in isolation, redundant in ensemble |
+| 008 | + nine reverting channels: each detector's current statistic beside its peak, so a false alarm can be recanted | **0.5719** vs 0.5662, better on all 5 folds | cloud |
 
 The augmentation pipeline (`augment.py`) survives its first product; the next
 target, per the inspection notebook, is cross-sectional discrimination — clean

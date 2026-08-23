@@ -207,3 +207,49 @@ same verdict the retrospective scans met, now measured on a channel that cost a
 full augmentation pipeline to build. The pipeline stays (augment.py); the next
 use of it should target what the inspection notebook says is actually missing —
 cross-sectional discrimination — rather than another within-series channel.
+
+
+---
+
+## 008 — reverting channels: the current statistic beside every peak
+
+**Hypothesis** (raised by looking at the score panel of the inspection
+notebook: the purple line climbs and never comes back). Every streaming
+channel reports its detector's *running peak* over the null — the right
+semantics for "has a break already occurred", but a false alarm becomes
+permanent: one bad stretch and a clean series outranks real breaks at every
+later step. The metric is cross-sectional per step, so a score that cannot
+come back down keeps paying for the same mistake until the series ends. Give
+the combiner each detector's *current* statistic too — CUSUM's reflected sums
+drain through the drift term, the variance EWMA forgets on its own — and the
+trees can learn "peak high, current low, long since: discount".
+
+**Design.** Nine new channels (`*_now`, one per view × family), the current
+statistic under the same null normalisation and squash. No channel removed:
+the peak stays correct for true breaks, the pair is what carries information.
+
+**Kill condition, stated before the run:** grouped 5-fold CV, 41 vs 50
+channels on the same folds; adopted only if better on most folds.
+
+**Result: adopted — better on all five folds.** 41 channels 0.5662, 50
+channels **0.5719** (+0.0057 mean; the widest fold gains +0.0120). First gain
+since 006, and it came from the failure mode the notebook diagnosed: false
+alarms that could not be recanted. Submitted as #8.
+
+---
+
+## 009 — planned: the rank view
+
+**Hypothesis** (imported from the public 2nd-place solution of the first,
+offline edition — segment tests and robust transformations were its core).
+The z-view calibrates detectors against a unit Gaussian; a genuinely
+heavy-tailed clean series lives in that view's tails and false-alarms
+forever (measured: final raw CUSUM 0.919 on a calm t(2.5) stream). Map each
+online observation to its midrank within the standardised history, then
+through the probit: under the null the result is N(0,1) *by construction*,
+whatever the noise distribution — the same calm t(2.5) stream ends at 0.653.
+Six channels: three detector families on the rank view, peak and current.
+
+**Kill condition, stated before the run:** grouped 5-fold CV over the
+41-channel base on the same folds; adopted only if better on most folds (and
+re-checked over the 50-channel base before entering a submission).
