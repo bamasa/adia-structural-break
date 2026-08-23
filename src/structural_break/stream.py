@@ -46,6 +46,13 @@ FAMILIES = ("cusum", "page_hinkley", "variance_ratio")
 #: Column names, one per (view, family) pair.
 CHANNELS = tuple(f"{view}_{family}" for view in VIEWS for family in FAMILIES)
 
+#: The reverting counterparts: the detector's *current* statistic rather than
+#: its running peak. The peak answers "has it ever looked broken", and can
+#: never take a false alarm back; the current value answers "does it look
+#: broken still", and drains once the stream behaves again. Held apart from
+#: CHANNELS so existing consumers keep their column order.
+NOW_CHANNELS = tuple(f"{view}_{family}_now" for view in VIEWS for family in FAMILIES)
+
 
 class Monitor:
     """One series being watched, one observation at a time."""
@@ -87,6 +94,7 @@ class Monitor:
         for view, value in values.items():
             for family, detector in self.detectors[view].items():
                 out[f"{view}_{family}"] = detector.update(value)
+                out[f"{view}_{family}_now"] = detector.now
         return out
 
 

@@ -82,6 +82,7 @@ class Cusum:
     up: float = 0.0
     down: float = 0.0
     peak: float = 0.0
+    now: float = 0.5
     steps: float = 0.0
 
     def update(self, z: float) -> float:
@@ -93,7 +94,13 @@ class Cusum:
             # is whether one has *already* occurred.
             self.peak = max(self.peak, self.up, self.down)
             self.steps += 1.0
-        return squash(self.peak / null_scale(self.steps, self.growth, "log"))
+        scale = null_scale(self.steps, self.growth, "log")
+        # The current value alongside the peak: the peak can never recant a
+        # false alarm, the current value drains back to zero once the stream
+        # behaves again. A combiner holding both can learn the difference
+        # between "was loud once" and "is loud still".
+        self.now = squash(max(self.up, self.down) / scale)
+        return squash(self.peak / scale)
 
 
 @dataclass
@@ -107,6 +114,7 @@ class PageHinkley:
     floor_up: float = 0.0
     floor_down: float = 0.0
     peak: float = 0.0
+    now: float = 0.5
     steps: float = 0.0
 
     def update(self, z: float) -> float:
@@ -121,7 +129,15 @@ class PageHinkley:
                 self.total_down - self.floor_down,
             )
             self.steps += 1.0
-        return squash(self.peak / null_scale(self.steps, self.growth, "sqrt"))
+        scale = null_scale(self.steps, self.growth, "sqrt")
+        # Page-Hinkley's excursion above its floor never shrinks, but the
+        # growing null does the reverting for it -- slowly. Reported anyway,
+        # for symmetry with CUSUM; the trees decide whether it earns its keep.
+        self.now = squash(
+            max(self.total_up - self.floor_up, self.total_down - self.floor_down)
+            / scale
+        )
+        return squash(self.peak / scale)
 
 
 @dataclass
@@ -141,6 +157,7 @@ class VarianceRatio:
     ewma_var: float = 1.0
     n_eff: float = 0.0
     peak: float = 0.0
+    now: float = 0.5
 
     def update(self, z: float) -> float:
         if not math.isfinite(z):
@@ -153,5 +170,9 @@ class VarianceRatio:
             return squash(self.peak / self.scale)
         # Against 1.0, since the input is standardised: the reference variance
         # is unity by construction.
-        self.peak = max(self.peak, abs(math.log(max(self.ewma_var, 1e-12))))
+        current = abs(math.log(max(self.ewma_var, 1e-12)))
+        self.peak = max(self.peak, current)
+        # The EWMA forgets on its own, so this one genuinely comes home after
+        # a false alarm -- the cleanest reverting channel of the three.
+        self.now = squash(current / self.scale)
         return squash(self.peak / self.scale)

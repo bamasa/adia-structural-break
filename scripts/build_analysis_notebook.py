@@ -107,6 +107,7 @@ for sid, part in x.groupby(level="id"):
     detected = int(crossed[0]) if len(crossed) else None
     records[int(sid)] = dict(
         hist=hist, online=online, z=z_online, z_hist=z_hist, scores=scores,
+        channels=channels,
         labels=labels, tau=tau, detected=detected,
         slope=norm.slope, sd=norm.sd, rho=norm.rho, kurt=norm.kurtosis,
     )
@@ -146,8 +147,9 @@ code('''def show(sid, title_extra=""):
     hist, online, z, scores, tau = r["hist"], r["online"], r["z"], r["scores"], r["tau"]
     z_hist, detected = r["z_hist"], r["detected"]
     n_h = len(hist)
-    fig, axes = plt.subplots(3, 1, figsize=(11, 6.5), sharex=True,
-                             gridspec_kw=dict(height_ratios=[2, 1.4, 1.4]))
+    ch = r["channels"]
+    fig, axes = plt.subplots(4, 1, figsize=(11, 8.6), sharex=True,
+                             gridspec_kw=dict(height_ratios=[2, 1.4, 1.4, 1.6]))
     t_hist = np.arange(-n_h, 0)
     t_on = np.arange(len(online))
     axes[0].plot(t_hist[-600:], hist[-600:], lw=0.6, color="#9aa0a6",
@@ -165,7 +167,21 @@ code('''def show(sid, title_extra=""):
                  label="счёт модели: уверенность, что слом уже был (0..1)")
     axes[2].set_ylim(-0.02, 1.02)
     axes[2].set_ylabel("счёт модели")
-    axes[2].set_xlabel("шаг онлайн-части (история — при отрицательных t)")
+    # Individual components feeding the combiner: each is a 0..1 score of its
+    # own, so they share one axis and one can see who raised the alarm.
+    comp = [
+        ("CUSUM (сдвиг уровня, макс. по 3 видам)", ch[:, [0, 3, 6]].max(axis=1), "#1a73e8"),
+        ("Page-Hinkley (медленный дрейф)", ch[:, [1, 4, 7]].max(axis=1), "#188038"),
+        ("Variance-ratio (изменение разброса)", ch[:, [2, 5, 8]].max(axis=1), "#d93025"),
+        ("Multiscale: текущее расхождение", ch[:, 9:21].max(axis=1), "#f9ab00"),
+        ("Multiscale: пик за всё время", ch[:, 21:33].max(axis=1), "#9334e6"),
+        ("Ретроскан лучшего разбиения", ch[:, 33], "#5f6368"),
+    ]
+    for name, series_c, colour in comp:
+        axes[3].plot(t_on, series_c, lw=1.0, color=colour, label=name, alpha=0.9)
+    axes[3].set_ylim(-0.02, 1.02)
+    axes[3].set_ylabel("компоненты")
+    axes[3].set_xlabel("шаг онлайн-части (история — при отрицательных t)")
     for k, ax in enumerate(axes):
         ax.axvline(0, color="grey", lw=1.0, alpha=0.6,
                    label="граница история/онлайн" if k == 0 else None)
@@ -176,7 +192,8 @@ code('''def show(sid, title_extra=""):
             ax.axvline(detected, color="#f9ab00", lw=1.6, alpha=0.9,
                        label="МОДЕЛЬ решила: слом был (первое пересечение половины"
                              " своего максимума)" if k == 0 else None)
-        ax.legend(loc="upper left", fontsize=8, frameon=True, framealpha=0.85)
+        ax.legend(loc="upper left", fontsize=7 if k == 3 else 8, ncols=2 if k == 3 else 1,
+                  frameon=True, framealpha=0.85)
     q = table.loc[sid]
     status = f"break at {tau}" if tau is not None else "no break"
     metric = (f"within-series AUC {q.quality:.3f}" if tau is not None
