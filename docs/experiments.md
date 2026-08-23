@@ -95,7 +95,12 @@ per-step AUCs equally while a long series floods the late steps.
 Ordering is consistent on every fold. Both learned combiners beat the maximum;
 the trees beat the line, so the conditional structure is real, not variance.
 
-**Status.** Both queued for submission as 003 (weighted) and 004 (boosted).
+**Local held-out check before submitting** (100 series, ±0.05 at that size):
+weighted 0.5232, boosted 0.5146 — both consistent with their CV numbers, no
+repeat of 002's fabrication.
+
+**Status.** Submitted: 003 = submission #2, 004 = submission #3. Cloud scores
+pending.
 
 ---
 
@@ -125,7 +130,13 @@ tie; KS null grows as 0.37·√(log t).
 spike: all three scan channels at 0.27–0.33, *below* the quiet series — the
 recantation property, which no streaming statistic has.
 
-**Status.** 12-channel matrix (9 streaming + 3 scan) building; combiner rerun
-next. Kill condition, stated now: if the 12-channel boosted combiner does not
-beat the 9-channel one on grouped CV, the scan channels carry nothing the
-stream did not, and 005 is not submitted.
+**Kill condition, stated before the run:** if the 12-channel boosted combiner
+does not beat the 9-channel one on grouped CV, the scan channels carry nothing
+the stream did not, and 005 is not submitted.
+
+**Result: killed.** 12-channel boosted CV 0.5570 against 9-channel 0.5568 — a
+gain of 0.0002 where the fold spread is ±0.006. The scans alone reach 0.52 as a
+maximum, so they do detect; what they detect, the streaming channels already
+carry. Not submitted. The class stays in the library: a convolutional model
+over the scan surfaces is the natural next attempt, and it starts from these
+channels.
