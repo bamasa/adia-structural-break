@@ -319,3 +319,15 @@ already handled by the kurtosis-widened winsor. Figure:
 never saw transformed input. Full run: rebuild all 50 channels on
 asinh-transformed series, retrain, grouped 5-fold CV against 0.5719 on the
 same folds; adopted only if better on most folds.
+
+**Full run, two verdicts.** As a *replacement* — killed: 0.5689 vs 0.5719,
+better on 2 folds of 5 with wild spread. The quick gate's gain was score
+compression flattering an untrained model, and retraining consumed it: a gate
+run without retraining can only suggest, never adopt. As a *union* — adopted:
+all 100 channels (raw fifty + asinh fifty), **0.5746 vs 0.5719**, ahead on 3
+folds of 5 with the two losses at −0.001 or less. First addition to survive
+the dilution that killed the retro scans, 007 and 009 — because the
+compressed pipeline is not derived from the raw one: its normalisation,
+trend, AR coefficient and thresholds are all fitted on the compressed series,
+so it disagrees with the raw view exactly where heavy tails mislead one of
+them. Submitted as #9.
