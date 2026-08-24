@@ -197,6 +197,74 @@ print(f"рядов со сломом: {len(broken)}, без слома: {len(cle
 print(f"со сломом: медианный AUC внутри ряда {broken.quality.median():.3f}")
 print(f"без слома: медианный финальный счёт {clean.false_alarm.median():.3f}")""")
 
+md("""## Как устроена метрика соревнования — и почему она не про «когда сработала»
+
+Метрика (TS-AUC) сравнивает **разные ряды между собой на одном и том же
+шаге** — а не ряд сам с собой во времени. На каждом шаге t платформа берёт все
+ряды, делит их на «слом уже был» и «слома ещё не было», и спрашивает: стоят ли
+первые по счёту выше вторых? Это AUC одного шага; итог — среднее по шагам
+(с весом по числу сравниваемых пар).
+
+Игрушечный пример — один шаг, четыре ряда:
+
+| ряд | слом уже был? | наш счёт |
+|-----|---------------|----------|
+| A   | да            | 0.08     |
+| B   | нет           | 0.03     |
+| C   | нет           | 0.12     |
+| D   | да            | 0.20     |
+
+Пары «сломанный против чистого»: A>B ✓, A>C ✗ (чистый C обогнал сломанный A!),
+D>B ✓, D>C ✓ → AUC шага = 3/4 = 0.75. Мы потеряли не потому, что A «поздно
+вырос относительно себя», а потому, что нервный чистый C стоит выше честного
+сломанного A. Отсюда два вывода: калибровка счёта не важна (только порядок),
+а ложные тревоги на чистых рядах — прямой убыток.
+
+Внутрирядный AUC из галерей выше — другая, диагностическая величина: для
+одного ряда соревновательная метрика не определена, как «место в забеге» для
+бегуна, бегущего в одиночку. Ниже — сама соревновательная метрика на нашей
+сотне: по шагам и итогом, для всех трёх моделей.""")
+
+code("""# Соревновательная метрика на размеченной сотне: AUC каждого шага
+# (сломанные против чистых на этом шаге) и итог с весом по числу пар —
+# ровно та же конструкция, что на платформе и в нашей кросс-валидации.
+def step_auc(scores_at_t, broken_at_t):
+    pos = scores_at_t[broken_at_t]
+    neg = scores_at_t[~broken_at_t]
+    if len(pos) == 0 or len(neg) == 0:
+        return np.nan, 0
+    ranks = np.concatenate([pos, neg]).argsort().argsort() + 1
+    auc = (ranks[: len(pos)].sum() - len(pos) * (len(pos) + 1) / 2) / (len(pos) * len(neg))
+    return auc, len(pos) * len(neg)
+
+max_t = max(len(r["online"]) for r in records.values())
+fig, ax = plt.subplots(figsize=(11, 4.5))
+totals = {}
+for name, (label, colour) in MODEL_STYLE.items():
+    aucs, weights = [], []
+    for t_step in range(max_t):
+        sc, br = [], []
+        for r in records.values():
+            if t_step < len(r["online"]):
+                sc.append(r["all_scores"][name][t_step])
+                br.append(r["tau"] is not None and t_step >= r["tau"])
+        auc, w = step_auc(np.asarray(sc), np.asarray(br))
+        aucs.append(auc); weights.append(w)
+    aucs = np.asarray(aucs); weights = np.asarray(weights, dtype=float)
+    ok = ~np.isnan(aucs)
+    totals[name] = float((aucs[ok] * weights[ok]).sum() / weights[ok].sum())
+    smooth = pd.Series(aucs).rolling(25, min_periods=1, center=True).mean()
+    ax.plot(smooth, lw=1.4, color=colour,
+            label=f"модель {name}: итог {totals[name]:.4f}")
+ax.axhline(0.5, color="#d93025", lw=0.8, ls="--", label="0.5 — монетка")
+ax.set_xlabel("шаг онлайн-части")
+ax.set_ylabel("AUC шага (сглажено окном 25)")
+ax.set_title("Соревновательная метрика по шагам: где именно модели зарабатывают и теряют")
+ax.legend(loc="lower right", fontsize=8, frameon=True)
+plt.tight_layout(); plt.show()
+print("итоговая метрика на сотне (с весом по парам):",
+      {k: round(v, 4) for k, v in totals.items()})""")
+
 code('''MODEL_STYLE = {
     "005": ("40 каналов", "#5f6368"),
     "006": ("41 канал, +свёрточный", "#1a73e8"),
