@@ -186,6 +186,11 @@ for sid, r in records.items():
         sd=r["sd"], rho=r["rho"], kurt=r["kurt"],
     ))
 table = pd.DataFrame(rows).set_index("id")
+# Глубина отката: насколько счёт 008 умеет спуститься после подъёма.
+table["drawdown"] = [
+    float((np.maximum.accumulate(records[sid]["scores"]) - records[sid]["scores"]).max())
+    for sid in table.index
+]
 broken = table[table.broken].sort_values("quality", ascending=False)
 clean = table[~table.broken].sort_values("false_alarm")
 print(f"рядов со сломом: {len(broken)}, без слома: {len(clean)}")
@@ -295,6 +300,22 @@ md("""## Ряды без слома: ложные тревоги
 
 code("""for sid in list(clean.index)[-3:]:
     show(sid, "  (ложная тревога)")""")
+
+md("""## Отмена тревоги в действии
+
+Ряды, где счёт лучшей модели (008) поднялся — и спустился обратно: «а, нет,
+это был не слом». Старые модели (005/006) этого не умеют: их каналы помнят
+только пик подозрения, и на тех же полосах видно, как их счёт застревает
+наверху. Именно эта разница дала +0.006 на кросс-валидации.""")
+
+code("""# Самый глубокий откат счёта 008 — три ряда без слома и, для контраста,
+# один со сломом: откат до настоящего слома не мешает потом сработать.
+deep_clean = table[~table.broken].sort_values("drawdown", ascending=False)
+for sid in list(deep_clean.index)[:3]:
+    show(sid, "  (отмена тревоги)")
+deep_broken = table[table.broken].sort_values("drawdown", ascending=False)
+for sid in list(deep_broken.index)[:1]:
+    show(sid, "  (откат, а потом настоящий слом)")""")
 
 md("""## Какие ряды трудные
 
