@@ -285,3 +285,37 @@ breaking looks; the channels themselves are already conditioned on the history
 (every threshold is calibrated per-series), so the context arrives
 pre-consumed, and what is left of it is an overfitting surface. A true gated
 mixture over series types would need to beat this bar first.
+
+
+---
+
+## 011 — preprocessing: rolling median killed, asinh promoted to a full run
+
+**Hypothesis (raised looking at spike-driven score jumps).** The detectors
+treat a lone spike as the start of a break; a causal rolling median (windows
+3/5/9) should erase spikes before anything sees them. A log-like squash
+(asinh, defined on negatives) is the smooth alternative.
+
+**Quick gate, before any retraining** — the 008 model applied unchanged to
+transformed input, over the labelled hundred (median within-series AUC on
+broken / median final score on clean, lower better):
+
+| variant   | AUC broken | false score |
+|-----------|-----------|-------------|
+| current   | 0.973     | 0.320       |
+| median 3  | 0.977     | 0.417       |
+| median 5  | 0.981     | 0.466       |
+| median 9  | 0.967     | 0.516       |
+| asinh     | **0.985** | **0.249**   |
+
+**Median: killed at the gate.** False alarms grow monotonically with the
+window (0.32 → 0.52). The filter smooths the *history* too, shrinking the
+fitted scale, and its overlapping windows manufacture serial dependence that
+the cumulative detectors read as drift. The spike it was built to erase is
+already handled by the kurtosis-widened winsor. Figure:
+`scripts/preprocessing_demo.py`.
+
+**asinh: promoted.** Better on both axes simultaneously, on a model that
+never saw transformed input. Full run: rebuild all 50 channels on
+asinh-transformed series, retrain, grouped 5-fold CV against 0.5719 on the
+same folds; adopted only if better on most folds.
