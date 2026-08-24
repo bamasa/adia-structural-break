@@ -3,19 +3,14 @@
 A notebook in a repository rots the moment the model changes, unless the
 notebook is itself generated and executed by a script that lives beside the
 model. This is that script: it writes the cells, runs them against the current
-artefact and the organisers' labelled hundred series, and commits the executed
+artefacts and the organisers' labelled hundred series, and commits the executed
 result — figures embedded, numbers current.
 
-The notebook answers four questions a person forms hypotheses from:
-
-1. What does a series look like, raw and after normalisation, with the true
-   break and the model's reaction on the same axis?
-2. Where does the model do well, averagely, badly — sorted, so the eye goes
-   straight to the failures?
-3. Which *kinds* of series are hard: strong trend, heavy tails, high
-   dependence, late breaks?
-4. How does the score trajectory behave around a break — sharp, sluggish,
-   or absent?
+The notebook's audience is the project owner reading it as a report, so every
+cell of prose, every label and every title is Russian; the repository around
+it stays English. Each figure stacks: the raw series, the normalised stream,
+one narrow panel per strong model (with the model's behaviour on the
+guaranteed-break-free history too), and the component channels.
 """
 
 from __future__ import annotations
@@ -39,18 +34,33 @@ def code(text: str) -> None:
     CELLS.append(("code", text))
 
 
-md("""# Inspecting the detector on the organisers' labelled test series
+md("""# Разбор моделей на размеченной сотне рядов
 
-One hundred series with known break positions, scored by the 40-channel model
-exactly as the platform would run it — one observation at a time, no lookahead.
-Every figure follows the same layout: **raw series** with the true break in
-red, **normalised stream** the detectors actually see, and the **model score**
-with the break marked again. The vertical grey line is the history/online
-boundary.
+Сто рядов с известными позициями сломов, прогнанные ровно так, как это делает
+платформа — по одной точке, без заглядывания вперёд. Оцениваются все три
+сильные модели: **005** (40 каналов), **006** (41, +свёрточный канал),
+**008** (50, +ревертируемые каналы — текущая лучшая).
 
-Sorted galleries first (best, median, worst), then slices by the character of
-the series — trend, dispersion, dependence, tail weight, break position — which
-is where hypotheses about the next model come from.""")
+Каждая картинка устроена одинаково, сверху вниз:
+
+1. **сырой ряд** — серая история (слома нет по условию) и синяя онлайн-часть;
+2. **нормированный ряд** — то, что реально видят детекторы: минус тренд,
+   минус масштаб, обрезка выбросов;
+3. **три узкие полосы — по одной на модель**: счёт от 0 до 1, в том числе на
+   истории (пунктиром) — видно, дёргалась ли модель там, где слома
+   гарантированно нет. Точка — где модель «решила», что слом был; у 008
+   оранжевые треугольники — отмены тревоги;
+4. **компоненты** — отдельные детекторы, из которых складывается счёт.
+
+Вертикальные линии на всех полосах: серая — граница история/онлайн, красная
+пунктирная — истинный слом из разметки.
+
+Счёт на истории — иллюстративный прогон: на платформе модель историю не
+оценивает, и на границе (t = 0) детекторы начинают с чистого листа, как в бою.
+Свёрточный канал на истории не пересчитывается и стоит на 0.5.
+
+Сначала галереи по качеству (лучшие, середина, худшие), затем срезы по
+характеру ряда — оттуда берутся гипотезы для следующей модели.""")
 
 code("""import sys, json, warnings
 from pathlib import Path
@@ -61,31 +71,30 @@ import matplotlib.pyplot as plt
 warnings.filterwarnings("ignore")
 
 WS = Path("../../structural-break-real-time-test")
-sys.path.insert(0, str(WS))  # the submission module, exactly as shipped
+sys.path.insert(0, str(WS))
 
 import importlib.util
 spec = importlib.util.spec_from_file_location(
     "submission", Path("../submissions/008-reverting-channels/main.py")
 )
 submission = importlib.util.module_from_spec(spec)
-# Registered before execution: the module defines dataclasses, and dataclass
-# field resolution looks itself up in sys.modules -- an unregistered module
-# crashes there with an AttributeError three frames deep.
+# Регистрация до исполнения: модуль объявляет dataclass-ы, а разрешение их
+# полей ищет модуль в sys.modules — без регистрации падает с AttributeError.
 sys.modules["submission"] = submission
 spec.loader.exec_module(submission)
 
 x = pd.read_parquet(WS / "data/X_test.reduced.parquet")
 y = pd.read_parquet(WS / "data/y_test.reduced.parquet")
 models = {
-    "005": joblib.load("../../model005_backup.joblib")["booster"],   # 40 каналов
-    "006": joblib.load("../../model006.joblib")["booster"],          # 41, +CNN
-    "008": joblib.load("../../resources008/model.joblib")["booster"],  # 50, +ревертируемые
+    "005": joblib.load("../../model005_backup.joblib")["booster"],    # 40 каналов
+    "006": joblib.load("../../model006.joblib")["booster"],           # 41, +CNN
+    "008": joblib.load("../../resources008/model.joblib")["booster"], # 50, +ревертируемые
 }
 model = models["008"]  # лучшая: сортировка и метрики считаются по ней
-print(f"{x.index.get_level_values(0).nunique()} series; models:",
+print(f"рядов: {x.index.get_level_values(0).nunique()}; каналов у моделей:",
       {k: m.n_features_ for k, m in models.items()})""")
 
-code("""# Score every series step by step, storing everything the figures need.
+code("""# Прогоняем каждый ряд по шагам и складываем всё, что нужно картинкам.
 records = {}
 for sid, part in x.groupby(level="id"):
     hist = part.loc[part.period == 1, "value"].to_numpy()
@@ -93,6 +102,8 @@ for sid, part in x.groupby(level="id"):
     if len(online) == 0:
         continue
     labels = y.loc[sid, "target"].to_numpy()
+
+    # Онлайн-прогон — ровно как на платформе.
     monitor = submission.Monitor(hist)
     channels = np.asarray([monitor.update(float(v)) for v in online])
     # Первые 40 колонок — вектор 005, первые 41 — 006: порядок каналов только
@@ -102,6 +113,19 @@ for sid, part in x.groupby(level="id"):
         for name, m in models.items()
     }
     scores = all_scores["008"]
+
+    # Иллюстративный прогон по истории: те же детекторы, шаги -n..-1, тренд
+    # снимается в своей точке. На платформе этого прогона нет; свёрточный
+    # канал здесь не пересчитывается и стоит на 0.5.
+    playback = submission.Monitor(hist)
+    playback._step = -len(hist)
+    playback._previous_z = 0.0
+    hist_channels = np.asarray([playback.update(float(v)) for v in hist])
+    hist_scores = {
+        name: m.predict_proba(hist_channels[:, : m.n_features_])[:, 1]
+        for name, m in models.items()
+    }
+
     norm = monitor.norm
     z_online = np.asarray(
         [norm.clip(norm.standardise(float(v), i)) for i, v in enumerate(online)]
@@ -110,16 +134,17 @@ for sid, part in x.groupby(level="id"):
         [norm.clip(norm.standardise(float(v), -len(hist) + i)) for i, v in enumerate(hist)]
     )
     tau = int(labels.argmax()) if labels.max() > 0 else None
-    # Where the model itself calls the break: the first step at which the score
-    # crosses half of its own maximum on this series. A display convention, not
-    # part of the metric -- the metric never asks for a point -- but a figure
-    # without it leaves the reader guessing where the purple line "decided".
+
+    # Где модель сама «решила», что слом был: первый шаг, на котором её счёт
+    # пересёк половину своего максимума по этому ряду. Условность для глаза —
+    # метрика точку не спрашивает.
     detected_by = {}
     for name, sc in all_scores.items():
         peak = float(sc.max())
         crossed = np.flatnonzero(sc >= 0.5 * peak) if peak > 0 else []
         detected_by[name] = int(crossed[0]) if len(crossed) else None
     detected = detected_by["008"]
+
     # Отмена тревоги (умеет только 008): счёт падает ниже половины своего
     # достигнутого максимума после того, как тревога была поднята всерьёз.
     running = np.maximum.accumulate(scores)
@@ -128,20 +153,21 @@ for sid, part in x.groupby(level="id"):
     cross_down = below & ~np.roll(below, 1) & alarmed
     cross_down[0] = False
     cancellations = np.flatnonzero(cross_down)
+
     records[int(sid)] = dict(
         hist=hist, online=online, z=z_online, z_hist=z_hist, scores=scores,
         channels=channels,
         labels=labels, tau=tau, detected=detected,
-        all_scores=all_scores, detected_by=detected_by, cancellations=cancellations,
+        all_scores=all_scores, hist_scores=hist_scores,
+        detected_by=detected_by, cancellations=cancellations,
         slope=norm.slope, sd=norm.sd, rho=norm.rho, kurt=norm.kurtosis,
     )
-print(f"scored {len(records)} series")""")
+print(f"прогнано рядов: {len(records)}")""")
 
-code("""# Per-series quality. For a broken series: the within-series AUC of the score
-# against the per-step label -- does the score rank post-break steps above
-# pre-break ones. For an unbroken series: the false-alarm level, taken as the
-# final score (lower is better). The two are different questions, so the
-# galleries are sorted separately.
+code("""# Качество по рядам. Для ряда со сломом: AUC внутри ряда — ставит ли счёт
+# шаги после слома выше шагов до. Для ряда без слома: уровень ложной тревоги,
+# взятый как финальный счёт (ниже — лучше). Вопросы разные, поэтому галереи
+# сортируются раздельно. Всё считается по лучшей модели (008).
 def within_auc(scores, labels):
     pos, neg = scores[labels == 1], scores[labels == 0]
     if len(pos) == 0 or len(neg) == 0:
@@ -160,58 +186,63 @@ for sid, r in records.items():
         sd=r["sd"], rho=r["rho"], kurt=r["kurt"],
     ))
 table = pd.DataFrame(rows).set_index("id")
-print(table.groupby("broken").size())
 broken = table[table.broken].sort_values("quality", ascending=False)
 clean = table[~table.broken].sort_values("false_alarm")
-print(f"broken: median within-series AUC {broken.quality.median():.3f}")
-print(f"clean:  median final score {clean.false_alarm.median():.3f}")""")
+print(f"рядов со сломом: {len(broken)}, без слома: {len(clean)}")
+print(f"со сломом: медианный AUC внутри ряда {broken.quality.median():.3f}")
+print(f"без слома: медианный финальный счёт {clean.false_alarm.median():.3f}")""")
 
-code('''def show(sid, title_extra=""):
+code('''MODEL_STYLE = {
+    "005": ("40 каналов", "#5f6368"),
+    "006": ("41 канал, +свёрточный", "#1a73e8"),
+    "008": ("50 каналов, +ревертируемые — ЛУЧШАЯ", "#7b1fa2"),
+}
+
+def show(sid, title_extra=""):
     r = records[sid]
     hist, online, z, scores, tau = r["hist"], r["online"], r["z"], r["scores"], r["tau"]
     z_hist, detected = r["z_hist"], r["detected"]
-    all_scores, detected_by = r["all_scores"], r["detected_by"]
-    cancellations = r["cancellations"]
+    all_scores, hist_scores = r["all_scores"], r["hist_scores"]
+    detected_by, cancellations = r["detected_by"], r["cancellations"]
     n_h = len(hist)
     ch = r["channels"]
-    fig, axes = plt.subplots(4, 1, figsize=(11, 8.6), sharex=True,
-                             gridspec_kw=dict(height_ratios=[2, 1.4, 1.4, 1.6]))
+    fig, axes = plt.subplots(6, 1, figsize=(11, 11), sharex=True,
+                             gridspec_kw=dict(height_ratios=[2, 1.2, 0.75, 0.75, 0.95, 1.5]))
     t_hist = np.arange(-n_h, 0)
     t_on = np.arange(len(online))
+
     axes[0].plot(t_hist[-600:], hist[-600:], lw=0.6, color="#9aa0a6",
                  label="история (слома нет по условию)")
     axes[0].plot(t_on, online, lw=0.8, color="#1a73e8",
                  label="онлайн-часть (приходит по одной точке)")
     axes[0].set_ylabel("сырой ряд")
+
     axes[1].plot(t_hist[-600:], z_hist[-600:], lw=0.6, color="#9aa0a6",
                  label="история после нормировки (для сравнения масштаба)")
     axes[1].plot(t_on, z, lw=0.8, color="#188038",
                  label="онлайн после нормировки: минус тренд, минус масштаб, обрезка выбросов")
     axes[1].axhline(0, color="grey", lw=0.5)
     axes[1].set_ylabel("нормированный")
-    model_style = {
-        "005": ("40 каналов", "#9aa0a6", 0.9),
-        "006": ("41 канал, +CNN", "#1a73e8", 1.0),
-        "008": ("50 каналов, +ревертируемые — ЛУЧШАЯ", "#7b1fa2", 1.6),
-    }
-    for name, (label, colour, width) in model_style.items():
-        sc = all_scores[name]
-        axes[2].plot(t_on, sc, lw=width, color=colour,
-                     label=f"модель {name} ({label})")
+
+    # По узкой полосе на модель: счёт на истории пунктиром, онлайн сплошной,
+    # точка — где эта модель сработала, у 008 — треугольники отмен тревоги.
+    for k, (name, (label, colour)) in enumerate(MODEL_STYLE.items()):
+        ax = axes[2 + k]
+        sc, hs = all_scores[name], hist_scores[name]
+        ax.plot(t_hist[-600:], hs[-600:], lw=0.8, color=colour, ls=":", alpha=0.7,
+                label="на истории (иллюстративно)")
+        ax.plot(t_on, sc, lw=1.3, color=colour, label=f"модель {name}: {label}")
         if detected_by[name] is not None:
-            axes[2].plot(detected_by[name], sc[detected_by[name]], "o",
-                         ms=6, color=colour, zorder=5)
-    if len(cancellations):
-        axes[2].plot(cancellations, scores[cancellations], "v", ms=9,
-                     color="#f9ab00", zorder=6,
-                     label="ОТМЕНА тревоги (008): счёт упал ниже половины максимума")
-    axes[2].set_ylim(-0.02, 1.02)
-    axes[2].set_ylabel("счёт моделей")
-    axes[2].set_title("точка на линии — где эта модель сработала"
-                      " (первое пересечение половины своего максимума)",
-                      fontsize=8, loc="right")
-    # Individual components feeding the combiner: each is a 0..1 score of its
-    # own, so they share one axis and one can see who raised the alarm.
+            d = detected_by[name]
+            ax.plot(d, sc[d], "o", ms=6, color=colour, zorder=5,
+                    label="здесь модель сработала")
+            ax.axvline(d, color=colour, lw=0.8, alpha=0.35)
+        if name == "008" and len(cancellations):
+            ax.plot(cancellations, sc[cancellations], "v", ms=8,
+                    color="#f9ab00", zorder=6, label="ОТМЕНА тревоги")
+        ax.set_ylim(-0.02, 1.02)
+        ax.set_ylabel(name)
+
     comp = [
         ("CUSUM (сдвиг уровня, макс. по 3 видам)", ch[:, [0, 3, 6]].max(axis=1), "#1a73e8"),
         ("Page-Hinkley (медленный дрейф)", ch[:, [1, 4, 7]].max(axis=1), "#188038"),
@@ -221,86 +252,86 @@ code('''def show(sid, title_extra=""):
         ("Ретроскан лучшего разбиения", ch[:, 33], "#5f6368"),
     ]
     for name, series_c, colour in comp:
-        axes[3].plot(t_on, series_c, lw=1.0, color=colour, label=name, alpha=0.9)
-    axes[3].set_ylim(-0.02, 1.02)
-    axes[3].set_ylabel("компоненты")
-    axes[3].set_xlabel("шаг онлайн-части (история — при отрицательных t)")
+        axes[5].plot(t_on, series_c, lw=1.0, color=colour, label=name, alpha=0.9)
+    axes[5].set_ylim(-0.02, 1.02)
+    axes[5].set_ylabel("компоненты")
+    axes[5].set_xlabel("шаг онлайн-части (история — при отрицательных t)")
+
     for k, ax in enumerate(axes):
         ax.axvline(0, color="grey", lw=1.0, alpha=0.6,
                    label="граница история/онлайн" if k == 0 else None)
         if tau is not None:
             ax.axvline(tau, color="#d93025", lw=1.2, ls="--",
                        label="ИСТИННЫЙ слом (разметка)" if k == 0 else None)
-        if detected is not None:
-            ax.axvline(detected, color="#f9ab00", lw=1.6, alpha=0.9,
-                       label="МОДЕЛЬ решила: слом был (первое пересечение половины"
-                             " своего максимума)" if k == 0 else None)
-        ax.legend(loc="upper left", fontsize=7 if k >= 2 else 8, ncols=2 if k >= 2 else 1,
+        ax.legend(loc="upper left", fontsize=7, ncols=2 if k in (0, 1, 5) else 3,
                   frameon=True, framealpha=0.85)
     q = table.loc[sid]
-    status = f"break at {tau}" if tau is not None else "no break"
-    metric = (f"within-series AUC {q.quality:.3f}" if tau is not None
-              else f"final score {q.false_alarm:.3f}")
-    fig.suptitle(f"series {sid} — {status} — {metric}{title_extra}", y=0.995)
+    status = f"слом на шаге {tau}" if tau is not None else "слома нет"
+    metric = (f"AUC внутри ряда {q.quality:.3f}" if tau is not None
+              else f"финальный счёт {q.false_alarm:.3f}")
+    fig.suptitle(f"ряд {sid} — {status} — {metric}{title_extra}", y=0.995)
     plt.tight_layout()
     plt.show()''')
 
-md("""## Broken series: best, median, worst
+md("""## Ряды со сломом: лучшие, середина, худшие
 
-Red dashed line — the true break. The question for each figure: does the score
-climb *at* the line, later, or never.""")
+Красный пунктир — истинный слом. Вопрос к каждой картинке: счёт поднимается
+*на* красной линии, позже — или вообще не поднимается.""")
 
 code("""ids = list(broken.index)
 for sid in ids[:3]:
-    show(sid, "  (best)")""")
+    show(sid, "  (лучшие)")""")
 code("""mid = len(ids) // 2
 for sid in ids[mid - 1 : mid + 2]:
-    show(sid, "  (median)")""")
+    show(sid, "  (середина)")""")
 code("""for sid in ids[-3:]:
-    show(sid, "  (worst — where the model loses most)")""")
+    show(sid, "  (худшие — здесь модель теряет больше всего)")""")
 
-md("""## Unbroken series: the false alarms
+md("""## Ряды без слома: ложные тревоги
 
-No red line exists; anything the score does here is a mistake. The three
-highest-scoring clean series are the model's worst false alarms.""")
+Красной линии не существует; всё, что счёт здесь делает, — ошибка. Три чистых
+ряда с самым высоким финальным счётом — худшие ложные тревоги модели. Здесь же
+видно главное умение 008: поднятая по ошибке тревога может быть отменена.""")
 
 code("""for sid in list(clean.index)[-3:]:
-    show(sid, "  (false alarm)")""")
+    show(sid, "  (ложная тревога)")""")
 
-md("""## Which kinds of series are hard
+md("""## Какие ряды трудные
 
-Median within-series AUC of the broken series, split at the median of each
-history property. A large gap names a hypothesis; a flat pair says that axis
-does not matter.""")
+Медианный AUC внутри ряда (по рядам со сломом), с разбиением каждой оси на
+половины по медиане. Большой зазор между столбиками — готовая гипотеза;
+одинаковые столбики — эта ось не важна.""")
 
 code("""splits = {}
 b = table[table.broken]
-for col, name in [("trend", "trend strength"), ("sd", "dispersion"),
-                  ("rho", "autocorrelation"), ("kurt", "tail weight"),
-                  ("tau", "break position"), ("n_online", "online length")]:
+for col, name in [("trend", "сила тренда"), ("sd", "разброс"),
+                  ("rho", "автокорреляция"), ("kurt", "тяжесть хвостов"),
+                  ("tau", "позиция слома"), ("n_online", "длина онлайн-части")]:
     m = b[col].median()
     low, high = b[b[col] <= m], b[b[col] > m]
     splits[name] = (low.quality.median(), high.quality.median(), m)
-frame = pd.DataFrame(splits, index=["low half", "high half", "split at"]).T
+frame = pd.DataFrame(splits, index=["нижняя половина", "верхняя половина", "порог (медиана)"]).T
 display(frame.round(3))
 
 fig, ax = plt.subplots(figsize=(9, 4))
 xpos = np.arange(len(frame))
-ax.bar(xpos - 0.18, frame["low half"], width=0.36, label="low half", color="#9aa0a6")
-ax.bar(xpos + 0.18, frame["high half"], width=0.36, label="high half", color="#1a73e8")
+ax.bar(xpos - 0.18, frame["нижняя половина"], width=0.36,
+       label="нижняя половина", color="#9aa0a6")
+ax.bar(xpos + 0.18, frame["верхняя половина"], width=0.36,
+       label="верхняя половина", color="#1a73e8")
 ax.set_xticks(xpos, frame.index, rotation=20)
-ax.set_ylabel("медианный AUC внутри ряда; выше = лучше отделяет до/после")
+ax.set_ylabel("медианный AUC внутри ряда; выше = лучше")
 ax.axhline(0.5, color="#d93025", lw=0.8, ls="--")
 ax.legend(frameon=False)
-ax.set_title("Where the detector is strong and where it is blind")
+ax.set_title("Где детектор силён, а где слеп")
 plt.tight_layout(); plt.show()""")
 
-md("""## Reading list for the next model
+md("""## Что читать из этого дальше
 
-The bars above are the hypothesis generator: every axis with a visible gap is a
-question — what channel would close it — and every worst-gallery figure is a
-concrete series to reason about. The notebook regenerates from
-`scripts/build_analysis_notebook.py`; edits belong there.""")
+Столбики выше — генератор гипотез: каждая ось с видимым зазором — вопрос,
+какой канал его закроет; каждая картинка из «худших» — конкретный ряд, о
+котором стоит подумать. Блокнот пересобирается скриптом
+`scripts/build_analysis_notebook.py`; правки — только там.""")
 
 
 def main() -> None:
@@ -319,7 +350,7 @@ def main() -> None:
                                 resources={"metadata": {"path": str(TARGET.parent)}})
         client.execute()
     nbf.write(nb, TARGET)
-    print(f"{'executed and ' if execute else ''}written -> {TARGET}")
+    print(f"executed and written -> {TARGET}" if execute else f"written -> {TARGET}")
 
 
 if __name__ == "__main__":
