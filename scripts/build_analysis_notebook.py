@@ -65,7 +65,7 @@ sys.path.insert(0, str(WS))  # the submission module, exactly as shipped
 
 import importlib.util
 spec = importlib.util.spec_from_file_location(
-    "submission", Path("../submissions/005-forty-channels/main.py")
+    "submission", Path("../submissions/008-reverting-channels/main.py")
 )
 submission = importlib.util.module_from_spec(spec)
 # Registered before execution: the module defines dataclasses, and dataclass
@@ -76,8 +76,14 @@ spec.loader.exec_module(submission)
 
 x = pd.read_parquet(WS / "data/X_test.reduced.parquet")
 y = pd.read_parquet(WS / "data/y_test.reduced.parquet")
-model = joblib.load("../../model005_backup.joblib")["booster"]
-print(f"{x.index.get_level_values(0).nunique()} series, model with {model.n_features_} channels")""")
+models = {
+    "005": joblib.load("../../model005_backup.joblib")["booster"],   # 40 каналов
+    "006": joblib.load("../../model006.joblib")["booster"],          # 41, +CNN
+    "008": joblib.load("../../resources008/model.joblib")["booster"],  # 50, +ревертируемые
+}
+model = models["008"]  # лучшая: сортировка и метрики считаются по ней
+print(f"{x.index.get_level_values(0).nunique()} series; models:",
+      {k: m.n_features_ for k, m in models.items()})""")
 
 code("""# Score every series step by step, storing everything the figures need.
 records = {}
@@ -89,7 +95,13 @@ for sid, part in x.groupby(level="id"):
     labels = y.loc[sid, "target"].to_numpy()
     monitor = submission.Monitor(hist)
     channels = np.asarray([monitor.update(float(v)) for v in online])
-    scores = model.predict_proba(channels)[:, 1]
+    # Первые 40 колонок — вектор 005, первые 41 — 006: порядок каналов только
+    # дописывался в конец, так что одна прогонка кормит все модели.
+    all_scores = {
+        name: m.predict_proba(channels[:, : m.n_features_])[:, 1]
+        for name, m in models.items()
+    }
+    scores = all_scores["008"]
     norm = monitor.norm
     z_online = np.asarray(
         [norm.clip(norm.standardise(float(v), i)) for i, v in enumerate(online)]
@@ -102,13 +114,25 @@ for sid, part in x.groupby(level="id"):
     # crosses half of its own maximum on this series. A display convention, not
     # part of the metric -- the metric never asks for a point -- but a figure
     # without it leaves the reader guessing where the purple line "decided".
-    peak = float(scores.max())
-    crossed = np.flatnonzero(scores >= 0.5 * peak) if peak > 0 else []
-    detected = int(crossed[0]) if len(crossed) else None
+    detected_by = {}
+    for name, sc in all_scores.items():
+        peak = float(sc.max())
+        crossed = np.flatnonzero(sc >= 0.5 * peak) if peak > 0 else []
+        detected_by[name] = int(crossed[0]) if len(crossed) else None
+    detected = detected_by["008"]
+    # Отмена тревоги (умеет только 008): счёт падает ниже половины своего
+    # достигнутого максимума после того, как тревога была поднята всерьёз.
+    running = np.maximum.accumulate(scores)
+    alarmed = running >= 0.6 * float(scores.max()) if scores.max() > 0 else running > 1
+    below = scores < 0.5 * running
+    cross_down = below & ~np.roll(below, 1) & alarmed
+    cross_down[0] = False
+    cancellations = np.flatnonzero(cross_down)
     records[int(sid)] = dict(
         hist=hist, online=online, z=z_online, z_hist=z_hist, scores=scores,
         channels=channels,
         labels=labels, tau=tau, detected=detected,
+        all_scores=all_scores, detected_by=detected_by, cancellations=cancellations,
         slope=norm.slope, sd=norm.sd, rho=norm.rho, kurt=norm.kurtosis,
     )
 print(f"scored {len(records)} series")""")
@@ -146,6 +170,8 @@ code('''def show(sid, title_extra=""):
     r = records[sid]
     hist, online, z, scores, tau = r["hist"], r["online"], r["z"], r["scores"], r["tau"]
     z_hist, detected = r["z_hist"], r["detected"]
+    all_scores, detected_by = r["all_scores"], r["detected_by"]
+    cancellations = r["cancellations"]
     n_h = len(hist)
     ch = r["channels"]
     fig, axes = plt.subplots(4, 1, figsize=(11, 8.6), sharex=True,
@@ -163,10 +189,27 @@ code('''def show(sid, title_extra=""):
                  label="онлайн после нормировки: минус тренд, минус масштаб, обрезка выбросов")
     axes[1].axhline(0, color="grey", lw=0.5)
     axes[1].set_ylabel("нормированный")
-    axes[2].plot(t_on, scores, lw=1.4, color="#7b1fa2",
-                 label="счёт модели: уверенность, что слом уже был (0..1)")
+    model_style = {
+        "005": ("40 каналов", "#9aa0a6", 0.9),
+        "006": ("41 канал, +CNN", "#1a73e8", 1.0),
+        "008": ("50 каналов, +ревертируемые — ЛУЧШАЯ", "#7b1fa2", 1.6),
+    }
+    for name, (label, colour, width) in model_style.items():
+        sc = all_scores[name]
+        axes[2].plot(t_on, sc, lw=width, color=colour,
+                     label=f"модель {name} ({label})")
+        if detected_by[name] is not None:
+            axes[2].plot(detected_by[name], sc[detected_by[name]], "o",
+                         ms=6, color=colour, zorder=5)
+    if len(cancellations):
+        axes[2].plot(cancellations, scores[cancellations], "v", ms=9,
+                     color="#f9ab00", zorder=6,
+                     label="ОТМЕНА тревоги (008): счёт упал ниже половины максимума")
     axes[2].set_ylim(-0.02, 1.02)
-    axes[2].set_ylabel("счёт модели")
+    axes[2].set_ylabel("счёт моделей")
+    axes[2].set_title("точка на линии — где эта модель сработала"
+                      " (первое пересечение половины своего максимума)",
+                      fontsize=8, loc="right")
     # Individual components feeding the combiner: each is a 0..1 score of its
     # own, so they share one axis and one can see who raised the alarm.
     comp = [
@@ -192,7 +235,7 @@ code('''def show(sid, title_extra=""):
             ax.axvline(detected, color="#f9ab00", lw=1.6, alpha=0.9,
                        label="МОДЕЛЬ решила: слом был (первое пересечение половины"
                              " своего максимума)" if k == 0 else None)
-        ax.legend(loc="upper left", fontsize=7 if k == 3 else 8, ncols=2 if k == 3 else 1,
+        ax.legend(loc="upper left", fontsize=7 if k >= 2 else 8, ncols=2 if k >= 2 else 1,
                   frameon=True, framealpha=0.85)
     q = table.loc[sid]
     status = f"break at {tau}" if tau is not None else "no break"
