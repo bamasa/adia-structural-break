@@ -263,3 +263,25 @@ of 008 already recant, and what remains of it is dilution. Same verdict as the
 retro scans and 007, with a sharper mechanism this time: two fixes for one
 disease do not stack. The module stays (rankview.py) — it is the better of the
 two fixes for any future channel set that lacks 008's.
+
+
+---
+
+## 010 — killed: series context as features
+
+**Hypothesis.** The combiner never sees what kind of series it is watching:
+the history's autocorrelation, kurtosis, length and scale, and the step index
+were features of the early 15-column set but never entered the 40-channel
+build. Handing them to the trees is the cheap version of a mixture-of-experts:
+a split on kurtosis *is* a per-type model choice.
+
+**Kill condition, stated before the run:** grouped 5-fold CV, 50 vs 56
+channels on the same folds; adopted only if better on most folds.
+
+**Result: killed — worse on 3 folds of 5** (0.5681 vs 0.5719), and the fold
+spread widened from ±0.005 to ±0.011 in both directions. The context lets the
+model memorise which series types break in the training folds rather than how
+breaking looks; the channels themselves are already conditioned on the history
+(every threshold is calibrated per-series), so the context arrives
+pre-consumed, and what is left of it is an overfitting surface. A true gated
+mixture over series types would need to beat this bar first.
