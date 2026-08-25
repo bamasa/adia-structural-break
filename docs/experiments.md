@@ -374,3 +374,14 @@ fast EWMA, slow EWMA, running peak, instantaneous.
 
 **Kill condition, stated before the run:** grouped 5-fold CV over the current
 base on the same folds; adopted only if better on most folds.
+
+**Result: adopted — better on 4 folds of 5.** Standalone the channels are the
+strongest single signals the project has produced: the running peak of the
+prediction error reaches TS-AUC 0.5586 alone — a whisker from the full
+nine-channel model of 004 (0.5568), far above the CNN (0.5315) and the 007
+classifier (0.5353). In ensemble: 100 channels 0.5746 → 104 channels
+**0.5779** (+0.0070, −0.0018, +0.0022, +0.0035, +0.0057). Unlike 007 it
+survives dilution because it asks a question no statistic channel asks:
+whether the *dynamics* remain forecastable, not whether the *distribution*
+matches. Submitted as #10, with the pretrained forecaster shipped in the
+artifact and the per-series finetune running at inference time.
