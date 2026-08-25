@@ -72,6 +72,9 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | 011 | every channel twice — raw and asinh-compressed pipelines side by side (100 channels) | **0.5746** vs 0.5719, ahead on 3 of 5, losses ≤0.001 | cloud |
 | — | 012: explicit reversion-depth channels (now − peak, 42 diffs) | 0.5754 vs 0.5746 | **killed by pre-stated condition**: better on 2 folds of 5 — the trees already extract recession from the peak/now pairs |
 | 013 | + a forecaster: LightGBM predicts each next deviation-from-trailing-mean, pretrained on all histories, finetuned per series; the standardised prediction error is the channel (104 total) | **0.5779** vs 0.5746, ahead on 4 of 5 | cloud |
+| — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |
+| — | 015: forecaster horizons 1+5 and signed error | 0.5751 vs 0.5779 | **killed by pre-stated condition**: the extensions dilute the compact four channels |
+| 016 | peak-hold on the output: the score rides its running maximum, draining 0.1%/step | **0.5799** vs 0.5779, ahead on 4 of 5 | cloud |
 
 The augmentation pipeline (`augment.py`) survives its first product; the next
 target, per the inspection notebook, is cross-sectional discrimination — clean

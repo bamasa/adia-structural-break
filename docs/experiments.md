@@ -410,3 +410,26 @@ forecaster says the series is predictable again, hold it otherwise.
 **Kill condition, stated before all runs:** grouped 5-fold CV against 0.5779
 on the same folds; a variant is adopted only if better on most folds. The
 best survivor is submitted.
+
+**Results.**
+
+*014, the deviation view: killed.* Alone its fifty channels reach 0.5316 by
+maximum; over the base, 0.5762 vs 0.5779, behind on 3 folds. The forecaster
+already lives on this representation and had extracted what it holds — the
+detectors on deviations are its paler copy.
+
+*015, the extended forecaster: killed.* Horizon 5 is strong alone (0.5561,
+nearly the horizon-1 peak), but 100+E8 lands at 0.5751, behind on 4 folds:
+the extra horizons and the signed error dilute the compact four channels of
+013. The everything-together 162-channel run (0.5756) confirms two losers do
+not make a winner.
+
+*016, how to combine: the peak-hold is adopted.* Weighted sum (0.5608 on the
+first fold) and plain maximum (0.5401) lose to boosting outright. But holding
+the *output* score at its running maximum with a 0.1%-per-step drain lifts
+every number: **0.5799 vs 0.5779**, ahead on 4 folds of 5 (α=0.995 is ahead
+on all five at 0.5795). Gating the release by the forecaster's own normality
+also beats the base but loses to the plain hold. The instructive part: the
+channels underneath revert fast (008), the output holds its peak — attack
+and release live at different layers, and the metric pays for both. Submitted
+as #11 — the models of #10 untouched, one line of inference added.
