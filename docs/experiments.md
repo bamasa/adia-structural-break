@@ -385,3 +385,28 @@ survives dilution because it asks a question no statistic channel asks:
 whether the *dynamics* remain forecastable, not whether the *distribution*
 matches. Submitted as #10, with the pretrained forecaster shipped in the
 artifact and the per-series finetune running at inference time.
+
+
+---
+
+## 014–016 — planned: the combination sweep
+
+**014 — the deviation view.** The full 50-channel pipeline (detectors with
+their reverting counterparts, the EWMA bank, the retrospective verdicts, the
+convolution) applied to a third representation: each point's deviation from
+the trailing ten-point mean, levels discarded. The forecaster proved the
+representation carries signal; this hands it to every algorithm we own.
+
+**015 — the forecaster, extended.** Horizons 1 and 5 (a slow break invisible
+one step ahead is visible five ahead), plus the *signed* error smoothed — a
+forecaster that keeps missing on the same side has found a trend change.
+
+**016 — how to combine.** Boosted trees against a weighted sum, a plain
+maximum ("at least one fired"), and asymmetric post-processing of the
+combiner's own score: fast attack with slow release (peak-hold with decay),
+and release gated by a different algorithm — drain the alarm quickly when the
+forecaster says the series is predictable again, hold it otherwise.
+
+**Kill condition, stated before all runs:** grouped 5-fold CV against 0.5779
+on the same folds; a variant is adopted only if better on most folds. The
+best survivor is submitted.
