@@ -331,3 +331,39 @@ compressed pipeline is not derived from the raw one: its normalisation,
 trend, AR coefficient and thresholds are all fitted on the compressed series,
 so it disagrees with the raw view exactly where heavy tails mislead one of
 them. Submitted as #9.
+
+
+---
+
+## 012 — planned: explicit reversion-depth channels
+
+**Hypothesis** (from the cancellation report, scripts/cancellation_report.py:
+across the labelled hundred the median peak-to-final drop on clean series is
+just 12%, and strict cancellations — score below half its peak — number three.
+The recanting works, but timidly). Trees split on one feature at a time and
+cannot subtract, so "how far has the evidence receded from its peak" must be
+assembled indirectly. Hand it over directly: now-minus-peak differences for
+all nine detectors and current-minus-peak for all twelve EWMA scales, in both
+views — 42 channels, all computable from the existing matrices.
+
+**Kill condition, stated before the run:** grouped 5-fold CV, 142 vs 100
+channels on the same folds; adopted only if better on most folds.
+
+---
+
+## 013 — planned: prediction-error channels (pretrained + per-series forecaster)
+
+**Hypothesis.** Every current channel asks "does the stream look like its
+history's statistics". A forecaster asks the stronger question: "is the next
+value *predictable* from the recent past the way the history was". The series
+is standardised, turned into deviations from a trailing mean (window 10) —
+levels are discarded, as in the trading pipeline — and a small LightGBM
+regressor predicts each next deviation from its lags: pretrained on all
+histories, then finetuned on each series' own break-free history, where its
+residual scale σ is measured. Online, |actual − predicted|/σ is the channel:
+it rises while the series stops being predictable and falls back once it is
+again — reversible by construction, an organic cancel/re-arm. Four channels:
+fast EWMA, slow EWMA, running peak, instantaneous.
+
+**Kill condition, stated before the run:** grouped 5-fold CV over the current
+base on the same folds; adopted only if better on most folds.
