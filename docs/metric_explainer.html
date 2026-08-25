@@ -1,0 +1,79 @@
+<!DOCTYPE html><html lang="ru"><head><meta charset="utf-8">
+<title>Метрика соревнования на пальцах</title>
+<style>
+body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:760px;margin:2rem auto;padding:0 1rem;color:#202124;}
+h1{font-size:22px;} .muted{color:#5f6368;font-size:14px;line-height:1.6;}
+.cards{display:flex;gap:12px;flex-wrap:wrap;margin:1rem 0;}
+.card{background:#f1f3f4;border-radius:8px;padding:10px 16px;flex:1;min-width:150px;}
+.card .l{font-size:13px;color:#5f6368;} .card .v{font-size:20px;font-weight:600;}
+.rowbar{display:flex;align-items:center;gap:10px;margin:5px 0;}
+.rowbar .track{flex:1;background:#f1f3f4;border-radius:4px;height:24px;position:relative;}
+.rowbar .fill{height:100%;border-radius:4px;}
+.rowbar .tag{position:absolute;left:8px;top:3px;font-size:12px;}
+input[type=range]{width:100%;}
+</style></head><body>
+<h1>Метрика соревнования на пальцах</h1>
+<p class="muted">Мы сдаём числа, но оценивается фактически <b>сортировка рядов на каждом шаге</b>:
+ряды, где слом уже был (оранжевые), должны стоять выше рядов без слома (зелёные).
+Оценка шага — доля правильных пар «сломанный выше чистого»; итог — среднее по шагам.
+Подвигайте шаг и снимите галочку отмены — увидите, как ложный всплеск без отмены
+застревает наверху и съедает итоговую метрику.</p>
+
+<label style="font-size:14px"><input type="checkbox" id="cancel" checked> модель умеет отменять тревогу</label>
+<div style="display:flex;align-items:center;gap:10px;margin:0.6rem 0;">
+  <span class="muted">Шаг</span><input type="range" min="1" max="20" step="1" value="6" id="st">
+  <b id="stout">6</b></div>
+<svg id="chart" viewBox="0 0 720 260" width="100%"></svg>
+<div id="rows"></div>
+<div class="cards">
+ <div class="card"><div class="l">Оценка этого шага</div><div class="v" id="sc">—</div></div>
+ <div class="card"><div class="l">Итог за шаги 1–20</div><div class="v" id="tot">—</div></div>
+ <div class="card"><div class="l">Итог, если отмены нет</div><div class="v" id="tot0">—</div></div>
+</div>
+<p class="muted" id="expl"></p>
+<script>
+const D={"n": 20, "sticky": [0.06, 0.06, 0.06, 0.55, 0.55, 0.55, 0.55, 0.55, 0.55, 0.55, 0.55, 0.55, 0.55, 0.55, 0.55, 0.55, 0.55, 0.55, 0.55, 0.55], "cancel": [0.06, 0.06, 0.06, 0.55, 0.55, 0.55, 0.46, 0.37, 0.28, 0.19, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1], "series": [{"name": "А — слом на 5, быстрая реакция", "tau": 5, "color": "#D85A30", "s": [0.05, 0.05, 0.05, 0.05, 0.19, 0.28, 0.37, 0.46, 0.55, 0.64, 0.73, 0.78, 0.78, 0.78, 0.78, 0.78, 0.78, 0.78, 0.78, 0.78]}, {"name": "Д — слом на 5, опоздавшая реакция", "tau": 5, "color": "#D4537E", "s": [0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.19, 0.28, 0.37, 0.46, 0.55, 0.64, 0.7, 0.7, 0.7, 0.7]}, {"name": "Г — поздний слом на 12", "tau": 12, "color": "#BA7517", "s": [0.06, 0.06, 0.06, 0.06, 0.06, 0.06, 0.06, 0.06, 0.06, 0.06, 0.06, 0.22, 0.32, 0.42, 0.52, 0.62, 0.72, 0.72, 0.72, 0.72]}, {"name": "Б — чистый спокойный", "tau": null, "color": "#0F6E56", "s": [0.06, 0.05, 0.06, 0.05, 0.06, 0.05, 0.06, 0.05, 0.06, 0.05, 0.06, 0.05, 0.06, 0.05, 0.06, 0.05, 0.06, 0.05, 0.06, 0.05]}, {"name": "В — чистый, ложный всплеск на 4", "tau": null, "color": "#185FA5", "s": [0.06, 0.06, 0.06, 0.55, 0.55, 0.55, 0.46, 0.37, 0.28, 0.19, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]}]};
+const st=document.getElementById("st"),stout=document.getElementById("stout"),
+cb=document.getElementById("cancel"),chart=document.getElementById("chart"),
+rows=document.getElementById("rows"),scEl=document.getElementById("sc"),
+totEl=document.getElementById("tot"),tot0El=document.getElementById("tot0"),
+expl=document.getElementById("expl");
+function seriesSet(cancel){return D.series.map(r=>r.name.startsWith("В")?{...r,s:cancel?D.cancel:D.sticky}:r);}
+function stepScore(t,ss){const b=[],c=[];
+ for(const r of ss){(r.tau!==null&&t>=r.tau?b:c).push(r.s[t-1]);}
+ if(!b.length||!c.length)return null;let ok=0,n=0;
+ for(const x of b)for(const y of c){n++;ok+=x>y?1:(x===y?0.5:0);}return ok/n;}
+function total(ss){let s=0,n=0;for(let t=1;t<=D.n;t++){const v=stepScore(t,ss);if(v!==null){s+=v;n++;}}return s/n;}
+function render(){
+ const t=+st.value;stout.textContent=t;
+ const ss=seriesSet(cb.checked);
+ const L=40,B=232,W=712;
+ const xs=i=>L+8+(W-L-16)*i/(D.n-1),ys=v=>B-(B-18)*v;
+ let svg='<line x1="'+L+'" y1="10" x2="'+L+'" y2="'+B+'" stroke="#888"/>'
+ +'<line x1="'+L+'" y1="'+B+'" x2="'+W+'" y2="'+B+'" stroke="#888"/>';
+ for(const r of ss){
+  svg+='<polyline fill="none" stroke="'+r.color+'" stroke-width="2" points="'
+   +r.s.map((v,i)=>xs(i)+","+ys(v)).join(" ")+'"/>';
+  if(r.tau)svg+='<line x1="'+xs(r.tau-1)+'" y1="14" x2="'+xs(r.tau-1)+'" y2="'+B+'" stroke="'+r.color+'" stroke-dasharray="4 3" opacity="0.5"/>';
+  svg+='<text x="'+(xs(D.n-1)-8)+'" y="'+(ys(r.s[D.n-1])-5)+'" font-size="11" fill="'+r.color+'">'+r.name[0]+'</text>';}
+ svg+='<line x1="'+xs(t-1)+'" y1="10" x2="'+xs(t-1)+'" y2="'+B+'" stroke="#444" stroke-width="1.5"/>'
+ +'<text x="'+(xs(t-1)+4)+'" y="24" font-size="11" fill="#444">шаг '+t+'</text>';
+ chart.innerHTML=svg;
+ const state=ss.map(r=>({short:r.name[0],color:r.color,score:r.s[t-1],broken:r.tau!==null&&t>=r.tau}))
+   .sort((a,b)=>b.score-a.score);
+ rows.innerHTML=state.map(r=>{
+  const fill=r.broken?"#F0997B":"#9FE1CB",txt=r.broken?"#712B13":"#085041";
+  return '<div class="rowbar"><b style="width:18px;color:'+r.color+'">'+r.short+'</b>'
+  +'<div class="track"><div class="fill" style="width:'+Math.round(r.score*100)+'%;background:'+fill+'"></div>'
+  +'<span class="tag" style="color:'+txt+'">'+(r.broken?"слом уже был":"чистый")+'</span></div>'
+  +'<b style="width:44px;text-align:right">'+r.score.toFixed(2)+'</b></div>';}).join("");
+ const v=stepScore(t,ss);
+ scEl.textContent=v===null?"пар нет":v.toFixed(2);
+ totEl.textContent=total(ss).toFixed(3);
+ tot0El.textContent=total(seriesSet(false)).toFixed(3);
+ const bad=[];const b=state.filter(r=>r.broken),c=state.filter(r=>!r.broken);
+ for(const x of b)for(const y of c)if(y.score>x.score)bad.push("«"+y.short+"» выше сломанного «"+x.short+"»");
+ expl.textContent=v===null?"Сломов ещё нет — судья пропускает шаг."
+   :(bad.length?"Потерянные пары: "+bad.join("; ")+".":"Все сломанные выше всех чистых — шаг идеальный.");}
+st.addEventListener("input",render);cb.addEventListener("change",render);render();
+</script></body></html>
