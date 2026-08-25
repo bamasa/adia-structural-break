@@ -70,6 +70,7 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | — | 011a: rolling median preprocessing (windows 3/5/9) | gate only | **killed at the quick gate**: false alarms grow with the window — the filter shrinks the fitted scale and manufactures serial dependence |
 | — | 011b: asinh as replacement preprocessing | 0.5689 vs 0.5719 | **killed**: the quick-gate gain was score compression flattering an untrained model; retraining consumed it |
 | 011 | every channel twice — raw and asinh-compressed pipelines side by side (100 channels) | **0.5746** vs 0.5719, ahead on 3 of 5, losses ≤0.001 | cloud |
+| — | 012: explicit reversion-depth channels (now − peak, 42 diffs) | 0.5754 vs 0.5746 | **killed by pre-stated condition**: better on 2 folds of 5 — the trees already extract recession from the peak/now pairs |
 
 The augmentation pipeline (`augment.py`) survives its first product; the next
 target, per the inspection notebook, is cross-sectional discrimination — clean

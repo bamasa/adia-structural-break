@@ -349,6 +349,13 @@ views — 42 channels, all computable from the existing matrices.
 **Kill condition, stated before the run:** grouped 5-fold CV, 142 vs 100
 channels on the same folds; adopted only if better on most folds.
 
+**Result: killed — better on 2 folds of 5** (0.5754 vs 0.5746; +0.0065 and
++0.0028 against three small losses). The mean nudges up by less than 0.001:
+whatever "distance from peak" carries, the trees were already extracting from
+the peak/now pairs indirectly, and the explicit subtraction adds noise on as
+many folds as it helps. The cancellation timidity the report measured is
+real, but this was not the lever.
+
 ---
 
 ## 013 — planned: prediction-error channels (pretrained + per-series forecaster)
