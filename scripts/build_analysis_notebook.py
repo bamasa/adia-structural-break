@@ -436,6 +436,74 @@ for sid in ids_e[mid_e - 1 : mid_e + 2]:
 code("""for sid in ids_e[-3:]:
     show(sid, f"  (ест метрику: заработок {ranked.earn[sid]:.3f})")""")
 
+md("""## Метрика точки: поймали ли слом и когда
+
+Порог срабатывания берём не с потолка, а от чистых рядов: это уровень счёта,
+который 90% чистых рядов не пересекают никогда. Пересёк — «модель объявила
+слом». Дальше для каждого ряда со сломом считаем задержку: шаг объявления
+минус истинный слом. Категории:
+
+- **фальстарт** — объявила до истинного слома;
+- **вовремя** — в первые 10 шагов после слома;
+- **поздно** — позже 10 шагов;
+- **не поймала** — порог не пересечён до конца ряда.
+
+Внизу — связь задержки с заработком: сколько соревновательная метрика реально
+платит за каждую категорию.""")
+
+code("""threshold = float(np.quantile(
+    [r["scores"].max() for r in records.values() if r["tau"] is None], 0.90))
+print(f"порог срабатывания (его держат 90% чистых): {threshold:.3f}")
+
+def call_step(scores):
+    hit = np.flatnonzero(scores >= threshold)
+    return int(hit[0]) if len(hit) else None
+
+cats, delays = {}, {}
+for sid, r in records.items():
+    if r["tau"] is None:
+        continue
+    d = call_step(r["scores"])
+    if d is None:
+        cats[sid] = "не поймала"; delays[sid] = np.nan
+    elif d < r["tau"]:
+        cats[sid] = "фальстарт"; delays[sid] = d - r["tau"]
+    elif d - r["tau"] <= 10:
+        cats[sid] = "вовремя"; delays[sid] = d - r["tau"]
+    else:
+        cats[sid] = "поздно"; delays[sid] = d - r["tau"]
+table["category"] = pd.Series(cats)
+table["delay"] = pd.Series(delays)
+b = table[table.broken]
+summary = b.groupby("category").agg(
+    рядов=("category", "size"),
+    средняя_задержка=("delay", "mean"),
+    средний_заработок=("earn", "mean"),
+).round(2)
+display(summary)
+
+fig, ax = plt.subplots(figsize=(8, 4))
+ok = b.dropna(subset=["delay", "earn"])
+ax.scatter(ok.delay, ok.earn, s=28, color="#7b1fa2", alpha=0.75)
+ax.axvline(0, color="grey", lw=0.8)
+ax.axhline(0.5, color="#d93025", lw=0.8, ls="--", label="0.5 — нейтрально для метрики")
+ax.set_xlabel("задержка объявления, шагов (минус — фальстарт)")
+ax.set_ylabel("заработок ряда в парах")
+ax.set_title("Чем позже объявлен слом, тем меньше ряд приносит метрике")
+ax.legend(fontsize=8, frameon=False)
+plt.tight_layout(); plt.show()
+print("корреляция задержки и заработка:",
+      round(ok.delay.corr(ok.earn), 3))""")
+
+md("""### Кейсы по категориям""")
+
+code("""for cat in ["вовремя", "поздно", "фальстарт", "не поймала"]:
+    ids_c = list(b[b.category == cat].sort_values("delay").index)
+    for sid in ids_c[:2]:
+        d = table.delay[sid]
+        extra = f"  ({cat}" + (f", задержка {d:+.0f} шагов)" if pd.notna(d) else ")")
+        show(sid, extra)""")
+
 md("""## Какие ряды трудные
 
 Медианный AUC внутри ряда (по рядам со сломом), с разбиением каждой оси на
