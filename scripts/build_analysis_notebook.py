@@ -240,7 +240,8 @@ def step_auc(scores_at_t, broken_at_t):
 max_t = max(len(r["online"]) for r in records.values())
 fig, ax = plt.subplots(figsize=(11, 4.5))
 totals = {}
-for name, (label, colour) in MODEL_STYLE.items():
+colours = {"005": "#5f6368", "006": "#1a73e8", "008": "#7b1fa2"}
+for name, colour in colours.items():
     aucs, weights = [], []
     for t_step in range(max_t):
         sc, br = [], []
@@ -264,6 +265,39 @@ ax.legend(loc="lower right", fontsize=8, frameon=True)
 plt.tight_layout(); plt.show()
 print("итоговая метрика на сотне (с весом по парам):",
       {k: round(v, 4) for k, v in totals.items()})""")
+
+md("""## Где зарабатываем и теряем на метрике
+
+Вклад одного ряда в метрику: на каждом шаге ряд участвует в парах против
+рядов из противоположной кучки. Сломанный ряд «зарабатывает», когда стоит
+выше чистых; чистый — когда стоит ниже сломанных. Средняя доля выигранных
+пар по всем шагам — это и есть заработок ряда (0.5 — нейтрально, выше —
+кормит метрику, ниже — ест её). Считаем по лучшей модели (008) и смотрим три
+галереи: лучшие добытчики, середина, худшие потери. На каждой картинке все
+три модели — видно, кто из них где справляется.""")
+
+code("""# Заработок каждого ряда: средняя доля выигранных пар по шагам.
+earn = {sid: [] for sid in records}
+for t_step in range(max(len(r["online"]) for r in records.values())):
+    alive = [(sid, r) for sid, r in records.items() if t_step < len(r["online"])]
+    broken_scores = [r["all_scores"]["008"][t_step] for _, r in alive
+                     if r["tau"] is not None and t_step >= r["tau"]]
+    clean_scores = [r["all_scores"]["008"][t_step] for _, r in alive
+                    if not (r["tau"] is not None and t_step >= r["tau"])]
+    if not broken_scores or not clean_scores:
+        continue
+    bs = np.asarray(broken_scores); cs = np.asarray(clean_scores)
+    for sid, r in alive:
+        sc = r["all_scores"]["008"][t_step]
+        if r["tau"] is not None and t_step >= r["tau"]:
+            earn[sid].append((sc > cs).mean() + 0.5 * (sc == cs).mean())
+        else:
+            earn[sid].append((sc < bs).mean() + 0.5 * (sc == bs).mean())
+table["earn"] = [float(np.mean(earn[sid])) if earn[sid] else np.nan
+                 for sid in table.index]
+ranked = table.dropna(subset=["earn"]).sort_values("earn", ascending=False)
+print("топ-заработок:", ranked.earn.head(3).round(3).to_dict())
+print("худшие потери:", ranked.earn.tail(3).round(3).to_dict())""")
 
 code('''MODEL_STYLE = {
     "005": ("40 каналов", "#5f6368"),
@@ -384,6 +418,23 @@ for sid in list(deep_clean.index)[:3]:
 deep_broken = table[table.broken].sort_values("drawdown", ascending=False)
 for sid in list(deep_broken.index)[:1]:
     show(sid, "  (откат, а потом настоящий слом)")""")
+
+md("""## Галереи по заработку: лучшие, середина, потери
+
+Подпись каждой картинки — заработок: доля пар, выигранных этим рядом за все
+шаги. У «потерь» смотрите, кто из моделей виноват: если у 005/006 счёт застрял
+наверху на чистом ряде, а у 008 спустился — это отмена тревоги в действии;
+если все три высоко — ряд обманывает саму предобработку, и это задача для
+следующего эксперимента.""")
+
+code("""ids_e = list(ranked.index)
+for sid in ids_e[:3]:
+    show(sid, f"  (кормит метрику: заработок {ranked.earn[sid]:.3f})")""")
+code("""mid_e = len(ids_e) // 2
+for sid in ids_e[mid_e - 1 : mid_e + 2]:
+    show(sid, f"  (середина: заработок {ranked.earn[sid]:.3f})")""")
+code("""for sid in ids_e[-3:]:
+    show(sid, f"  (ест метрику: заработок {ranked.earn[sid]:.3f})")""")
 
 md("""## Какие ряды трудные
 
