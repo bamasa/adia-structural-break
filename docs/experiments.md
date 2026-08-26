@@ -534,3 +534,18 @@ drain: α=0.99 now wins (the battery carries part of the memory), final
 **0.5821**. Shipped as #13. The read on the family: still paying, but v3
 should be feature *selection* within the battery rather than another forty —
 the mixed folds are the first sign of dilution inside the vein itself.
+
+
+---
+
+## 021 — planned: hyperparameter resweep and feature selection at 186 channels
+
+**Hypothesis.** The combiner's hyperparameters were swept once, at 40
+channels; five channel families later the model is fit with settings tuned
+for a fifth of its present width. A fresh sweep (leaves, child samples,
+learning rate, rounds, feature fraction) plus importance-based pruning of the
+186 should recover whatever the stale settings are leaving on the table.
+
+**Kill condition, stated before the run:** each candidate configuration on
+grouped 3-fold CV first (same folds 0–2), the best confirmed on the full
+five; adopted only if the confirmed run beats 0.5817 raw on most folds.
