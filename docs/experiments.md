@@ -487,3 +487,14 @@ alone, and 104 + battery, against 0.5779 on the same folds; adopted only if
 better on most folds. This is the first candidate for a new *foundation*
 rather than a new add-on: if the battery alone approaches the 104-channel
 stack, the second stage is to rebuild on top of it, not to append it.
+
+**Result: adopted — better on 4 folds of 5.** Solo the battery is weak
+(0.5381 — classical-detector territory), so it is not yet a foundation. As an
+addition it is the largest gain since the forecaster: 104 channels 0.5779 →
+144 channels **0.5807** (−0.0029, +0.0031, +0.0028, +0.0078, +0.0032). The
+strategic read stands: prefix-recomputed two-sample statistics carry
+information the streaming summaries do not, and this was v1 with 21 features
+per view out of a few hundred available. Next: measure with the peak-hold,
+ship, then scale the battery (more tests, more transformations, more
+windows) — the first add-on family whose obvious next iteration is *larger*,
+not different.
