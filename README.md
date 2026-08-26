@@ -81,6 +81,8 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | 018 | + a per-prefix battery: 42 drift-free two-sample statistics (history vs prefix) recomputed on a geometric cadence, both views; peak-hold softened to 0.995 | **0.5814** (0.5807 raw) vs 0.5779, ahead on 4 of 5 | cloud |
 | 020 | + battery v2: forty more two-sample statistics (CvM, Anderson–Darling, Levene, increments, windows 10/25/100, tail exceedance, signs, slope t-stats); hold sped to 0.99 | **0.5821** (0.5817 raw) vs 0.5814, ahead on 3 of 5 | cloud |
 | 021 | hyperparameter resweep at full width: 63 leaves, colsample 0.5 — each tree sees a different half of the channels | **0.5841** vs 0.5821, ahead on 4 of 5 | cloud |
+| — | 024: gain-importance pruning (top-150/120/90) | 0.5825/0.5813/0.5805 | **killed**: monotone degradation — colsample already mines the weak channels |
+| 022 | the ranking objective: lambdarank, groups = per-step cross-sections, truncation 2000 | **0.5881** raw, ahead on all 5; fold 0 crosses 0.60 | shipping |
 | — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |
 | — | 015: forecaster horizons 1+5 and signed error | 0.5751 vs 0.5779 | **killed by pre-stated condition**: the extensions dilute the compact four channels |
 | 016 | peak-hold on the output: the score rides its running maximum, draining 0.1%/step | **0.5799** vs 0.5779, ahead on 4 of 5 | cloud |
