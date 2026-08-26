@@ -588,3 +588,16 @@ that fold.
 
 **Kill condition, stated before the run:** the ensemble number must beat the
 stack's fold-0 alone; the net ships only inside an ensemble, never alone.
+
+
+---
+
+## 024 — planned: pruning the 186
+
+**Hypothesis.** colsample 0.5 winning the resweep says the channel set
+carries redundancy the trees pay for; explicit pruning by gain importance
+(top-150/120/90 on 3 folds, best confirmed on 5) may pay again on top, and a
+cleaner set feeds every later stage (lambdarank, the ensemble).
+
+**Kill condition, stated before the run:** confirmed 5-fold CV must beat the
+current best raw configuration on most folds; otherwise the full set stays.
