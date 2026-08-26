@@ -411,6 +411,37 @@ forecaster says the series is predictable again, hold it otherwise.
 on the same folds; a variant is adopted only if better on most folds. The
 best survivor is submitted.
 
+**Results (scripts in scripts/experiments/).**
+
+*Channel sets — all killed.* The extended forecaster (horizons 1+5, signed
+error): 0.5751, worse on 4 folds — the compact four-channel version carries
+the signal, the extensions dilute it. The deviation view: 0.5762, worse on 3
+— the forecaster already mines that representation, and fifty detectors over
+it are its paler copy. Everything at once (170 channels): 0.5736 — dilution
+compounds. A magnitude forecaster (predict |deviation|, 015b): solo 0.5524,
+combined 0.5782 — passes the letter of the condition (3 of 5) but the mean
+gain is +0.0003, noise; deferred rather than adopted, a candidate for the
+neural-ensemble stage.
+
+*Combiners.* A weighted sum over the 104 channels: 0.5608 on fold 0. A plain
+maximum: 0.5401. Boosted trees stay unchallenged.
+
+*Post-processing — adopted.* Fast attack, slow release on the OUTPUT score:
+ride the running maximum, drain 0.1% per step. **0.5799 vs 0.5779**, ahead
+on 4 folds of 5 (α=0.995 wins all five at 0.5795; α=0.999 taken for the
+higher mean). Release gated by the forecaster's calm signal also beats the
+base (0.5789–0.5792) but loses to the plain hold. The pair with the
+channels' fast reversion is the interesting part: recant *evidence* quickly,
+release the *verdict* slowly. Submitted as #11.
+
+*The TCN pilot (017).* A 16.5k-parameter causal TCN (receptive field 255,
+dropout, weight decay, 8 epochs, BCE on online steps): fold-0 TS-AUC climbs
+0.520 → 0.532 against the stack's 0.5874. The concept learns; it is nowhere
+near competitive yet. What it lacks is known — a ranking loss, augmentation
+(the 007 pipeline finally has its customer), capacity, epochs — and that is
+a deliberate, larger build, not a channel experiment.
+
+
 **Results.**
 
 *014, the deviation view: killed.* Alone its fifty channels reach 0.5316 by
