@@ -464,3 +464,26 @@ also beats the base but loses to the plain hold. The instructive part: the
 channels underneath revert fast (008), the output holds its peak — attack
 and release live at different layers, and the metric pays for both. Submitted
 as #11 — the models of #10 untouched, one line of inference added.
+
+
+---
+
+## 018 — planned: the per-prefix battery
+
+**Hypothesis** (the strategic one). The streaming O(1)-per-step architecture
+was a self-imposed constraint — the platform allows any amount of prefix
+recomputation per step. The first edition's winners reached 0.90 offline with
+a large battery of two-sample statistics between the segments; the real-time
+metric asks the same question at every prefix. So: at a geometric cadence
+(held between recomputes, like the retro scans and the CNN already do),
+compute ~50 drift-free two-sample features "history vs online prefix" —
+quantile differences, moment differences, KS, MAD ratio, autocorrelation
+differences, gauss-rank moments, recent-window and half-split contrasts — on
+both views (raw and asinh). Statistics are kept drift-free under the null
+(no √t multipliers), so length is not evidence.
+
+**Kill condition, stated before the run:** grouped 5-fold CV: the battery
+alone, and 104 + battery, against 0.5779 on the same folds; adopted only if
+better on most folds. This is the first candidate for a new *foundation*
+rather than a new add-on: if the battery alone approaches the 104-channel
+stack, the second stage is to rebuild on top of it, not to append it.
