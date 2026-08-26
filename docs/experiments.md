@@ -599,6 +599,17 @@ that fold.
 **Kill condition, stated before the run:** the ensemble number must beat the
 stack's fold-0 alone; the net ships only inside an ensemble, never alone.
 
+**Result: not yet.** The v2 recipe trains — 0.512 → 0.538 over 24 epochs on
+fold 0, sawtooth but climbing to the end, loss still falling — and the
+ranking loss with boundary augmentation beats the pilot's ceiling within
+three epochs. But at 0.538 against the stack's 0.5952 the ensemble is flat:
++10% of the net moves fold 0 by +0.0002 (noise), more of it hurts. The net
+appears to have learned a subset of what the channels already encode. The
+concept survives; ensemble value requires a net at ~0.55+, which means
+scale — capacity, epochs, cloud GPU — a deliberate build with the owner in
+the loop on architecture, per plan. Checkpoint kept (tcn_v2.pt), aligned
+fold-0 scores kept (tcn_fold0_aligned.npy).
+
 
 ---
 
