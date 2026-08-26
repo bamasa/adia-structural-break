@@ -84,6 +84,8 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | — | 024: gain-importance pruning (top-150/120/90) | 0.5825/0.5813/0.5805 | **killed**: monotone degradation — colsample already mines the weak channels |
 | 022 | the ranking objective: lambdarank, groups = per-step cross-sections, truncation 2000 | **0.5881** raw, ahead on all 5; fold 0 crosses 0.60 | shipping |
 | — | 023: TCN v2 — ranking loss, boundary augmentation, 75k params, 24 epochs | fold-0 0.538; ensemble with the stack flat (+0.0002 at 10%) | concept survives, needs scale: ensemble value starts at ~0.55+ |
+| — | 025: ranker truncation 500/8000, resweep params for the ranker | fold-0 0.5919/0.5986; 0.6006 unchanged | 2000 stays; the ranking loss regularises itself |
+| 022b | shipped blend: 0.6·sigmoid(ranker) + 0.4·classifier, no hold — the ranker carries the memory | fold-0 **0.6035** (ranker 0.6006, classifier 0.5952) | cloud |
 | — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |
 | — | 015: forecaster horizons 1+5 and signed error | 0.5751 vs 0.5779 | **killed by pre-stated condition**: the extensions dilute the compact four channels |
 | 016 | peak-hold on the output: the score rides its running maximum, draining 0.1%/step | **0.5799** vs 0.5779, ahead on 4 of 5 | cloud |

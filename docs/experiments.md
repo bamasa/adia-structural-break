@@ -628,3 +628,26 @@ current best raw configuration on most folds; otherwise the full set stays.
 0.5 the trees already mine the weak channels for what they carry; hard
 removal only takes it away. The full set stays, and "prune then rebuild" is
 off the roadmap.
+
+
+---
+
+## 025–026 — the fold-0 protocol era begins
+
+By the owner's call, research and pre-ship validation now run on fold 0 only
+(the fold-0 ordering of models has never disagreed with the five-fold
+verdict here); full CV returns at 0.62.
+
+**025 — truncation: 2000 is the optimum.** Fold-0: 500 → 0.5919, 2000 →
+0.6006, 8000 → 0.5986. Shallow cuts the signal, deep dilutes the gradient.
+The resweep hyperparameters do nothing for the ranker (0.6006 → 0.6006 on
+fold 0; its loss regularises by itself) — the classifier keeps them, the
+ranker keeps the defaults.
+
+**026 — the shippable blend.** Per-step cross-sectional rank averaging is
+not implementable at inference (series arrive alone), so the blend is score
+space: 0.6·sigmoid(ranker) + 0.4·classifier. Fold-0: classifier 0.5952,
+ranker 0.6006, blend **0.6035**. The peak-hold now *costs* on top of the
+blend (0.6030) — the ranker carries the memory the hold used to supply, and
+that closes the hold's arc: adopted at #11, softened at #12, sped at #13,
+retired at #15. Shipped as #15 with both combiners in the artifact.
