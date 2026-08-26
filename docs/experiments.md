@@ -491,10 +491,18 @@ stack, the second stage is to rebuild on top of it, not to append it.
 **Result: adopted — better on 4 folds of 5.** Solo the battery is weak
 (0.5381 — classical-detector territory), so it is not yet a foundation. As an
 addition it is the largest gain since the forecaster: 104 channels 0.5779 →
-144 channels **0.5807** (−0.0029, +0.0031, +0.0028, +0.0078, +0.0032). The
+146 channels **0.5807** (−0.0029, +0.0031, +0.0028, +0.0078, +0.0032). The
 strategic read stands: prefix-recomputed two-sample statistics carry
 information the streaming summaries do not, and this was v1 with 21 features
 per view out of a few hundred available. Next: measure with the peak-hold,
 ship, then scale the battery (more tests, more transformations, more
 windows) — the first add-on family whose obvious next iteration is *larger*,
 not different.
+
+**With the peak-hold, and the correction.** The channel count is 146, not 144
+(42 battery features, mislabelled in the first write-up of this entry). On
+the 146-channel OOF the hard hold (α=0.999) no longer helps — the battery
+carries part of the memory the hold was supplying — but the soft hold
+(α=0.995) still does: **0.5814**, ahead on 3 folds of 5 over the raw output.
+Shipped as #12 with the forecaster artifact reused from 013 and scipy added
+to requirements (erfinv for the gauss-ranks).
