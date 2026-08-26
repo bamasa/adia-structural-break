@@ -79,6 +79,7 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | 016 | peak-hold on the output: fast attack, slow release (drain 0.1%/step); channels underneath keep fast reversion | **0.5799** vs 0.5779, ahead on 4 of 5 | cloud |
 | — | 017: TCN pilot, 16.5k params, 8 epochs | fold-0 0.532 vs stack 0.587 | concept learns, not yet competitive — needs ranking loss, augmentation, capacity |
 | 018 | + a per-prefix battery: 42 drift-free two-sample statistics (history vs prefix) recomputed on a geometric cadence, both views; peak-hold softened to 0.995 | **0.5814** (0.5807 raw) vs 0.5779, ahead on 4 of 5 | cloud |
+| 020 | + battery v2: forty more two-sample statistics (CvM, Anderson–Darling, Levene, increments, windows 10/25/100, tail exceedance, signs, slope t-stats); hold sped to 0.99 | **0.5821** (0.5817 raw) vs 0.5814, ahead on 3 of 5 | cloud |
 | — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |
 | — | 015: forecaster horizons 1+5 and signed error | 0.5751 vs 0.5779 | **killed by pre-stated condition**: the extensions dilute the compact four channels |
 | 016 | peak-hold on the output: the score rides its running maximum, draining 0.1%/step | **0.5799** vs 0.5779, ahead on 4 of 5 | cloud |
