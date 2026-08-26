@@ -651,3 +651,32 @@ ranker 0.6006, blend **0.6035**. The peak-hold now *costs* on top of the
 blend (0.6030) — the ranker carries the memory the hold used to supply, and
 that closes the hold's arc: adopted at #11, softened at #12, sped at #13,
 retired at #15. Shipped as #15 with both combiners in the artifact.
+
+---
+
+## 027–029 — the fold-0 sprint: seeds and stacking killed, the longer ranker adopted
+
+**027 — seed ensembling of rankers: killed.** Seeds 1 and 2 land weaker than
+seed 0 (0.5963/0.5968 vs 0.6006) and averaging drags the blend down (0.6031
+vs 0.6035). The ranking loss rewards sharpness, not smoothing.
+
+**028 — a longer ranker: adopted.** 600 trees at lr 0.03: solo 0.6016, blend
+**0.6045** (over 0.6035). 900 at 0.02 overshoots (blend 0.6026) — the
+optimum is 600. Shipped as #16 with the final ranker retrained at 600.
+
+**029 — stacking over the OOF scores: killed.** Three meta-rankers over
+[classifier, ranker] scores (+forecaster channels, +slope t-stats):
+0.5936–0.5991, all below the fixed 60/40 blend. Brandão's stacking presumes
+many diverse level-0 models; ours are two and correlated, so the meta-layer
+only overfits. Revisit when a strong net joins.
+
+**Fast screening, calibrated.** Half the training series, 150 trees, max_bin
+63: a hypothesis in ~4 minutes. Within a family the ordering reproduces
+exactly (rank-2000 > rank-500); across families it distorts (the classifier
+suffers more than rankers) — so the fast mode screens within-family only,
+and cross-family calls plus ship candidates run full.
+
+**Fold-1 diagnosis, first pass.** Composition is unremarkable (same break
+share, lengths, tau positions as other folds) — the 0.02 weakness lives in
+the series content, not the metadata. Next: an eyes-on gallery of fold-1's
+worst earners.
