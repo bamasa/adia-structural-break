@@ -506,3 +506,23 @@ carries part of the memory the hold was supplying — but the soft hold
 (α=0.995) still does: **0.5814**, ahead on 3 folds of 5 over the raw output.
 Shipped as #12 with the forecaster artifact reused from 013 and scipy added
 to requirements (erfinv for the gauss-ranks).
+
+
+---
+
+## 020 — planned: battery v2
+
+**Hypothesis.** v1 adopted with 21 features per view; the family's obvious
+next move is more of the same. v2 adds ~20 per view: outer quantiles (q10,
+q90), Cramér–von Mises and a clipped Anderson–Darling-style CDF distance,
+the Levene contrast (mean absolute deviation from the median), statistics on
+*increments* (dispersion ratio, lag-1 autocorrelation shift), fixed recent
+windows of 10/25/100 against the history, tail-exceedance fractions beyond
+the history's 5th/95th percentiles, sign statistics, and OLS slope
+t-statistics of the prefix and of its magnitudes (a drift-free trend-change
+and heteroscedasticity-trend probe). All drift-free under the null, both
+views, same cadence.
+
+**Kill condition, stated before the run:** grouped 5-fold CV, 186 vs 146
+channels on the same folds (raw output; the hold re-checked after); adopted
+only if better on most folds.
