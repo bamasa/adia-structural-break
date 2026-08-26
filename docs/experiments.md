@@ -550,6 +550,13 @@ learning rate, rounds, feature fraction) plus importance-based pruning of the
 grouped 3-fold CV first (same folds 0–2), the best confirmed on the full
 five; adopted only if the confirmed run beats 0.5817 raw on most folds.
 
+**Result: adopted — better on 4 folds of 5.** The winner is not depth alone
+but decorrelation: 63 leaves with **colsample 0.5**, each tree seeing a
+different half of the 186 channels — the direct antidote to the dilution
+that killed five add-on families. Confirmed raw 0.5831 vs 0.5817; with the
+peak-hold **0.5841** (fold 0 reaches 0.5962). Shipped as #14 — same
+channels, same artifact structure, retrained combiner.
+
 
 ---
 
