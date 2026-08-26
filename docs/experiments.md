@@ -572,6 +572,16 @@ each group, since AUC cares about the whole order, not just the top.
 0.5817 raw baseline on the same folds (or against 021's winner if it
 confirms); adopted only if better on most folds.
 
+**Result: adopted on all five folds — the project's largest single gain.**
+**0.5881** against 0.5831 for the resweep classifier on the same folds
+(+0.0054, +0.0034, +0.0020, +0.0048... fold 4 +0.0090); fold 0 crosses 0.60
+for the first time (0.6006). The metric is a per-step ranking, and training
+the trees to rank per step — groups are cross-sections, truncation deep at
+2000 — pays more than every channel family added this week. And this ran on
+the *pre-resweep* hyperparameters; the combination with 63 leaves and
+colsample 0.5 is measured next, and every later combiner (the ensemble
+включая) moves to the ranking objective.
+
 ---
 
 ## 023 — planned: the TCN, seriously this time
@@ -601,3 +611,9 @@ cleaner set feeds every later stage (lambdarank, the ensemble).
 
 **Kill condition, stated before the run:** confirmed 5-fold CV must beat the
 current best raw configuration on most folds; otherwise the full set stays.
+
+**Result: killed — monotone degradation.** 186 → 150 → 120 → 90 channels:
+0.5849 → 0.5825 → 0.5813 → 0.5805 on the same three folds. With colsample
+0.5 the trees already mine the weak channels for what they carry; hard
+removal only takes it away. The full set stays, and "prune then rebuild" is
+off the roadmap.
