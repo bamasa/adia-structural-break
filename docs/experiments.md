@@ -526,3 +526,11 @@ views, same cadence.
 **Kill condition, stated before the run:** grouped 5-fold CV, 186 vs 146
 channels on the same folds (raw output; the hold re-checked after); adopted
 only if better on most folds.
+
+**Result: adopted — better on 3 folds of 5, and the vein is thinning.** Raw
+output 0.5817 vs 0.5807: two folds gain strongly (+0.005, +0.006), two lose
+mildly (−0.003, −0.004). The hold re-check moved the optimum to a faster
+drain: α=0.99 now wins (the battery carries part of the memory), final
+**0.5821**. Shipped as #13. The read on the family: still paying, but v3
+should be feature *selection* within the battery rather than another forty —
+the mixed folds are the first sign of dilution inside the vein itself.
