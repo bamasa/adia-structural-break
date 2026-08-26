@@ -549,3 +549,35 @@ learning rate, rounds, feature fraction) plus importance-based pruning of the
 **Kill condition, stated before the run:** each candidate configuration on
 grouped 3-fold CV first (same folds 0–2), the best confirmed on the full
 five; adopted only if the confirmed run beats 0.5817 raw on most folds.
+
+
+---
+
+## 022 — planned: lambdarank
+
+**Hypothesis.** The combiner still optimises classification log-loss; the
+metric is a per-step ranking. LightGBM's ranking objective with groups = step
+indices (rows sorted by step, every cross-section one group) optimises the
+ordering directly. Truncation level raised so the objective looks deep into
+each group, since AUC cares about the whole order, not just the top.
+
+**Kill condition, stated before the run:** grouped 5-fold CV against the
+0.5817 raw baseline on the same folds (or against 021's winner if it
+confirms); adopted only if better on most folds.
+
+---
+
+## 023 — planned: the TCN, seriously this time
+
+**Hypothesis.** The 017 pilot learned but was starved: BCE instead of the
+metric, no augmentation, 16k parameters. v2: pairwise ranking loss computed
+inside each batch at matched steps (the metric's own question), boundary
+augmentation (random history crops, online truncations, and moving the split
+point of clean series — the 007 machinery finally feeding a data-hungry
+learner), roughly 100k parameters, receptive field 511, cosine schedule.
+Judged on fold 0 (stack: 0.5874); the real prize is ensemble diversity, so
+the second number that matters is the rank-average with the stack's OOF on
+that fold.
+
+**Kill condition, stated before the run:** the ensemble number must beat the
+stack's fold-0 alone; the net ships only inside an ensemble, never alone.
