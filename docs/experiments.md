@@ -823,3 +823,15 @@ diversity through data where seeds gave none. Fold-0: solo **0.6004** against
 saw fold 1 (0.5991) — its clean-but-different series poison the net's
 training, one more echo of the resistant disease. Shipping as #19 with the
 four members retrained to include fold 0 (each sees four folds of five).
+
+---
+
+## 039 — adopted: fold-bagged rankers
+
+The data-diversity principle applied to the other leg: four rankers, each
+missing one training fold. Solo the bag reaches 0.6033 against 0.6016 for
+the single ranker, and the full ensemble — bagged rankers 0.35, classifier
+0.15, fold-ensembled nets 0.50 — lands at **0.6099** on fold 0. Both legs of
+the ensemble now stand on the same principle: models diversified by withheld
+data, averaged in sigmoid space. Shipping as #19: four rankers + one
+classifier + four nets, all finals retrained with fold 0 included.
