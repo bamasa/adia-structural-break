@@ -88,6 +88,8 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | 022b | shipped blend: 0.6·sigmoid(ranker) + 0.4·classifier, no hold — the ranker carries the memory | fold-0 **0.6035** (ranker 0.6006, classifier 0.5952) | cloud |
 | — | 027 seed-ensembled rankers / 029 stacking over OOF scores | 0.6031 / 0.5991 | **killed**: sharpness beats smoothing; two correlated level-0 models give a meta-layer nothing |
 | 028 | the ranker lengthened to 600 trees at lr 0.03 in the blend (#16) | fold-0 **0.6045** | cloud |
+| — | 030: Chronos-2 error/interval channels (zero-shot, whitelisted) | solo 0.5597 (interval width); blend +0.0004 | **killed**: the finetuned forecaster and variance detectors already tell the trees everything it knows |
+| — | 031: online-anchor view (fold-1 gallery diagnosis) | 0.6094 → 0.6047 after removing length leakage | **killed**: the apparent gain was length leakage entirely; the diagnosis stands, the cure does not |
 | — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |
 | — | 015: forecaster horizons 1+5 and signed error | 0.5751 vs 0.5779 | **killed by pre-stated condition**: the extensions dilute the compact four channels |
 | 016 | peak-hold on the output: the score rides its running maximum, draining 0.1%/step | **0.5799** vs 0.5779, ahead on 4 of 5 | cloud |

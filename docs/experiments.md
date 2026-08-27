@@ -703,6 +703,25 @@ the label means a break *inside* the online part, not "online differs from
 history", and nearly every channel we own asks the latter question. The fix:
 the full 50-channel pipeline referenced to the online segment's own first 40
 points. Fold-0 screen: ranker solo 0.6016 → 0.6063, blend 0.6045 → **0.6094**
-— the largest single addition since the ranking objective. Rebuilt with the
-anchor length fixed at 40 (the first cut derived it from the online length,
-which the model may not know) and re-screened before shipping.
+— seemingly the largest single addition since the ranking objective.
+
+**Result: killed — the gain was length leakage, all of it.** The first build
+derived the anchor size from the online length (`len // 4`), which the model
+may not know. Fixed at 40: blend 0.6051. Rebuilt causally as a *progressive*
+anchor (refit at steps 10 and 40, no length anywhere): **0.6047 vs 0.6045**
+— two ten-thousandths, noise. The honest residual of the anchor view is
+zero: whatever "is the online segment internally broken" carries, the
+battery's half-split contrasts and the retrospective scan already encode.
+The fold-1 diagnosis stands — clean series whose online differs from the
+history bleed pairs — but this cure does not work, and the disease goes back
+on the board as an open question. A leak caught before shipping, again, by
+the pre-stated-condition discipline.
+
+**030, closed. Chronos in the ensemble: killed.** 186+Chronos blend 0.6049
+vs 0.6045 (noise), ranker solo slightly worse; with the anchor stacked on,
+worse still (0.6025). The zero-shot signal is real (interval width 0.5597
+solo) and the lesson is kept — a strong probabilistic forecaster absorbs
+breaks into its own widening uncertainty, so surprise must be measured in
+raw units — but everything it knows, the finetuned forecaster and the
+variance detectors already tell the trees. Cloud GPU and a 120M-parameter
+dependency, for nothing the ensemble can use: not shipped.
