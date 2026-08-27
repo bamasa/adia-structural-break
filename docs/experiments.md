@@ -811,3 +811,15 @@ Breaking it is a different class of effort — a transformer over the channel
 trajectories, real GPU training budget, the owner in the loop on
 architecture — plus the one unclosed averaging idea, an ensemble across fold
 splits rather than seeds.
+
+---
+
+## 038 — adopted: the fold-ensemble of channel nets
+
+Four small nets, each trained with a different training fold withheld —
+diversity through data where seeds gave none. Fold-0: solo **0.6004** against
+0.5939 for the single net, and the triple at a 0.50 net weight reaches
+**0.6090** against 0.6068. The strongest single member is the one that never
+saw fold 1 (0.5991) — its clean-but-different series poison the net's
+training, one more echo of the resistant disease. Shipping as #19 with the
+four members retrained to include fold 0 (each sees four folds of five).
