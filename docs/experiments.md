@@ -725,3 +725,17 @@ breaks into its own widening uncertainty, so surprise must be measured in
 raw units — but everything it knows, the finetuned forecaster and the
 variance detectors already tell the trees. Cloud GPU and a 120M-parameter
 dependency, for nothing the ensemble can use: not shipped.
+
+---
+
+## 032 — killed: interaction channels for the fold-1 disease
+
+Ten hand-built interactions — "external difference × a silent internal
+scan", external minus internal, composite evidence — from existing battery
+and scan columns. Fold-0: solo 0.6016 (the baseline exactly), blend 0.6042.
+The trees already extract whatever these interactions encode. The fold-1
+disease (clean series whose online differs from the history) has now
+survived two cures — the anchor view and explicit interactions — and goes
+back on the board marked *resistant*: the next candidate is a learned
+detector trained specifically on these cases, which belongs to the network
+line. Meanwhile TCN v3 (297k parameters, 40 epochs) trains overnight.
