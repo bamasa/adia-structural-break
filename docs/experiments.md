@@ -774,3 +774,14 @@ spawns across eight workers thrashed the box. The fix — raw
 longest series (~10 cloud-minutes for the full test). Both #17 (the pair,
 fixed) and #18 (the triple) shipped through the new mandatory profiling
 gate; #15 and #16 must not be re-run.
+
+---
+
+## 035 — killed: a bigger channel net
+
+Tripled (314k parameters, receptive field 511, heavier dropout, best-epoch
+checkpointing): best 0.5940 against the small net's 0.5985. The dataset
+saturates around 100k parameters — the line is data-bound, not
+capacity-bound, which redirects the effort to averaging and richer inputs
+rather than size. 036 (a seed ensemble of the small architecture) and 037
+(the net fed channels plus both combiners' scores) queued.
