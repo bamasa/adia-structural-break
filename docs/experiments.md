@@ -680,3 +680,29 @@ and cross-family calls plus ship candidates run full.
 share, lengths, tau positions as other folds) — the 0.02 weakness lives in
 the series content, not the metadata. Next: an eyes-on gallery of fold-1's
 worst earners.
+
+---
+
+## 030–031 — the world-model's nerves, and the online anchor
+
+**030 — Chronos-2 error channels (fold-0 screen).** The first cut scored a
+coin flip (0.4978) for an instructive reason: the error was normalised by
+Chronos's own predicted interval, and a good probabilistic forecaster widens
+its intervals after a break — the model absorbed the break into its
+uncertainty and the signal self-cancelled. Re-measured in raw units: error
+0.5308, error peak 0.5381, and the **predicted interval width itself 0.5597**
+— "the world model got nervous" is the best of the three, zero-shot, at a
+coarse cadence, ~100 forecasts/s on the laptop's GPU. Full-train channels are
+building; the verdict is the ensemble screen. The library is whitelisted on
+the platform (GPU runners available).
+
+**031 — the online anchor (from the fold-1 gallery).** The gallery of
+fold-1's worst earners showed five of six to be *clean* series whose online
+segment simply differs from the history (variance blown, level shifted) —
+the label means a break *inside* the online part, not "online differs from
+history", and nearly every channel we own asks the latter question. The fix:
+the full 50-channel pipeline referenced to the online segment's own first 40
+points. Fold-0 screen: ranker solo 0.6016 → 0.6063, blend 0.6045 → **0.6094**
+— the largest single addition since the ranking objective. Rebuilt with the
+anchor length fixed at 40 (the first cut derived it from the online length,
+which the model may not know) and re-screened before shipping.
