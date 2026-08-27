@@ -91,6 +91,8 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | — | 030: Chronos-2 error/interval channels (zero-shot, whitelisted) | solo 0.5597 (interval width); blend +0.0004 | **killed**: the finetuned forecaster and variance detectors already tell the trees everything it knows |
 | — | 031: online-anchor view (fold-1 gallery diagnosis) | 0.6094 → 0.6047 after removing length leakage | **killed**: the apparent gain was length leakage entirely; the diagnosis stands, the cure does not |
 | — | 032: interaction channels (external difference × silent internal scan) | solo 0.6016, blend 0.6042 | **killed**: the trees already extract it; the fold-1 disease is marked resistant |
+| — | 034: channel-velocity features for the trees | blend 0.6045 (baseline) | **killed**: hand-picked derivatives add nothing |
+| 033 | a channel-trajectory TCN (111k params, ranking loss) joins the blend at weight 0.40 (#18; #17 is the pair with the timeout fix) | fold-0 solo 0.5985, triple **0.6068** | cloud |
 | — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |
 | — | 015: forecaster horizons 1+5 and signed error | 0.5751 vs 0.5779 | **killed by pre-stated condition**: the extensions dilute the compact four channels |
 | 016 | peak-hold on the output: the score rides its running maximum, draining 0.1%/step | **0.5799** vs 0.5779, ahead on 4 of 5 | cloud |

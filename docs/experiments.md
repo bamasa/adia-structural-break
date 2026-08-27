@@ -739,3 +739,38 @@ survived two cures — the anchor view and explicit interactions — and goes
 back on the board marked *resistant*: the next candidate is a learned
 detector trained specifically on these cases, which belongs to the network
 line. Meanwhile TCN v3 (297k parameters, 40 epochs) trains overnight.
+
+---
+
+## 033–034 — the trees' blind spot: trajectories
+
+**The premise.** A boosted tree sees each step's 186 channels as an isolated
+snapshot; how the evidence *moves* — ramp shapes, fronts, agreement — is
+invisible to it. Two attacks, one per family.
+
+**034 — channel velocities for the trees: killed.** Deltas of the top-12
+channels over 10 and 30 steps: solo 0.6019 (+0.0003), blend 0.6045 — the
+baseline exactly. Hand-picked derivatives add nothing.
+
+**033 — a network over the channel trajectories: adopted, decisively.** A
+111k-parameter causal TCN reading the 186-channel sequence (ranking loss,
+receptive field 127): fold-0 solo climbs to **0.5985 by epoch 9** — near the
+ranker, from a completely different mechanism — with an overfitting tail
+after (final retrain stops at 10 epochs). The raw-series nets never came
+close (0.5441 at 4x the size); the representation was the bottleneck, not
+capacity. In the shippable score-space blend the net takes a **0.40 weight**:
+0.36 ranker + 0.24 classifier + 0.40 net = **0.6068** on fold 0, against
+0.6045 for the pair. The first network in the project to earn its seat.
+Shipped as #18 with an incremental numpy forward (0.8 ms/step, verified to
+2e-7 against torch). An alignment trap resurfaced on the way — validation
+scores saved in length-sorted order scored 0.5023 against row-ordered labels
+until re-aligned — same trap as the raw-series nets, now twice learned.
+
+**The run #109121 timeout, root-caused.** Submission #16 died in the cloud
+at 7 hours (exit 124) with only 21 quota-minutes consumed: the sklearn
+wrappers spawn a thread pool on every one-row predict, and five million
+spawns across eight workers thrashed the box. The fix — raw
+`booster_.predict(..., num_threads=1)` — profiles at **0.77 ms/step** on the
+longest series (~10 cloud-minutes for the full test). Both #17 (the pair,
+fixed) and #18 (the triple) shipped through the new mandatory profiling
+gate; #15 and #16 must not be re-run.
