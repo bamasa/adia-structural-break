@@ -785,3 +785,14 @@ saturates around 100k parameters — the line is data-bound, not
 capacity-bound, which redirects the effort to averaging and richer inputs
 rather than size. 036 (a seed ensemble of the small architecture) and 037
 (the net fed channels plus both combiners' scores) queued.
+
+---
+
+## 036 — killed: seed-ensembled channel nets
+
+Three seeds of the small architecture: solos 0.5939/0.5929/0.5894, the
+average 0.5933 — below the best single seed — and the triple 0.6067 against
+0.6068. On channel trajectories the nets converge to nearly the same
+solution; there is nothing to average. With 027 this closes the whole
+"multiply and average" family for this project. Next: 037, the net fed the
+channels plus both combiners' OOF scores — learning when to trust them.
