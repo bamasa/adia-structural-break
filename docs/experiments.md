@@ -796,3 +796,18 @@ average 0.5933 — below the best single seed — and the triple 0.6067 against
 solution; there is nothing to average. With 027 this closes the whole
 "multiply and average" family for this project. Next: 037, the net fed the
 channels plus both combiners' OOF scores — learning when to trust them.
+
+---
+
+## 037 — killed: the score-fed net
+
+The channel net with both combiners' OOF scores appended as inputs (188
+dims): peak 0.5915 against the plain net's 0.5985. The scores are functions
+of the channels, and the net spends capacity rediscovering that. With 035 and
+036 this closes the declared trio: bigger, averaged, and score-fed all lose
+to the small plain net. **The line has found its plateau: fold-0 ≈ 0.607,
+cloud ≈ 0.588 (first calibration point: #18 ran 0.5877 in 30 minutes).**
+Breaking it is a different class of effort — a transformer over the channel
+trajectories, real GPU training budget, the owner in the loop on
+architecture — plus the one unclosed averaging idea, an ensemble across fold
+splits rather than seeds.
