@@ -881,3 +881,15 @@ build gets OOM-killed at batch 4000, and again at 500. Three attempts is
 enough flogging: the screen (30k cadence points of fold 0, battery vectors)
 is written and waiting in scripts/experiments/tabpfn_screen.py — it runs in
 minutes on CUDA. First item of the GeForce-3080 programme.
+
+---
+
+## 040b — killed, and the stacking line closes
+
+The honest rerun: four clean members retrained (fold 0 and their own fold
+withheld, models saved to resources040), the meta-ranker fed only
+leak-free features. Verdict: the meta's tree leg 0.6015, with the nets
+0.6080 — against 0.6099 for the fixed sigmoid weights. Twice attempted, one
+leak caught in between: the meta-layer has nothing to add over weighted
+averaging here. The line is closed; the laptop era ends with every local
+computation finished and every verdict written.

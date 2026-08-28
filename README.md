@@ -100,6 +100,8 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | 038 | a fold-ensemble of four channel nets (diversity through withheld folds, not seeds) at a 0.50 blend weight | net solo 0.6004, triple 0.6090 | folded into #19 |
 | 039 | fold-bagged rankers join: 0.35 bagged rankers + 0.15 classifier + 0.50 fold-ensembled nets (#19) | ranker bag solo 0.6033, ensemble 0.6099; **cloud 0.5877 — identical to #18**: fold-0 exhausted as a ruler, protocol amended | cloud, rank 215 |
 | — | 043: long augmented training (48 epochs, noise, channel dropout) | peak 0.5993 vs 0.5985 | **killed**: overfits through the augmentations; the 3080 programme is many short nets on diverse subsamples |
+| — | 040b: stacking rerun on clean members (after the leak) | meta 0.6080 vs fixed weights 0.6099 | **killed**: the meta-layer loses to weighted averaging, twice attempted |
+| — | 042: TabPFN | OOM-killed on CPU ×3 | deferred to the GeForce-3080 kit (scripts/gpu/) |
 | — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |
 | — | 015: forecaster horizons 1+5 and signed error | 0.5751 vs 0.5779 | **killed by pre-stated condition**: the extensions dilute the compact four channels |
 | 016 | peak-hold on the output: the score rides its running maximum, draining 0.1%/step | **0.5799** vs 0.5779, ahead on 4 of 5 | cloud |
