@@ -104,8 +104,9 @@ def main() -> None:
     ap.add_argument("--members", type=int, default=16)
     ap.add_argument("--epochs", type=int, default=10)
     ap.add_argument("--batch", type=int, default=48)
+    ap.add_argument("--device", default="cuda")
     args = ap.parse_args()
-    device = torch.device("cuda")
+    device = torch.device(args.device)
     args.out_dir.mkdir(exist_ok=True)
 
     d = args.data_dir
@@ -169,7 +170,7 @@ def main() -> None:
         batches = [[train_set[i] for i in order[k:k + args.batch]]
                    for k in range(0, len(order), args.batch)]
         best = (0.0, None)
-        t0 = time.time()
+        t0 = time.time()  # noqa: F841 -- per-member timer
         for epoch in range(args.epochs):
             model.train()
             for bi in rng.permutation(len(batches)):
@@ -189,7 +190,7 @@ def main() -> None:
             model.load_state_dict(best[1])
             a1 = validate(model, 1)
             torch.save(best[1], args.out_dir / f"member_{member}.pt")
-        print(f"member {member}: fold0 {best[0]:.4f}, fold1 {a1:.4f}  [{time.time()-t0:.0f}s]",
+        print(f"member {member}: fold0 {best[0]:.4f}, fold1 {a1}  [{time.time()-t0:.0f}s]",
               flush=True)
     print("done", flush=True)
 
