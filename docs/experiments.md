@@ -868,3 +868,16 @@ fold-0 protocol; increments of +0.002–0.003 on it no longer transfer.
 Protocol amended: fold-0 stays for screening and kills; adoption into a
 submission now requires the gain visible on two folds (0 and 1) or ≥0.005 on
 fold 0 alone. The transferable frontier: cloud 0.5877.
+
+---
+
+## 042 — deferred to the 3080: TabPFN
+
+Whitelisted on the platform (with tabpfn-extensions, GPU recommended), and
+the v3 client now needs a PriorLabs API token — so the open v2 it is. On the
+laptop it trains in six seconds and then dies silently on predict: the
+10k-row training context multiplies into memory on every batch, and the CPU
+build gets OOM-killed at batch 4000, and again at 500. Three attempts is
+enough flogging: the screen (30k cadence points of fold 0, battery vectors)
+is written and waiting in scripts/experiments/tabpfn_screen.py — it runs in
+minutes on CUDA. First item of the GeForce-3080 programme.
