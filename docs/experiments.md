@@ -847,3 +847,24 @@ screen were never saved as models — only their fold-0 scores — so an honest
 rerun needs four retrained clean members. Queued at low priority: the fixed
 sigmoid weights over clean arrays are already measured (0.6099), and the
 meta-layer's headroom over them is the only open question.
+
+---
+
+## 043 — killed: the long augmented training
+
+48 epochs, input noise, channel dropout, heavier weight decay, receptive
+field 255, best-epoch checkpointing: the peak lands at **0.5993 vs 0.5985**
+— noise — around epoch 15, and the tail overfits straight through the
+augmentations (loss 0.60 by the end, validation sliding to 0.566). The
+bottleneck is data diversity, not epochs or capacity — for the third time.
+The GeForce-3080 programme is therefore *many short nets on diverse
+subsamples*, not one long one.
+
+## The #19 cloud read: fold-0 is exhausted as a ruler
+
+#19 (nine models, fold-0 0.6099) scored **0.5877 — identical to #18**
+(fold-0 0.6068). Rank 215. Dozens of selection decisions have overfitted the
+fold-0 protocol; increments of +0.002–0.003 on it no longer transfer.
+Protocol amended: fold-0 stays for screening and kills; adoption into a
+submission now requires the gain visible on two folds (0 and 1) or ≥0.005 on
+fold 0 alone. The transferable frontier: cloud 0.5877.

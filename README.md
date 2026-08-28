@@ -98,7 +98,8 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | — | 037: the net fed channels plus both combiners' scores | peak 0.5915 vs 0.5985 | **killed**: the scores are functions of the channels — capacity spent rediscovering them |
 | — | cloud calibration | #18 scored **0.5877** in 30 min | fold-0 − 0.019 ≈ cloud; the 0.65 target means fold-0 ≈ 0.67 |
 | 038 | a fold-ensemble of four channel nets (diversity through withheld folds, not seeds) at a 0.50 blend weight | net solo 0.6004, triple 0.6090 | folded into #19 |
-| 039 | fold-bagged rankers join: 0.35 bagged rankers + 0.15 classifier + 0.50 fold-ensembled nets (#19) | ranker bag solo 0.6033, ensemble **0.6099** | shipping |
+| 039 | fold-bagged rankers join: 0.35 bagged rankers + 0.15 classifier + 0.50 fold-ensembled nets (#19) | ranker bag solo 0.6033, ensemble 0.6099; **cloud 0.5877 — identical to #18**: fold-0 exhausted as a ruler, protocol amended | cloud, rank 215 |
+| — | 043: long augmented training (48 epochs, noise, channel dropout) | peak 0.5993 vs 0.5985 | **killed**: overfits through the augmentations; the 3080 programme is many short nets on diverse subsamples |
 | — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |
 | — | 015: forecaster horizons 1+5 and signed error | 0.5751 vs 0.5779 | **killed by pre-stated condition**: the extensions dilute the compact four channels |
 | 016 | peak-hold on the output: the score rides its running maximum, draining 0.1%/step | **0.5799** vs 0.5779, ahead on 4 of 5 | cloud |
