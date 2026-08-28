@@ -893,3 +893,17 @@ leak-free features. Verdict: the meta's tree leg 0.6015, with the nets
 leak caught in between: the meta-layer has nothing to add over weighted
 averaging here. The line is closed; the laptop era ends with every local
 computation finished and every verdict written.
+
+---
+
+## 044 — shipped: the nets-alone ablation, and the overnight bag
+
+**#20** is the four fold-ensembled channel nets with the trees removed
+(fold-0 solo 0.6004, 1.2 ms/step): after #18 and #19 scored identically in
+the cloud, this is the measurement that decides how much the net line
+transfers — before a GPU day is spent scaling it.
+
+Meanwhile the Mac runs the 3080 programme in miniature overnight: 24 short
+nets, each on a random 60% of the training series, folds 0 and 1 held out as
+the two-fold validation the amended protocol requires. By morning the
+member table says whether the bag scales past its 4-member 0.6004.
