@@ -835,3 +835,15 @@ the single ranker, and the full ensemble — bagged rankers 0.35, classifier
 the ensemble now stand on the same principle: models diversified by withheld
 data, averaged in sigmoid space. Shipping as #19: four rankers + one
 classifier + four nets, all finals retrained with fold 0 included.
+
+---
+
+## 040 — invalidated: the stacking meta-ranker leaked
+
+The meta-features used the *final* bagged rankers (fold 0 included in their
+training) to score fold-0 validation rows: 0.7731 "out of nowhere" was the
+smell, and the leak was found in minutes. The clean bag members from the 039
+screen were never saved as models — only their fold-0 scores — so an honest
+rerun needs four retrained clean members. Queued at low priority: the fixed
+sigmoid weights over clean arrays are already measured (0.6099), and the
+meta-layer's headroom over them is the only open question.
