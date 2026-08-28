@@ -102,7 +102,8 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | — | 043: long augmented training (48 epochs, noise, channel dropout) | peak 0.5993 vs 0.5985 | **killed**: overfits through the augmentations; the 3080 programme is many short nets on diverse subsamples |
 | — | 040b: stacking rerun on clean members (after the leak) | meta 0.6080 vs fixed weights 0.6099 | **killed**: the meta-layer loses to weighted averaging, twice attempted |
 | — | 042: TabPFN | OOM-killed on CPU ×3 | deferred to the GeForce-3080 kit (scripts/gpu/) |
-| 044 | ablation shipped as #20: the four channel nets alone, no trees | fold-0 solo 0.6004 | cloud — the transfer question for the net line |
+| 044 | ablation shipped as #20: the four channel nets alone, no trees | fold-0 solo 0.6004, **cloud 0.5846** (vs 0.5877 for the full #19) | the net line transfers better than the trees |
+| 045 | the twelve-net bag (random-60% subsamples, batched streaming forward) at weight 0.7 (#21) | fold-0 **0.6201**, fold-1 **0.5918** — both folds verified | cloud |
 | — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |
 | — | 015: forecaster horizons 1+5 and signed error | 0.5751 vs 0.5779 | **killed by pre-stated condition**: the extensions dilute the compact four channels |
 | 016 | peak-hold on the output: the score rides its running maximum, draining 0.1%/step | **0.5799** vs 0.5779, ahead on 4 of 5 | cloud |

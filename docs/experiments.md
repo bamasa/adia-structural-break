@@ -907,3 +907,22 @@ Meanwhile the Mac runs the 3080 programme in miniature overnight: 24 short
 nets, each on a random 60% of the training series, folds 0 and 1 held out as
 the two-fold validation the amended protocol requires. By morning the
 member table says whether the bag scales past its 4-member 0.6004.
+
+---
+
+## 045 — adopted on both folds and shipped: the twelve-net bag
+
+The Mac ran the 3080 programme in miniature overnight: 24 short nets on
+random 60% subsamples, folds 0 and 1 never trained on. The bag alone:
+fold-0 **0.6136**, and **0.5880 on fold 1** — the poisonous fold where the
+whole tree stack lived at 0.57x. Member-count sweep says 12 is the plateau
+(0.6152/0.5886). The full ensemble — 0.3·(0.7 bagged rankers + 0.3
+classifier) + 0.7·bag-12 — lands at **fold-0 0.6201, fold-1 0.5918**: both
+folds up ~0.01 over #19, the amended protocol satisfied with room. The cloud
+agreed in advance: the #20 ablation (four nets alone) scored 0.5846 against
+the full #19's 0.5877 — the net line transfers *better* than the trees.
+
+Shipped as #21 with a batched streaming forward: the twelve members' weights
+stacked into single einsums, 1.77 ms/step for the whole bag (verified
+against the per-member forward to 3e-15), ~19 cloud-minutes. The GeForce-3080
+programme now has its confirmed shape: more members, richer subsamples.
