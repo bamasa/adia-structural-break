@@ -998,3 +998,17 @@ What can move past a family ceiling is a new family: representations we do
 not have — raw-series models at real scale, hybrid raw+channel towers,
 TabPFN's tabular prior, channel types not yet invented (the resistant
 fold-1 disease still marks one). That is the GPU's actual job.
+
+---
+
+## 048 — killed at laptop scale: the hybrid two-tower
+
+The first genuinely new family the Mac could afford: a channel tower (the
+proven TCN) fused per-step with a raw-series tower (normalised stream with a
+256-point history tail, receptive field 255). Four members, private
+holdouts: **0.6035 / 0.5589 / 0.5740 / 0.5938** — mean ≈0.583 with wild
+variance, against ≈0.60 for the plain heavy channel nets on the same
+protocol. The raw tower adds noise, not signal, at this scale; no cloud run
+is spent on it (the new regime reserves those for promising bets). The idea
+survives as a 3080 item in one specific form — a raw tower *pretrained* at
+real capacity — but as a laptop line it is closed.
