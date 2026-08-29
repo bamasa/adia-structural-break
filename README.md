@@ -108,6 +108,7 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | — | the #21 cloud read | fold-0 0.6201 / fold-1 0.5918 → **cloud 0.5810** | both local folds burnt by selection; the paradigm shifts to few large bets validated in the cloud |
 | 047 | eight heavy members (88% of all data, 16 epochs, private holdouts) at #19's exact weights (#22) | **cloud 0.5876 vs 0.5877** | the family's ceiling measured at ≈0.588: count, weights, and member quality all exhausted — a new representation family is required |
 | — | 048: the hybrid two-tower (channels + raw series) | holdouts 0.6035/0.5589/0.5740/0.5938 | **killed at laptop scale**: the raw tower adds variance, not signal; revisit only pretrained at 3080 capacity |
+| — | 049: self-supervised pretraining of the channel backbone | finetuned members 0.5887/0.5943/0.5874 vs ≈0.60 from scratch | **killed**: the backbone clings to forecasting and resists ranking; the laptop era closes |
 | — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |
 | — | 015: forecaster horizons 1+5 and signed error | 0.5751 vs 0.5779 | **killed by pre-stated condition**: the extensions dilute the compact four channels |
 | 016 | peak-hold on the output: the score rides its running maximum, draining 0.1%/step | **0.5799** vs 0.5779, ahead on 4 of 5 | cloud |

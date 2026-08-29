@@ -1012,3 +1012,17 @@ protocol. The raw tower adds noise, not signal, at this scale; no cloud run
 is spent on it (the new regime reserves those for promising bets). The idea
 survives as a 3080 item in one specific form — a raw tower *pretrained* at
 real capacity — but as a laptop line it is closed.
+
+---
+
+## 049 — killed, and the laptop era closes for real
+
+Self-supervised pretraining of the channel backbone (predict the next
+channel vector — huber falls 0.107 → 0.047 in twelve minutes, the dynamics
+are learnable) followed by ranking-loss finetunes: **0.5887 / 0.5943 /
+0.5874** against ≈0.60 for the same recipe trained from scratch. The
+pretrained backbone clings to its forecasting task and slightly *resists*
+the ranking one. The last laptop-scale idea is spent. Forty-nine
+experiments; the cloud ceiling of the family stands at 0.588; everything
+that remains lives on CUDA: TabPFN, a raw-series model at real capacity,
+and whatever new family the two of us design next.
