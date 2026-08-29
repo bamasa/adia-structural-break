@@ -926,3 +926,18 @@ Shipped as #21 with a batched streaming forward: the twelve members' weights
 stacked into single einsums, 1.77 ms/step for the whole bag (verified
 against the per-member forward to 3e-15), ~19 cloud-minutes. The GeForce-3080
 programme now has its confirmed shape: more members, richer subsamples.
+
+---
+
+## 046 — the scaling law says no: the bag saturates at twelve
+
+Forty-eight more members over six hours — three architectures, subsample
+fractions 0.5/0.6/0.7 — and the growth curve points *down*: 12 → 24 → 48 →
+72 members gives 0.6152 → 0.6136 → 0.6099 → 0.6076 on fold 0, the same shape
+on fold 1. Averaging does not rescue weak members; it dilutes with them. The
+twelve of #21 remain the optimum, and six Mac-hours just saved the GPU day
+from its default mistake: a hundred members would have been worse than
+twelve. The 3080 programme is rewritten: *stronger members, not more* —
+larger fractions (0.75–0.85) across different splits, more epochs with
+early stopping per member, richer member inputs — plus the TabPFN screen.
+Member quality dominates count; the curve is the proof.
