@@ -981,3 +981,20 @@ weights are exactly #19's (0.35 bagged rankers + 0.15 classifier + 0.50
 nets), so the cloud score isolates a single variable — member quality (88%
 data vs #19's 80%, 16 epochs vs 10, private-holdout early stopping). The
 frontier to beat: 0.5877.
+
+---
+
+## The #22 verdict: the family's ceiling, measured
+
+The clean A/B returned **0.5876 against #19's 0.5877** — member quality
+(88% data, 16 epochs, private holdouts) moves the cloud by nothing, exactly
+as member count (#21) and weights did not. The conclusion is now
+overdetermined: the current family — 186 hand-built channels, TCNs over
+their trajectories, bagged trees — has a cloud ceiling at **≈0.588**, and
+we have hit it from every direction the family allows. The heavy-member
+pipeline is stopped (14 members kept on disk).
+
+What can move past a family ceiling is a new family: representations we do
+not have — raw-series models at real scale, hybrid raw+channel towers,
+TabPFN's tabular prior, channel types not yet invented (the resistant
+fold-1 disease still marks one). That is the GPU's actual job.
