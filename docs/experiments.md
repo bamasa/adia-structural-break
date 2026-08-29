@@ -965,3 +965,19 @@ five cloud runs a day are the only ruler that cannot be burnt. The GPU day
 becomes one strong thing (members on 85–90% of the data, trained long),
 A/B-tested in the cloud, not against folds. The cloud frontier to beat
 remains #18/#19's 0.5877.
+
+---
+
+## 047 — the first bet of the cloud-validated era
+
+Heavy members: each net sees 88% of ALL training series (a fresh random cut
+per member), trains 16 epochs, and picks its best epoch on a private 8%
+holdout of its own — the burnt folds play no part in anything. The Mac
+pipeline is resumable (finished members are skipped) and will keep producing
+members until the 3080 takes over with the same script.
+
+Shipped as **#22** after the first eight members: the ensemble formula and
+weights are exactly #19's (0.35 bagged rankers + 0.15 classifier + 0.50
+nets), so the cloud score isolates a single variable — member quality (88%
+data vs #19's 80%, 16 epochs vs 10, private-holdout early stopping). The
+frontier to beat: 0.5877.
