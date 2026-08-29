@@ -941,3 +941,27 @@ twelve. The 3080 programme is rewritten: *stronger members, not more* —
 larger fractions (0.75–0.85) across different splits, more epochs with
 early stopping per member, richer member inputs — plus the TabPFN screen.
 Member quality dominates count; the curve is the proof.
+
+---
+
+## The #21 cloud read: both folds are burnt, the paradigm shifts
+
+#21 (the twelve-net bag at 0.7; fold-0 0.6201, fold-1 0.5918 — both folds
+verified) scored **0.5810** in the cloud: below the nine-model 0.5877 and
+below the nets-alone 0.5846. Two lessons, neither small.
+
+First: fold 1 joined the protocol yesterday and was burnt within a day —
+member selection and the 0.7 weight were tuned against it, and its +0.01
+was selection noise, exactly as fold 0's was at #19. With ~10k training
+series, local validation is exhausted as a way to certify +0.01 increments:
+any fold we optimise against stops transferring within dozens of decisions.
+
+Second: the bag members each saw ~36% of the data, and averaging does not
+buy that back on fresh series — the #19/#20 nets that saw 80% each are
+simply stronger in the cloud.
+
+The operating mode changes: fewer, larger bets, validated where it counts —
+five cloud runs a day are the only ruler that cannot be burnt. The GPU day
+becomes one strong thing (members on 85–90% of the data, trained long),
+A/B-tested in the cloud, not against folds. The cloud frontier to beat
+remains #18/#19's 0.5877.
