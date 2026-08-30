@@ -111,7 +111,7 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | — | 049: self-supervised pretraining of the channel backbone | finetuned members 0.5887/0.5943/0.5874 vs ≈0.60 from scratch | **killed**: the backbone clings to forecasting and resists ranking; the laptop era closes |
 | — | 050: metric-aligned training weights (pair-proportional) | 0.5912 / 0.6003 vs 0.5952 / 0.6016 | **killed**: equal-step weighting regularises; the 48× mismatch was not the problem |
 | — | 051: history-level calibration of the score | 0.5577 subtracting, +0.0007 adding | **killed with a reversal**: the history level predicts breaks *positively* (0.5297 solo) |
-| 053 | the spectral family: 14 frequency-domain channels (#23) | ranker 0.6032, pair **0.6060** (vs 0.6016 / 0.6045) | cloud — the first new modality since the forecaster |
+| 053 | the spectral family: 14 frequency-domain channels (#23) | fold-0 pair 0.6060; **cloud 0.5893 vs the 0.5877 ceiling** | the ceiling breaks — the first new modality since the forecaster transfers exactly |
 | — | 054: spectral v2 (windows 32/128, increment spectra, band balance) | 0.6026 / 0.6053 vs v1's 0.6032 / 0.6060 | **killed**: v1's fourteen channels are the family's optimum |
 | 055 | trees alone on the 200 spectral channels, no nets (#24) | fold-0 pair 0.6060; 0.74 ms/step | cloud — the configuration never tried |
 | — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |

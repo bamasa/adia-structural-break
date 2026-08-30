@@ -1081,3 +1081,24 @@ ranker and classifier with no nets at all (0.74 ms/step, the fastest
 submission yet). Together with #23 it forms today's pair of cloud
 questions: does the new modality transfer (#23), and have the nets been
 carrying anything at all (#24).
+
+---
+
+## #23 in the cloud: 0.5893 — the ceiling breaks
+
+Five consecutive submissions sat at 0.5877 whatever we changed inside the
+family; the spectral channels moved it to **0.5893**. The gain matches the
+fold-0 screen exactly (+0.0016 there, +0.0016 here), which is the cleanest
+transfer this project has recorded — and the reason is what the channels
+are: the first *new information* since the forecaster, not another
+arrangement of the same evidence.
+
+The lesson generalises past this competition: when a family saturates, no
+amount of model work moves it, and a single new modality does. Everything
+that failed this week (bag size, member quality, stacking, weights,
+pretraining, the hybrid) rearranged known information; the one thing that
+worked added an unknown one.
+
+New frontier: **0.5893**. Next: #24 answers whether the nets carry anything
+in battle, and the modality question reopens — what else is the project
+still blind to?
