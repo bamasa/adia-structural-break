@@ -113,6 +113,7 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | — | 051: history-level calibration of the score | 0.5577 subtracting, +0.0007 adding | **killed with a reversal**: the history level predicts breaks *positively* (0.5297 solo) |
 | 053 | the spectral family: 14 frequency-domain channels (#23) | ranker 0.6032, pair **0.6060** (vs 0.6016 / 0.6045) | cloud — the first new modality since the forecaster |
 | — | 054: spectral v2 (windows 32/128, increment spectra, band balance) | 0.6026 / 0.6053 vs v1's 0.6032 / 0.6060 | **killed**: v1's fourteen channels are the family's optimum |
+| 055 | trees alone on the 200 spectral channels, no nets (#24) | fold-0 pair 0.6060; 0.74 ms/step | cloud — the configuration never tried |
 | — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |
 | — | 015: forecaster horizons 1+5 and signed error | 0.5751 vs 0.5779 | **killed by pre-stated condition**: the extensions dilute the compact four channels |
 | 016 | peak-hold on the output: the score rides its running maximum, draining 0.1%/step | **0.5799** vs 0.5779, ahead on 4 of 5 | cloud |

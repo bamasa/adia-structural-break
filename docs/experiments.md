@@ -1069,3 +1069,15 @@ structure moved), low-versus-high band balance — and the ranker drops to
 fourteen-channel v1 is the family's optimum; #23 already carries exactly
 those. Dilution inside a family, for the seventh time in this project: the
 first good channels of a modality take almost everything it has.
+
+---
+
+## 055 — shipped as #24: trees alone, the untried cloud configuration
+
+Every cloud submission this project has made carried networks, and every one
+landed within 0.003 of 0.5877; the nets alone scored 0.5846. The one thing
+never tried is the other half by itself. #24 is the spectral-augmented
+ranker and classifier with no nets at all (0.74 ms/step, the fastest
+submission yet). Together with #23 it forms today's pair of cloud
+questions: does the new modality transfer (#23), and have the nets been
+carrying anything at all (#24).
