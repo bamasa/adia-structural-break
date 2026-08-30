@@ -1102,3 +1102,23 @@ worked added an unknown one.
 New frontier: **0.5893**. Next: #24 answers whether the nets carry anything
 in battle, and the modality question reopens — what else is the project
 still blind to?
+
+---
+
+## #24 in the cloud: 0.5853 — the nets do earn their place
+
+Trees alone on the spectral channels score 0.5853 against the full #23's
+0.5893: the networks are worth **+0.0040** in battle, and the ensemble's
+two halves are now both measured against a common baseline —
+
+| configuration | cloud |
+|---|---|
+| trees alone (#24) | 0.5853 |
+| nets alone (#20) | 0.5846 |
+| trees + nets, no spectral (#19) | 0.5877 |
+| trees + nets, with spectral (#23) | **0.5893** |
+
+Neither half reaches the pair; the halves are close to each other and the
+combination beats both — textbook complementarity, and the spectral
+channels lift the whole. Nothing here is to be simplified away: the
+frontier stands at 0.5893 with everything in place.
