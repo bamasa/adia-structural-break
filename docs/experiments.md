@@ -1026,3 +1026,34 @@ the ranking one. The last laptop-scale idea is spent. Forty-nine
 experiments; the cloud ceiling of the family stands at 0.588; everything
 that remains lives on CUDA: TabPFN, a raw-series model at real capacity,
 and whatever new family the two of us design next.
+
+---
+
+## 050–052 — three structural probes, one survivor
+
+**050 — metric-aligned weights: killed.** The metric weights a step by its
+pos×neg pair count; our training weighted every step equally — a mismatch of
+up to 48× (step 0 carries 289k pairs, step 300 carries 9.9M). Retraining
+with pair-proportional weights *hurt*: classifier 0.5952 → 0.5912, ranker
+0.6016 → 0.6003. Equal-step weighting is acting as a regulariser, and the
+misalignment was never the problem.
+
+**051 — history-level calibration: killed, with a reversal.** The
+inspection notebook's old diagnosis (clean-but-jittery series outrank broken
+ones) suggested discounting each series by the score its own break-free
+history earns. Subtracting it collapses the pair to 0.5577 — because the
+history level *predicts breaks positively* (0.5297 standalone: series that
+look restless in history do break more often). Adding it back gives +0.0007,
+noise: the models already know.
+
+**052 — the spectral family: adopted, shipped as #23.** Every channel this
+project owned lived in the time domain; a break that rearranges periodicity
+without touching level or variance passed them all unseen. Fourteen
+frequency-domain channels — eight power bands read in the history's own
+sigmas, plus entropy, peak-frequency, total-power shifts and spectral shape
+distance — lift the ranker 0.6016 → 0.6032 and the pair 0.6045 → 0.6060.
+Adding the step index on top cancels the gain (0.6017/0.6045), confirming
+experiment 010's verdict on step. The trees are retrained on all 200
+channels, the eight heavy nets of #22 read the first 186 unchanged, and the
+ensemble weights are #22's exactly, so the cloud isolates one variable: new
+information, in a modality the project had never touched.

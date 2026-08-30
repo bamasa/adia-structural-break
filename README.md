@@ -109,6 +109,9 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | 047 | eight heavy members (88% of all data, 16 epochs, private holdouts) at #19's exact weights (#22) | **cloud 0.5876 vs 0.5877** | the family's ceiling measured at ≈0.588: count, weights, and member quality all exhausted — a new representation family is required |
 | — | 048: the hybrid two-tower (channels + raw series) | holdouts 0.6035/0.5589/0.5740/0.5938 | **killed at laptop scale**: the raw tower adds variance, not signal; revisit only pretrained at 3080 capacity |
 | — | 049: self-supervised pretraining of the channel backbone | finetuned members 0.5887/0.5943/0.5874 vs ≈0.60 from scratch | **killed**: the backbone clings to forecasting and resists ranking; the laptop era closes |
+| — | 050: metric-aligned training weights (pair-proportional) | 0.5912 / 0.6003 vs 0.5952 / 0.6016 | **killed**: equal-step weighting regularises; the 48× mismatch was not the problem |
+| — | 051: history-level calibration of the score | 0.5577 subtracting, +0.0007 adding | **killed with a reversal**: the history level predicts breaks *positively* (0.5297 solo) |
+| 053 | the spectral family: 14 frequency-domain channels (#23) | ranker 0.6032, pair **0.6060** (vs 0.6016 / 0.6045) | cloud — the first new modality since the forecaster |
 | — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |
 | — | 015: forecaster horizons 1+5 and signed error | 0.5751 vs 0.5779 | **killed by pre-stated condition**: the extensions dilute the compact four channels |
 | 016 | peak-hold on the output: the score rides its running maximum, draining 0.1%/step | **0.5799** vs 0.5779, ahead on 4 of 5 | cloud |
