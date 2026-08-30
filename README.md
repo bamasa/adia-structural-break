@@ -114,6 +114,7 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | 053 | the spectral family: 14 frequency-domain channels (#23) | fold-0 pair 0.6060; **cloud 0.5893 vs the 0.5877 ceiling** | the ceiling breaks — the first new modality since the forecaster transfers exactly |
 | — | 054: spectral v2 (windows 32/128, increment spectra, band balance) | 0.6026 / 0.6053 vs v1's 0.6032 / 0.6060 | **killed**: v1's fourteen channels are the family's optimum |
 | 055 | trees alone on the 200 spectral channels, no nets (#24) | **cloud 0.5853** vs #23's 0.5893 | the nets are worth +0.0040 in battle; nothing to simplify away |
+| 056 | the spectral gain re-measured on fold 2, untouched by any selection | 0.5912 → **0.5967 (+0.0055)** | three independent readings agree; folds 3–4 held in reserve as unspent rulers |
 | — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |
 | — | 015: forecaster horizons 1+5 and signed error | 0.5751 vs 0.5779 | **killed by pre-stated condition**: the extensions dilute the compact four channels |
 | 016 | peak-hold on the output: the score rides its running maximum, draining 0.1%/step | **0.5799** vs 0.5779, ahead on 4 of 5 | cloud |

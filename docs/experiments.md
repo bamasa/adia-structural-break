@@ -1122,3 +1122,20 @@ Neither half reaches the pair; the halves are close to each other and the
 combination beats both — textbook complementarity, and the spectral
 channels lift the whole. Nothing here is to be simplified away: the
 frontier stands at 0.5893 with everything in place.
+
+---
+
+## 056 — the virgin-fold confirmation
+
+Folds 2, 3 and 4 have never taken part in a single decision of this
+project; fold 2 is therefore the one honest local ruler left. Trained on
+everything else, the spectral channels move it **0.5912 → 0.5967
+(+0.0055)** — larger than the burnt fold-0 screen suggested (+0.0016) and
+in the same direction as the cloud (+0.0016). Three independent readings,
+one sign: the modality is real.
+
+It also quantifies what selection cost us: on a burnt fold, a genuine +0.005
+was compressed to +0.002 — years of small "improvements" measured there were
+probably the same effect running the other way. Folds 3 and 4 remain
+unspent; they are the reserve rulers for the GPU era, to be used once each
+and never for tuning.
