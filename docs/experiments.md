@@ -1057,3 +1057,15 @@ experiment 010's verdict on step. The trees are retrained on all 200
 channels, the eight heavy nets of #22 read the first 186 unchanged, and the
 ensemble weights are #22's exactly, so the cloud isolates one variable: new
 information, in a modality the project had never touched.
+
+---
+
+## 054 — killed: spectral v2
+
+Thirty-two more frequency channels — windows 32 and 128 beside the shipped
+64, the spectrum of *increments* (a different question: has the correlation
+structure moved), low-versus-high band balance — and the ranker drops to
+0.6026 against v1's 0.6032, the pair to 0.6053 against 0.6060. The
+fourteen-channel v1 is the family's optimum; #23 already carries exactly
+those. Dilution inside a family, for the seventh time in this project: the
+first good channels of a modality take almost everything it has.
