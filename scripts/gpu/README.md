@@ -9,6 +9,15 @@ this directory exists to train them properly and bring them home.
 Everything else — building the channels, training the trees, assembling and
 profiling the submission — stays on the laptop and is fast there.
 
+## Quick start
+
+    git clone <this repository> && cd adia-structural-break
+    pip install numpy torch --index-url https://download.pytorch.org/whl/cu121
+    ./scripts/gpu/run.sh /path/to/matrices 24
+
+That is the whole job. The rest of this page explains what it needs, what it
+trains, and why it is shaped this way.
+
 ## What you need
 
 * A CUDA GPU (developed against a 3080, 16 GB; less will do with a smaller
@@ -24,10 +33,6 @@ profiling the submission — stays on the laptop and is fast there.
   `rsync` or a stick.
 
 ## Run it
-
-    git clone <this repository> && cd adia-structural-break
-    pip install numpy torch --index-url https://download.pytorch.org/whl/cu121
-    ./scripts/gpu/run.sh /path/to/matrices 24
 
 The runner checks the box first (CUDA present, all matrices consistent,
 measured speed per member), prints what it found, and only then trains. Each
