@@ -118,7 +118,9 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | — | 057–060: wavelets, rank tests, matched filters | 0.5933 / 0.5929 / 0.5815 vs 0.5979 | **all killed**: at 200 channels hand-built families dilute |
 | 062 | ranker resweep at 200 channels (63 leaves, colsample 0.5) | 0.5922 → **0.5956** | adopted |
 | 065 | augmented training data: history boundary moved right, breaks land earlier | tree pair 0.5999 → **0.6043** | adopted — the largest single gain of the day |
-| 066–068 | augmentation splits the combiners: rankers train on augmented data (best ranker 0.6029), the classifier on clean; six best net members by holdout | **fold-2 0.6106** (≈0.604 cloud) vs shipped 0.5893 | held back; target is fold-2 0.617 |
+| 066–069 | augmentation splits the combiners: rankers and nets train on augmented data (best ranker 0.6029, best aug net 0.6286), the classifier on clean | **fold-2 0.6106** vs 0.5979 for the configuration that scored 0.5893 | shipped |
+| 071–072 | shipped: #26 (six selected nets) and #27 (augmented + clean rankers, clean classifier, eight nets) | fold-2 0.6106 | cloud |
+| — | #25: broken upload, do not run | — | a `channels[:186]` slice survived the spectral upgrade; the push followed the check with `;` instead of `&&` |
 | — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |
 | — | 015: forecaster horizons 1+5 and signed error | 0.5751 vs 0.5779 | **killed by pre-stated condition**: the extensions dilute the compact four channels |
 | 016 | peak-hold on the output: the score rides its running maximum, draining 0.1%/step | **0.5799** vs 0.5779, ahead on 4 of 5 | cloud |

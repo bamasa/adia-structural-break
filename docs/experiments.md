@@ -1211,3 +1211,30 @@ selected by their private holdouts:
 
 That calibrates to roughly 0.604 in the cloud against the shipped 0.5893.
 The target is fold-2 0.617; nothing is submitted until it is met.
+
+---
+
+## 069–072 — augmentation reaches the networks, and two submissions ship
+
+Nets trained on the augmented pool (original series plus pseudo-series with
+the boundary moved right) came out consistently strong: holdouts 0.6010,
+0.6286, 0.6217 against ~0.59 typical for the clean-data generation. The
+strongest members of every pool now come from augmented training, which
+matches the trees' story and the project's oldest lesson — this line is
+data-bound, and the boundary shift manufactures the data it lacks.
+
+Two submissions went out:
+
+* **#26** — the six best net members by private holdout on spectral trees,
+  weights from the untouched fold 2.
+* **#27** — the full shape: an augmented ranker (trained on 8.8M rows) and a
+  clean one, a classifier on clean data only, and the eight best nets.
+  Fold 2: **0.6106** against 0.5979 for the configuration that scored 0.5893
+  in the cloud.
+
+**#25 is broken and must not be run.** Its interface kept a `channels[:186]`
+slice from the era when the nets predated the spectral family, so the
+200-channel members received 186 inputs. The verification caught it — and
+the push ran anyway, because the shell chained it after the check with `;`
+instead of `&&`. The rule that follows: the push command must depend on the
+verification's exit status, never merely follow it.
