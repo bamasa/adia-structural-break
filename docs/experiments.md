@@ -1139,3 +1139,49 @@ was compressed to +0.002 — years of small "improvements" measured there were
 probably the same effect running the other way. Folds 3 and 4 remain
 unspent; they are the reserve rulers for the GPU era, to be used once each
 and never for tuning.
+
+---
+
+## 057–066 — the hand-crafted era ends, the data era begins
+
+Four more channel families were built and screened on fold 2 (untouched by
+any earlier decision), and all four lost:
+
+| family | fold-2 pair | verdict |
+|---|---|---|
+| baseline (200 channels) | 0.5979 | — |
+| wavelets (16) | 0.5933 | killed |
+| rank two-sample tests (14) | 0.5929 | killed |
+| matched filter bank (24) | 0.5815 | killed |
+
+At 200 channels every additional hand-built family dilutes: with colsample
+0.8 each tree sees 160 columns, and weak newcomers crowd out strong
+incumbents. The spectral family remains the exception that proved the rule —
+it carried a modality nothing else had.
+
+What did pay, in order of size:
+
+* **Augmented training data (065): +0.0044 on the tree pair.** Move the
+  history boundary right: history H + online O[:k] with k < tau, online
+  O[k:], break at tau−k. The new history is break-free by construction and
+  the break lands earlier — precisely where the metric is thin. Nine
+  thousand pseudo-series doubled the rows and lifted the pair 0.5999 →
+  0.6043.
+* **Nets retrained on the 200 channels (058).** They had never seen the
+  spectral family; the strongest member reached holdout 0.6349 against ~0.60
+  typical for the 186-channel generation.
+* **Ranker resweep at 200 channels (062): +0.0034.** 63 leaves with
+  colsample 0.5 — the same decorrelation that helped the classifier a
+  hundred channels ago. The classifier's own sweep found nothing: it is
+  already optimal.
+* **Member selection by private holdout: +0.0014.** Members vary from 0.588
+  to 0.635; averaging the best half beats averaging all.
+* **A second net variant (063): channels plus their differences**, 600
+  inputs — the differences the trees rejected (034) help the nets, whose
+  members reached 0.6178.
+
+Together: **fold-2 0.5979 → 0.6091** (augmented trees + best half of both
+net pools at weight 0.5), which calibrates to roughly 0.601 in the cloud
+against the shipped 0.5893. Nothing is submitted yet — the target is
+fold-2 0.617, and the next lever is the one that just proved itself:
+three cuts per series instead of one.
