@@ -1238,3 +1238,25 @@ slice from the era when the nets predated the spectral family, so the
 the push ran anyway, because the shell chained it after the check with `;`
 instead of `&&`. The rule that follows: the push command must depend on the
 verification's exit status, never merely follow it.
+
+---
+
+## 073 — the net half is saturated
+
+Ten augmented members finished, and the pool now holds seventeen. The best
+of them reached **0.6473** on its private holdout — a project record, the
+previous being 0.6349 — yet the ensemble barely moved: ten members at equal
+weights give fold-2 0.6116 against 0.6106 for the eight shipped in #27, and
+softmax weighting by holdout quality adds exactly nothing (0.6116 again,
+whatever the temperature). A single excellent member dissolves in the
+average; the half is saturated at its current recipe.
+
+The day's ledger on the untouched fold: **0.5979 → 0.6116**, of which
+augmentation contributed the most (trees +0.0044, and the strongest members
+of every net pool now come from augmented training), the ranker resweep
++0.0034, and holdout-based selection the rest. Four hand-crafted channel
+families were built and killed in the same span.
+
+What remains untried at laptop scale is thin: a third ranker breed, and the
+GPU pool of twenty-four members where selection could actually bite. The
+cloud numbers for #26 and #27 will say where the 0.6116 really landed.
