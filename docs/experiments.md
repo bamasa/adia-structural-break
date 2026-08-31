@@ -1185,3 +1185,29 @@ net pools at weight 0.5), which calibrates to roughly 0.601 in the cloud
 against the shipped 0.5893. Nothing is submitted yet — the target is
 fold-2 0.617, and the next lever is the one that just proved itself:
 three cuts per series instead of one.
+
+---
+
+## 067–068 — augmentation splits the two combiners
+
+Three cuts per series instead of one produced 27k pseudo-series, and the
+result is a split verdict: the **ranker reached 0.6029** — its best ever,
+against 0.5956 clean — while the **classifier fell to 0.5874** from 0.5980.
+Ranking learns from more, noisier orderings; the classifier's probabilities
+degrade when the same series appears three times with correlated rows.
+
+So the components stop sharing a training set. The best assembly to date
+takes both augmented rankers (single and triple cuts), the classifier
+trained on clean data only, and the six best members of the two net pools
+selected by their private holdouts:
+
+| stage | fold-2 |
+|---|---|
+| morning baseline | 0.5979 |
+| + augmented trees | 0.6043 |
+| + ranker resweep, net retrain | 0.6091 |
+| + split training sets, two rankers | 0.6103 |
+| + both net pools, six best members | **0.6106** |
+
+That calibrates to roughly 0.604 in the cloud against the shipped 0.5893.
+The target is fold-2 0.617; nothing is submitted until it is met.
