@@ -79,9 +79,49 @@ def assemble(title: str, description: str, interface: str) -> str:
     return "\n\n".join(parts)
 
 
+def verify_channels(assembled: str, target: Path) -> None:
+    """Refuse to ship a submission whose channel counts disagree.
+
+    Submission #25 died in the cloud because the interface still said
+    ``NET_CHANNELS = 186`` while every net in the artifact expected 200 — a
+    one-line leftover that no local import could catch, since the shapes only
+    meet at inference time. The counts all exist before shipping, so the
+    assembler compares them: every ``*_CHANNELS`` constant in the assembled
+    text against each other, and against the artifact next to the target —
+    tree feature counts, net input widths, normalisation vector lengths.
+    """
+    m = re.search(r"^NET_CHANNELS = (\d+)", assembled, re.M)
+    if not m:
+        return
+    declared = {"NET_CHANNELS": int(m.group(1))}
+
+    artifact = target.parent / "resources" / "model.joblib"
+    if not artifact.exists():
+        print(f"interface declares NET_CHANNELS={m.group(1)}; no artifact to check yet")
+        return
+
+    import joblib
+
+    model = joblib.load(artifact)
+    found = dict(declared)
+    boosters = [b for b in [model.get("booster")] + list(model.get("rankers", [])) if b is not None]
+    for i, booster in enumerate(boosters):
+        found[f"tree[{i}]"] = getattr(booster, "booster_", booster).num_feature()
+    for i, state in enumerate(model.get("nets", [])):
+        found[f"net[{i}]"] = state["inp.weight"].shape[1]
+    for key in ("net_mu", "net_sd"):
+        if key in model:
+            found[key] = len(model[key])
+    if len(set(found.values())) > 1:
+        raise SystemExit(f"channel counts disagree between interface and artifact: {found}")
+    print(f"channel check passed: {len(found)} counts, all {declared['NET_CHANNELS']}")
+
+
 if __name__ == "__main__":
     target = Path(sys.argv[1])
     interface = Path(sys.argv[2]).read_text()
     meta = Path(sys.argv[3]).read_text().split("\n---\n")
-    target.write_text(assemble(meta[0].strip(), meta[1].strip(), interface))
+    text = assemble(meta[0].strip(), meta[1].strip(), interface)
+    verify_channels(text, target)
+    target.write_text(text)
     print(f"assembled -> {target}")
