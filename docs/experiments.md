@@ -1260,3 +1260,25 @@ families were built and killed in the same span.
 What remains untried at laptop scale is thin: a third ranker breed, and the
 GPU pool of twenty-four members where selection could actually bite. The
 cloud numbers for #26 and #27 will say where the 0.6116 really landed.
+
+---
+
+## 074 — a third ranker breed, killed
+
+Hypothesis: the tree half rests on two rankers of near-identical
+configuration; a breed with different geometry (127 leaves, lr 0.02,
+colsample 0.7, truncation 1000, its own seed) trained on the same augmented
+set would add diversity. Kill condition: the three-ranker blend is no better
+than two.
+
+Killed cleanly. Solo 0.5960 against 0.6034 for the standard breed, and the
+blend degrades monotonically with its share — 0.6107 at zero, 0.6093 at a
+quarter. Tree geometry is not a source of diversity here: both breeds read
+the same channels off the same rows and disagree only where neither is
+right. A joint weight sweep the same day (rankers × classifier × nets on a
+0.05 grid) plateaued at 0.6104–0.6116 — the current composition is fully
+squeezed.
+
+Laptop-scale levers are now exhausted. The fold-2 ledger stands at
+**0.6116**; what remains is the cloud verdict on #26/#27 and the
+twenty-four-member GPU pool.

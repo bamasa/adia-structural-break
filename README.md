@@ -121,6 +121,7 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | 066–069 | augmentation splits the combiners: rankers and nets train on augmented data (best ranker 0.6029, best aug net 0.6286), the classifier on clean | **fold-2 0.6106** vs 0.5979 for the configuration that scored 0.5893 | shipped |
 | 071–072 | shipped: #26 (six selected nets) and #27 (augmented + clean rankers, clean classifier, eight nets) | fold-2 0.6106 | cloud |
 | 073 | ten augmented nets finish; best member 0.6473 (project record), weighted averaging tested | fold-2 **0.6116** — +0.001 over the shipped eight | the net half is saturated at this recipe |
+| 074 | third ranker breed (127 leaves, truncation 1000) + joint weight sweep | solo 0.5960, any share degrades the blend; sweep plateaus at 0.6104–0.6116 | killed — laptop-scale levers exhausted |
 | — | #25: broken upload, do not run | — | a `channels[:186]` slice survived the spectral upgrade; the push followed the check with `;` instead of `&&` |
 | — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |
 | — | 015: forecaster horizons 1+5 and signed error | 0.5751 vs 0.5779 | **killed by pre-stated condition**: the extensions dilute the compact four channels |
