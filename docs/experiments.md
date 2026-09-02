@@ -1282,3 +1282,27 @@ squeezed.
 Laptop-scale levers are now exhausted. The fold-2 ledger stands at
 **0.6116**; what remains is the cloud verdict on #26/#27 and the
 twenty-four-member GPU pool.
+
+---
+
+## 075 — augmentation reaches the diff nets
+
+The last untried combination at laptop scale: the diff architecture (600
+inputs — channels plus lag-1 and lag-10 differences) had only ever trained
+on clean data (best holdout 0.6178), while augmentation had lifted every
+plain pool it touched. Six diff members trained overnight on the augmented
+set; holdouts 0.5695–0.6458, two above the old diff record.
+
+The ensemble verdict is mixed. Adding diff members helps monotonically —
+the best mix is *all six*, including the weakest — and lifts fold-2 from
+0.6116 to **0.6120**. So the gain is architectural diversity, not member
+quality: the member with the record 0.6458 holdout scores a dismal 0.5863
+on fold-2, the worst of the six. Diff-net holdouts do not transfer; plain
+holdouts do. Selection within the diff pool should therefore be by fold-2,
+or not at all.
+
++0.0004 does not justify a submission slot by itself. The mix (12 plain +
+6 diff, net weight 0.5) is the new local ledger and goes into the next
+assembly whenever a bigger gain — the GPU pool, or a new modality — pays
+for the slot. Per-member fold-2 sigmoids are cached as
+``fold2_sig_*.npy`` for instant recombination.
