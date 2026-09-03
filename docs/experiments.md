@@ -1306,3 +1306,34 @@ or not at all.
 assembly whenever a bigger gain — the GPU pool, or a new modality — pays
 for the slot. Per-member fold-2 sigmoids are cached as
 ``fold2_sig_*.npy`` for instant recombination.
+
+---
+
+## 076 — the triple augmentation reaches the nets; submission #28
+
+Hypothesis: the nets are data-bound, and every pool so far saw at most the
+single boundary augmentation (7,241 pseudo-series). The triple version —
+three random slices per original, 26,887 pseudo-series, 8.3 GB read through
+a memory map — had only ever fed the ranker, where it did nothing. Kill
+condition: members no stronger than the single-augmentation pools on the
+untouched fold.
+
+Not killed — the opposite. Six plain members, fold-2 solo scores
+0.6048 / 0.6027 / 0.6047 / 0.5983 / 0.5981 / **0.6102**: every earlier
+member in the project sat below 0.60, and the last one alone beats the
+previous ten-member net ensemble (0.6016). The six together read 0.6108 as
+the net half — above the *entire* #27 ensemble — and blended 0.55 to the
+trees (augmented ranker 0.7, clean classifier 0.3) give fold-2 **0.6163**,
+against 0.6106 for #27.
+
+Three lessons on the way. A diff member trained the same way reached a
+0.6543 holdout — the highest number the project has produced — and scored
+0.5875 on fold 2; diff holdouts are noise, and the two remaining diff jobs
+were cut from the queue. The old pools add nothing on top: twelve plain
+members at 0.3 group weight are worth +0.0002, so the shipped configuration
+is six nets, one ranker, one classifier, 1.2 ms/step. And the GPU kit was
+found training on clean data — the recipe the laptop had outgrown — and
+rewritten around AUG3 in the same session.
+
+Shipped as **#28**, resources073. Fold-2 → cloud calibration says ≈0.609.
+The assembler's new channel check ran on this build: eleven counts, all 200.

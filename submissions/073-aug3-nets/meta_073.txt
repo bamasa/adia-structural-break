@@ -1,0 +1,10 @@
+Nets trained on the triple boundary augmentation; the nets now outweigh the trees.
+---
+Six channel-trajectory networks trained on the original series plus the
+triple boundary augmentation — three pseudo-series per original, each with
+its break moved early. The data, not the architecture, was the lever: single
+members reach 0.60 on the untouched fold, where no earlier member did, and
+six of them replace the twenty-four-member pools entirely. Trees are the
+augmented ranker (0.7) and the clean classifier (0.3); the blend is 0.45
+trees to 0.55 nets, read off fold 2 at 0.6152 against 0.6106 for the
+configuration shipped as #27.
