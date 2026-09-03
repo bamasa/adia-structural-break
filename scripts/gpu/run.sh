@@ -10,6 +10,6 @@ echo
 echo "Training $MEMBERS members into $OUT/ — safe to interrupt and rerun,"
 echo "finished members are skipped."
 python scripts/gpu/train_nets_cuda.py \
-    --data-dir "$DATA" --out-dir "$OUT" --members "$MEMBERS" --epochs 14
+    --data-dir "$DATA" --out-dir "$OUT" --members "$MEMBERS" --variant plain
 echo
 echo "Done. Copy $OUT/ back to the laptop workspace root."

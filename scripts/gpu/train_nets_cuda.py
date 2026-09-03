@@ -2,21 +2,34 @@
 
 Everything the laptop era established is baked in: the ranking loss the metric
 actually measures, per-member private holdouts (the CV folds are burnt by
-selection and must not be used), short schedules with best-epoch checkpoints
-(past ~12 epochs the nets overfit through any augmentation), and diversity
-through data rather than seeds. Two input variants are trained side by side —
-plain 200 channels, and 600 with explicit first- and tenth-order differences,
-the variant whose members reached the best holdouts on the laptop.
+selection and must not be used), short schedules with best-epoch checkpoints,
+and diversity through data rather than seeds.
+
+The data is the lever. The nets are data-bound: training on the original ten
+thousand series plateaued at holdout 0.635; adding *boundary augmentation* —
+pseudo-series whose history is the original history plus a slice of the
+online part, so the break lands early — lifted single members to 0.647, and
+the triple version (three random slices per series, ``AUG3_*``) produced the
+strongest single member the project has on its untouched fold. So this script
+trains on originals plus the triple augmentation, and by default trains only
+the plain 200-channel variant: the 600-input variant with explicit
+differences reaches spectacular holdouts that do not transfer to the untouched
+fold (0.654 holdout -> 0.588 fold), so its members are not worth the GPU time.
+
+Fold 2 of the series-level split is excluded from every member's training —
+it is the one honest yardstick the project has left, and the laptop measures
+the finished pool on it.
 
 Usage on the Linux box (CUDA):
 
     python scripts/gpu/train_nets_cuda.py --data-dir /path/to/matrices \
-        --out-dir nets_cuda --members 24 --epochs 14
+        --out-dir nets_cuda --members 24
 
-Expects in --data-dir the ten matrices listed in scripts/gpu/README.md.
-Members land as out-dir/{plain,diff}_member_N.pt with their holdout scores
-printed per line; copy the whole out-dir back to the laptop, where the
-submission assembler turns them into a shipped ensemble.
+Expects in --data-dir the matrices listed in scripts/gpu/README.md, including
+the 8.3 GB ``AUG3_X.npy`` (memory-mapped, read series by series). Members
+land as out-dir/plain_member_N.pt with holdout scores printed per line; copy
+the whole out-dir back to the laptop, where they are measured on fold 2 and
+assembled into the shipped ensemble.
 """
 
 from __future__ import annotations
@@ -78,6 +91,16 @@ class ChanTCN(nn.Module):
         return self.head(h).squeeze(1)
 
 
+def split_by_series(groups, folds=5, seed=0):
+    """The laptop's fold assignment, reproduced exactly (combiners.split_by_series)."""
+    series = np.unique(groups)
+    rng = np.random.default_rng(seed)
+    order = series.copy()
+    rng.shuffle(order)
+    assignment = {int(sid): i % folds for i, sid in enumerate(order.tolist())}
+    return np.array([assignment[int(g)] for g in groups], dtype="int8")
+
+
 def with_diffs(seg):
     d1 = np.zeros_like(seg)
     d1[1:] = seg[1:] - seg[:-1]
@@ -92,9 +115,15 @@ def main() -> None:
     ap.add_argument("--data-dir", type=Path, required=True)
     ap.add_argument("--out-dir", type=Path, default=Path("nets_cuda"))
     ap.add_argument("--members", type=int, default=24)
-    ap.add_argument("--epochs", type=int, default=14)
+    ap.add_argument("--epochs", type=int, default=10)
     ap.add_argument("--batch", type=int, default=48)
     ap.add_argument("--device", default="cuda")
+    ap.add_argument("--variant", choices=["plain", "diff", "both"], default="plain",
+                    help="diff members are kept only as an option; their holdouts do not transfer")
+    ap.add_argument("--no-augmentation", action="store_true",
+                    help="train on the original series only (for comparison; expect weaker members)")
+    ap.add_argument("--smoke", action="store_true",
+                    help="tiny subset, one epoch: checks the plumbing in a minute")
     args = ap.parse_args()
     device = torch.device(args.device)
     args.out_dir.mkdir(exist_ok=True)
@@ -112,10 +141,32 @@ def main() -> None:
     mu, sd = X.mean(0), X.std(0) + 1e-6
     np.save(args.out_dir / "mu200.npy", mu)
     np.save(args.out_dir / "sd200.npy", sd)
+    assignment = split_by_series(g)
+    fold_by_sid = {int(g[a]): int(assignment[a]) for a in starts}
     series = [(((X[a:b] - mu) / sd), y[a:b].astype("float32"))
-              for a, b in zip(starts, bounds[1:])]
-    print(f"{len(series)} series ready [{time.time()-t0:.0f}s]", flush=True)
+              for a, b in zip(starts, bounds[1:]) if int(assignment[a]) != 2]
     del X
+
+    augmented = []
+    if not args.no_augmentation:
+        # 8.3 GB on disk: memory-mapped and normalised one pseudo-series at a time.
+        AX = np.load(d / "AUG3_X.npy", mmap_mode="r")
+        AY = np.load(d / "AUG3_Y.npy")
+        AG = np.load(d / "AUG3_G.npy")
+        a_starts = np.flatnonzero(np.concatenate([[True], AG[1:] != AG[:-1]]))
+        a_bounds = np.append(a_starts, len(AG))
+        for a, b in zip(a_starts, a_bounds[1:]):
+            parent = (int(AG[a]) - 100000) // 10
+            if fold_by_sid.get(parent, 0) == 2:
+                continue
+            augmented.append((((np.asarray(AX[a:b]) - mu) / sd).astype("float32"),
+                              AY[a:b].astype("float32")))
+        del AX, AY, AG
+    if args.smoke:
+        series, augmented = series[:300], augmented[:300]
+        args.epochs, args.members = 1, min(args.members, 2)
+    print(f"{len(series)} original series (fold 2 held out), "
+          f"{len(augmented)} augmented pseudo-series [{time.time()-t0:.0f}s]", flush=True)
 
     def batch_tensors(rows, n_in):
         L = max(len(f) for f, _ in rows)
@@ -161,7 +212,10 @@ def main() -> None:
         return ts_auc(np.concatenate(scores), np.concatenate(labels), np.concatenate(steps))
 
     for member in range(args.members):
-        variant, n_in = ("plain", 200) if member % 2 == 0 else ("diff", 600)
+        if args.variant == "both":
+            variant, n_in = ("plain", 200) if member % 2 == 0 else ("diff", 600)
+        else:
+            variant, n_in = args.variant, (200 if args.variant == "plain" else 600)
         path = args.out_dir / f"{variant}_member_{member}.pt"
         if path.exists():
             continue
@@ -169,8 +223,11 @@ def main() -> None:
         torch.manual_seed(20000 + member)
         idx = rng.permutation(len(series))
         hold_n = int(0.08 * len(series))
+        # The holdout is original series only; augmented copies of a holdout
+        # series would leak its break into training.
         hold = [series[i] for i in idx[:hold_n]]
-        train_set = [series[i] for i in idx[hold_n:]]
+        train_set = [series[i] for i in idx[hold_n:]] + augmented
+        rng.shuffle(train_set)
         model = ChanTCN(n_in).to(device)
         opt = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
         sched = torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=args.epochs)

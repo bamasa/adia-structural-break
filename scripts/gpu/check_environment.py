@@ -22,6 +22,8 @@ MATRICES = {
     "E4.npy": 4, "B40.npy": 42, "B2.npy": 40, "SPEC14.npy": 14,
 }
 LABELS = ("Y40.npy", "G40.npy", "S40.npy")
+#: Triple boundary augmentation — its own row count, checked for shape only.
+AUGMENTATION = {"AUG3_X.npy": 200, "AUG3_Y.npy": None, "AUG3_G.npy": None}
 
 
 def main() -> int:
@@ -68,10 +70,28 @@ def main() -> int:
             print(f"FAIL  missing {name}")
             ok = False
 
+    aug_rows = None
+    for name, cols in AUGMENTATION.items():
+        path = args.data_dir / name
+        if not path.exists():
+            print(f"FAIL  missing {name} — the nets are data-bound; this file is the lever")
+            ok = False
+            continue
+        arr = np.load(path, mmap_mode="r")
+        if aug_rows is None:
+            aug_rows = arr.shape[0]
+        if arr.shape[0] != aug_rows:
+            print(f"FAIL  {name}: {arr.shape[0]} rows, expected {aug_rows}")
+            ok = False
+        elif cols is not None and arr.shape[1] != cols:
+            print(f"FAIL  {name}: {arr.shape[1]} columns, expected {cols}")
+            ok = False
+
     if not ok:
         print("\nSomething is missing — copy the files listed in scripts/gpu/README.md")
         return 1
     print(f"OK    matrices: {n_rows:,} rows x {total_cols} channels, labels present")
+    print(f"OK    augmentation: {aug_rows:,} rows of triple boundary augmentation")
 
     import torch.nn as nn
     import torch.nn.functional as F
@@ -90,7 +110,9 @@ def main() -> int:
     if device.type == "cuda":
         torch.cuda.synchronize()
     per_batch = (time.time() - t0) / 20
-    est_member = per_batch * 200 * 14 / 60   # ~200 batches per epoch, 14 epochs
+    # ~200 batches per epoch of originals; the augmentation multiplies the rows.
+    batches_per_epoch = 200 * (n_rows + aug_rows) / n_rows
+    est_member = per_batch * batches_per_epoch * 10 / 60
     print(f"OK    speed: {per_batch*1000:.0f} ms per batch, roughly "
           f"{est_member:.0f} min per member")
     print("\nReady. Next:")
