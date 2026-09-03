@@ -1372,3 +1372,24 @@ it leaves: the cloud verdict on #28, and a GPU pool large enough that
 averaging drowns the member variance — twenty-four members with the
 spread seen here should sit near the pool mean, ≈0.6155 blended, not
 above the lucky six.
+
+---
+
+## 077 — capacity, killed
+
+Hypothesis: with three times the data, the laptop-era finding that small
+nets beat big ones may have expired — adding members no longer moves the
+pool (076b), so perhaps capacity binds. Three members with 96 channels
+instead of 64 (~250k parameters), same recipe, same triple augmentation.
+Kill condition: fold-2 solos not above 0.605.
+
+Killed. Solos 0.5975 / 0.5974 / 0.5998 — below the 64-channel median, not
+above it; the three together read 0.6048 as a net half against 0.6108 for
+the six of #28, and folding them into #28 lowers it to 0.6156. The wider
+net fits its holdout better (0.6175–0.6381) and transfers worse, which is
+the same story the diff nets told: on this data, extra fit is extra noise.
+
+The net half is bounded by the data even at three times the data. What
+remains is not capacity, members, or architecture, but the cloud gap:
+#28 reads 0.6163 here and 0.6004 there, and the next 0.01 has to come from
+a member whose gain survives a fold it was not tuned on.
