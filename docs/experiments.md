@@ -1337,3 +1337,29 @@ rewritten around AUG3 in the same session.
 
 Shipped as **#28**, resources073. Fold-2 → cloud calibration says ≈0.609.
 The assembler's new channel check ran on this build: eleven counts, all 200.
+
+
+---
+
+## 076b — six more of the same, and the pool gets worse
+
+Six further plain members on the triple augmentation, same recipe, seeds
+51006–51011. Holdouts 0.6233–0.6571 — the highest the plain breed has
+posted. Fold-2 solos 0.5913–0.6019, the lowest of the aug3 pool. Twelve
+members averaged: net half 0.6078 against 0.6108 for the first six, blend
+**0.6147 against 0.6163**. The shipped #28 stands.
+
+Two readings, both uncomfortable. Private holdouts do not rank plain
+members either — the correlation with fold 2 across twelve members is
+negative (0.6571 → 0.5913, 0.6533 → 0.5942, while 0.6167 → 0.6048). An 8%
+holdout of eight hundred series is too small a yardstick, and a member that
+fits its holdout may be one that fits its particular 92%. And the first six
+were, in part, lucky: the spread of solos (0.591–0.610) is wider than the
+gap between the two batches, so a fresh six would land anywhere in between.
+
+What this rules out: selecting members by fold 2 (it would burn the last
+honest fold), and expecting more members alone to move the number. What
+it leaves: the cloud verdict on #28, and a GPU pool large enough that
+averaging drowns the member variance — twenty-four members with the
+spread seen here should sit near the pool mean, ≈0.6155 blended, not
+above the lucky six.
