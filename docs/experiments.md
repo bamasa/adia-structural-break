@@ -1335,8 +1335,17 @@ is six nets, one ranker, one classifier, 1.2 ms/step. And the GPU kit was
 found training on clean data — the recipe the laptop had outgrown — and
 rewritten around AUG3 in the same session.
 
-Shipped as **#28**, resources073. Fold-2 → cloud calibration says ≈0.609.
-The assembler's new channel check ran on this build: eleven counts, all 200.
+Shipped as **#28**, resources073. The assembler's new channel check ran on
+this build: eleven counts, all 200.
+
+**Cloud: 0.6004** (45 min 37 s). The best cloud score of the project, up
+from 0.5893 for #23 — the first move above 0.59 after five submissions
+pinned at 0.588. The fold-2 → cloud gap widened, though: 0.0159 here
+against 0.0086 for #23. Part of that is honest variance; part is that the
+composition and blend weights of #28 were read off fold 2, which has now
+carried a handful of decisions. Calibration for the next step: 0.61 in
+the cloud wants fold-2 ≈ 0.626, and the next composition should be
+checked on fold 3 before it ships.
 
 
 ---
