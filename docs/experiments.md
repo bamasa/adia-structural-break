@@ -1412,3 +1412,26 @@ augmentation moved the members from below 0.60 to above it, so a further
 quarter more data should not move them down. Shipped as **#29**,
 resources074, everything else identical to #28 — the cloud reads the
 difference directly, as a paired comparison against #28's 0.6004.
+
+
+---
+
+## 079 — nine slices per series, killed
+
+The one axis that ever moved the nets was the volume of boundary
+augmentation (single → triple took members from below 0.60 to above it),
+so: six more random slices per series, built in eight shards (22.1M rows,
+53,128 pseudo-series, 17.7 GB), added to the triple — 80k pseudo-series
+against 10k originals. Stored as float16 to fit in memory; checked: no
+overflow, median rounding error 1.7e-4.
+
+Killed at two members: fold-2 solos **0.5824 / 0.5748**, far below the
+0.598–0.610 of the triple. The volume axis has an optimum, and it is not
+"more". At 8:1 the pseudo-series dominate and the model drifts toward
+their distribution — longer histories, early breaks — while the metric is
+scored on the originals. The private holdout, drawn from originals, picks
+the least-bad epoch but cannot undo the drift.
+
+Follow-up running as 079b: the triple's volume per epoch (21.5k
+pseudo-series) but a fresh random third of the nine slices every epoch —
+variety at constant ratio. Three members.

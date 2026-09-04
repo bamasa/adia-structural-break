@@ -127,6 +127,7 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | 076b | six more aug3 members (holdouts 0.62–0.66) | twelve averaged: 0.6147 < 0.6163 for the first six; holdouts anti-correlate with fold 2 | #28 stands; holdouts unreliable for ranking members |
 | 077 | 96-channel nets on the triple augmentation (capacity hypothesis) | solos 0.597–0.600, three together 0.6048 vs 0.6108 for #28's six | killed — capacity is not the constraint |
 | 078 | the #28 recipe with nets retrained on every series (fold 2 included) | no local number by construction | shipped as **#29** — a paired test against #28's cloud 0.6004 |
+| 079 | nine boundary slices per series (80k pseudo-series, 8:1 to originals) | fold-2 solos 0.5824 / 0.5748 vs 0.598–0.610 for the triple | killed — the volume axis has an optimum; pseudo-series drown the originals |
 | — | #25: broken upload, do not run | — | a `channels[:186]` slice survived the spectral upgrade; the push followed the check with `;` instead of `&&` |
 | — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |
 | — | 015: forecaster horizons 1+5 and signed error | 0.5751 vs 0.5779 | **killed by pre-stated condition**: the extensions dilute the compact four channels |
