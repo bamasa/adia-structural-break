@@ -143,8 +143,11 @@ def main() -> None:
     np.save(args.out_dir / "sd200.npy", sd)
     assignment = split_by_series(g)
     fold_by_sid = {int(g[a]): int(assignment[a]) for a in starts}
-    series = [(((X[a:b] - mu) / sd), y[a:b].astype("float32"))
-              for a, b in zip(starts, bounds[1:]) if int(assignment[a]) != 2]
+    series, series_sid = [], []
+    for a, b in zip(starts, bounds[1:]):
+        if int(assignment[a]) != 2:
+            series.append((((X[a:b] - mu) / sd), y[a:b].astype("float32")))
+            series_sid.append(int(g[a]))
     del X
 
     augmented = []
@@ -160,7 +163,7 @@ def main() -> None:
             if fold_by_sid.get(parent, 0) == 2:
                 continue
             augmented.append((((np.asarray(AX[a:b]) - mu) / sd).astype("float32"),
-                              AY[a:b].astype("float32")))
+                              AY[a:b].astype("float32"), parent))
         del AX, AY, AG
     if args.smoke:
         series, augmented = series[:300], augmented[:300]
@@ -223,10 +226,14 @@ def main() -> None:
         torch.manual_seed(20000 + member)
         idx = rng.permutation(len(series))
         hold_n = int(0.08 * len(series))
-        # The holdout is original series only; augmented copies of a holdout
-        # series would leak its break into training.
+        # The holdout is original series only, and the augmented copies of a
+        # holdout series stay out of training: with them in, a long schedule
+        # memorises the copies, the holdout inflates (0.7255 was seen), and
+        # best-epoch selection picks the most memorised epoch.
         hold = [series[i] for i in idx[:hold_n]]
-        train_set = [series[i] for i in idx[hold_n:]] + augmented
+        hold_sids = {series_sid[i] for i in idx[:hold_n]}
+        train_set = [series[i] for i in idx[hold_n:]] + [
+            (f, lab) for f, lab, parent in augmented if parent not in hold_sids]
         rng.shuffle(train_set)
         model = ChanTCN(n_in).to(device)
         opt = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
