@@ -1413,6 +1413,16 @@ quarter more data should not move them down. Shipped as **#29**,
 resources074, everything else identical to #28 — the cloud reads the
 difference directly, as a paired comparison against #28's 0.6004.
 
+**Cloud: 0.5996** — against 0.6004 for #28. No difference within noise. A
+fifth more data, fold 2 and its pseudo-series included, moved the net half
+by nothing the cloud can see: the six-member average sits at 0.600 either
+way. Two readings. The nets are not short of *this kind* of data any more
+— the triple augmentation saturated the axis, and 079 showed that more of
+it hurts. And the fold-2 → cloud gap (0.016) is not a data-quantity
+artefact; it is what these members lose on the platform's series, which
+the honest fold predicts only up to a constant. The remaining 0.01 will
+not come from feeding the same members more of the same.
+
 
 ---
 
