@@ -1451,3 +1451,26 @@ first three members of the plain triple, and folding them into #28 gives
 different ones, is not. The augmentation axis is closed in every direction
 it has: single → triple was the gain, and everything past it is flat or
 worse.
+
+---
+
+## 080 — cross-sectional batch size, killed; and a leak found
+
+The ranking loss sees pairs only inside a batch of 24 series, while the
+metric ranks thousands per step. Batch 96, four times the pairs per step:
+three members at ten epochs read 0.5939 / 0.5922 / 0.6004 on fold 2 —
+slightly below the triple's 0.598–0.610. A quarter of the optimiser steps
+is a confound, so **080b** ran batch 96 for thirty epochs. Its first member
+posted a *0.7255* holdout — and 0.5678 on fold 2.
+
+That pair of numbers exposes a leak that has been in every net pool since
+augmentation began: the private holdout is drawn from the originals, but
+the augmented pseudo-series of those same originals stay in the training
+set. A long schedule memorises them, the holdout inflates, and best-epoch
+selection — which every member relies on — has been biased toward
+memorisation all along. It also explains why holdouts never ranked members.
+
+080 is killed (batch size is not the lever); 080b is invalid rather than
+killed. **081** now tests the fix directly: the #28 recipe with the
+holdout's pseudo-series excluded from training, same seeds as p0–p2 for a
+paired comparison.
