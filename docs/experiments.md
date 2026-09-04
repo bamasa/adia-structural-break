@@ -1393,3 +1393,22 @@ The net half is bounded by the data even at three times the data. What
 remains is not capacity, members, or architecture, but the cloud gap:
 #28 reads 0.6163 here and 0.6004 there, and the next 0.01 has to come from
 a member whose gain survives a fold it was not tuned on.
+
+---
+
+## 078 — the #28 recipe on every series; submission #29
+
+#28's six nets had never seen fold 2: two thousand series and their 5,345
+augmented pseudo-series, a fifth of the data, held out so the laptop could
+measure them. For a data-bound model that is a real cost paid for a
+yardstick, and the final model should not pay it — the trees have trained
+on everything all along. Six members, same seeds and recipe as #28, trained
+on all ten thousand series and all 26,887 pseudo-series (holdouts
+0.6195–0.6545, recorded for the protocol, not consulted).
+
+There is no local number for this configuration by construction, and none
+is claimed. What is claimed is direction: single augmentation → triple
+augmentation moved the members from below 0.60 to above it, so a further
+quarter more data should not move them down. Shipped as **#29**,
+resources074, everything else identical to #28 — the cloud reads the
+difference directly, as a paired comparison against #28's 0.6004.

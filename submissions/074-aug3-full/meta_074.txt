@@ -1,0 +1,10 @@
+The #28 recipe with the nets trained on every series — fold 2 included.
+---
+Identical to #28 in every respect but one: the six channel-trajectory
+networks are trained on all ten thousand series and all 26,887 augmented
+pseudo-series, where #28's had never seen fold 2 — twenty percent of the
+data, held out so the laptop could measure them. The nets are data-bound,
+so the final model gets the data; the trees have trained on everything all
+along. There is no local number for this configuration by construction —
+the cloud is its only judge. Trees: augmented ranker 0.7, clean classifier
+0.3; blend 0.45 trees to 0.55 nets.
