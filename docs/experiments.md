@@ -1442,6 +1442,12 @@ their distribution — longer histories, early breaks — while the metric is
 scored on the originals. The private holdout, drawn from originals, picks
 the least-bad epoch but cannot undo the drift.
 
-Follow-up running as 079b: the triple's volume per epoch (21.5k
-pseudo-series) but a fresh random third of the nine slices every epoch —
-variety at constant ratio. Three members.
+**079b**, the follow-up — the triple's volume per epoch (21.5k
+pseudo-series) but a fresh random third of the nine slices every epoch,
+variety at constant ratio — is neutral at best: three members read
+0.5975 / 0.6047 / 0.5993 solo, 0.6053 together against 0.6092 for the
+first three members of the plain triple, and folding them into #28 gives
+0.6161 against 0.6163. The ratio was the thing; which slices, and how many
+different ones, is not. The augmentation axis is closed in every direction
+it has: single → triple was the gain, and everything past it is flat or
+worse.
