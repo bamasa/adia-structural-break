@@ -1510,3 +1510,17 @@ The rule that follows is simpler: **train to the end and take the last
 epoch**, put the holdout back into training, and — since the curve has not
 turned down at ten — see whether fifteen epochs buy anything. 082 runs
 that on the six #28 seeds, scoring fold 2 at epochs 9 and 14 only.
+
+---
+
+## 082 — fifteen epochs, killed at one member
+
+Seed 51000 under a fifteen-epoch cosine, last epoch, no holdout: fold-2
+**0.5936** at epoch 14, against 0.6036 for the same seed's last epoch under a
+ten-epoch cosine. Consistent with 080b's thirty epochs (0.5678): past ten
+epochs the extra updates go into memorising the pseudo-series. The schedule
+has an optimum near ten, and it is not a soft one.
+
+082b runs the direct candidate for #30: the six #28 seeds, ten epochs, last
+epoch, every series in training. Fold 2 is scored once per member at the
+end, and the six together against #28's 0.6163.
