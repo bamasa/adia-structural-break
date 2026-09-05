@@ -1564,3 +1564,35 @@ each step's pairwise loss by n_pos·n_neg, everything else as 082b: three
 members 0.6049 / 0.6049 / 0.6031 against their 082b pairs 0.6057 / 0.6065 /
 0.6051. Slightly lower every time. The loss already ranks the right thing;
 re-weighting where it ranks is not the missing piece.
+
+---
+
+## 084 — the raw series as input, killed
+
+The channels are summaries; the networks had never seen the series itself.
+Two raw channels — the point's z-score against the (extended) history,
+clipped at ±20, and its asinh — appended to the 200, for originals and
+pseudo-series alike. Three members under the 082b recipe: 0.5937 / 0.6036 /
+0.6011 against their pairs 0.6057 / 0.6065 / 0.6051. Worse on every seed,
+by 0.002–0.012. The raw trajectory adds noise the dilated convolutions
+cannot filter better than the engineered channels already do.
+
+---
+
+## Where this leaves the project (6 September)
+
+Since #23 (0.5893) the cloud has moved once — to #28's 0.6004 — and that
+move came from a single lever, boundary augmentation at a 1:2.7 ratio,
+which was found and then bracketed from both sides. Everything else
+measured on the untouched fold since then is flat or negative: member
+count, augmentation volume and variety, full-data training (#29: 0.5996),
+capacity, schedule length, batch size, epoch selection, loss weighting,
+raw input. Fourteen experiments, one gain.
+
+The fold-2 → cloud gap sits at 0.016 and did not shrink with more data,
+so it is a property of the platform's series, not of our sample size. To
+reach 0.61 in the cloud the fold needs ≈0.626, a full 0.01 above the
+recipe's ceiling — the size of the augmentation gain itself. That is a
+new-modality-sized gap, and the laptop has no untried modality left that
+costs less than a day. The GPU pool would tighten the variance, not lift
+the mean.
