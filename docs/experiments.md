@@ -1596,3 +1596,21 @@ recipe's ceiling — the size of the augmentation gain itself. That is a
 new-modality-sized gap, and the laptop has no untried modality left that
 costs less than a day. The GPU pool would tighten the variance, not lift
 the mean.
+
+---
+
+## 085 — Bayesian online change-point channels (in progress)
+
+A new modality for the trees, the only kind of thing that has ever moved
+the cloud: the run-length posterior of Adams & MacKay's BOCPD — a
+Normal-Gamma model of the point, prior fitted to the history, hazard
+1/200, run lengths to 600. Six channels per step: P(r<5), P(r<20), P(r<60),
+P(r<200), E[r]/(t+1), and the point's surprise (−log predictive density).
+0.1 ms per step; built for all ten thousand series in a minute across
+eight shards.
+
+First screen, classifier on fold 2, same configuration with 200 and 206
+channels: 0.5953 → 0.5963, **+0.0010**. Below the +0.002 acceptance line,
+but two of the six — P(r<200) and E[r]/t — rank 31st and 33rd of 206 by
+gain. Running next: the same channels for the nets (built for the triple
+augmentation too), and a hazard of 1/50 for the trees.
