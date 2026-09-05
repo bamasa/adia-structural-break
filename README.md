@@ -133,6 +133,7 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | 081 | clean holdout; per-epoch curve on fold 2 | fold 2 rises monotonically to the last epoch (0.6043); the clean holdout peaks at epoch 0 and falls | best-epoch selection is noise — take the last epoch; 082 tests 15 epochs |
 | 082 | fifteen-epoch cosine, last epoch, no holdout | 0.5936 vs 0.6036 for ten epochs, same seed | killed — past ten epochs the updates memorise; 082b runs ten epochs on the six #28 seeds |
 | 082b | last-epoch rule on the six #28 seeds | five of six members improve, ensemble 0.6157 vs 0.6163; twelve together 0.6163 | neutral — the recipe's ceiling is ≈0.616 fold-2; #28 stands |
+| 083 | ranking loss with the metric's step weights (n_pos·n_neg) | 0.6049 / 0.6049 / 0.6031 vs pairs 0.6057 / 0.6065 / 0.6051 | killed — slightly worse every time |
 | — | #25: broken upload, do not run | — | a `channels[:186]` slice survived the spectral upgrade; the push followed the check with `;` instead of `&&` |
 | — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |
 | — | 015: forecaster horizons 1+5 and signed error | 0.5751 vs 0.5779 | **killed by pre-stated condition**: the extensions dilute the compact four channels |

@@ -1553,3 +1553,14 @@ lever inside it — members, data volume, data variety, capacity, schedule,
 batch, epoch choice — is now measured flat or worse. #28 stands as
 shipped. What remains is outside the recipe: the loss itself (083), and
 what the networks see.
+
+---
+
+## 083 — the metric's step weights in the loss, killed
+
+TS-AUC averages steps weighted by the number of positive–negative pairs at
+each; the ranking loss averaged its 48 sampled steps uniformly. Weighting
+each step's pairwise loss by n_pos·n_neg, everything else as 082b: three
+members 0.6049 / 0.6049 / 0.6031 against their 082b pairs 0.6057 / 0.6065 /
+0.6051. Slightly lower every time. The loss already ranks the right thing;
+re-weighting where it ranks is not the missing piece.
