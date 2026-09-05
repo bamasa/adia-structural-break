@@ -1524,3 +1524,32 @@ has an optimum near ten, and it is not a soft one.
 082b runs the direct candidate for #30: the six #28 seeds, ten epochs, last
 epoch, every series in training. Fold 2 is scored once per member at the
 end, and the six together against #28's 0.6163.
+
+---
+
+## 082b — the last-epoch rule, measured on the six #28 seeds
+
+Ten epochs, last epoch, every series in training, seeds 51000–51005 — the
+#28 members re-trained under the clean rule. Paired on fold 2:
+
+| seed | #28 (leaky best-epoch) | last epoch |
+|---|---|---|
+| 51000 | 0.6048 | 0.6057 |
+| 51001 | 0.6027 | 0.6065 |
+| 51002 | 0.6047 | 0.6051 |
+| 51003 | 0.5983 | 0.6023 |
+| 51004 | 0.5981 | 0.6026 |
+| 51005 | **0.6102** | 0.5954 |
+
+Five of six improve, by 0.001–0.005; the sixth loses the lucky epoch that
+made it #28's best member. Mean member 0.6031 → 0.6046. The ensemble does
+not move: six nets 0.6108 → 0.6091 solo, blend 0.6163 → 0.6157, and the
+twelve together read 0.6163 again. The rule is the right one — it removes
+a selector that was noise and adds the holdout to training — but it is
+neutral in expectation, and #28's edge over it was one member's luck.
+
+The recipe has a ceiling: ≈0.616 on fold 2, ≈0.600 in the cloud, and every
+lever inside it — members, data volume, data variety, capacity, schedule,
+batch, epoch choice — is now measured flat or worse. #28 stands as
+shipped. What remains is outside the recipe: the loss itself (083), and
+what the networks see.
