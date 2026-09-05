@@ -1474,3 +1474,39 @@ memorisation all along. It also explains why holdouts never ranked members.
 killed. **081** now tests the fix directly: the #28 recipe with the
 holdout's pseudo-series excluded from training, same seeds as p0–p2 for a
 paired comparison.
+
+---
+
+## 081 — the clean holdout, and what the epoch curve actually looks like
+
+Fixing the leak the obvious way — holding the pseudo-series of the holdout
+originals out of training — made things *worse*: the first clean member
+(seed 51000, paired with #28's p0 at 0.6048) read **0.5623** on fold 2. So
+081d trained the same seed once more and scored every epoch on both the
+clean holdout and fold 2:
+
+| epoch | clean holdout | fold 2 |
+|---|---|---|
+| 0 | 0.5994 | 0.5623 |
+| 1 | 0.5882 | 0.5834 |
+| 2 | 0.5962 | 0.5863 |
+| 3 | 0.5702 | 0.5877 |
+| 4 | 0.5773 | 0.5953 |
+| 5 | 0.5821 | 0.5973 |
+| 6 | 0.5834 | 0.5999 |
+| 7 | 0.5779 | 0.5998 |
+| 8 | 0.5682 | **0.6043** |
+| 9 | 0.5693 | 0.6036 |
+
+Fold 2 climbs monotonically to the last epochs. The clean holdout — 640
+series — peaks at epoch zero and drifts *down* while the model improves:
+as a selection criterion it is noise with the wrong sign. The leaky holdout
+of #28 picked late epochs only because memorising the pseudo-series pulled
+it late, and so was right by accident. Best-epoch selection, the recipe's
+one piece of validation machinery, has been either useless or harmful all
+along.
+
+The rule that follows is simpler: **train to the end and take the last
+epoch**, put the holdout back into training, and — since the curve has not
+turned down at ten — see whether fifteen epochs buy anything. 082 runs
+that on the six #28 seeds, scoring fold 2 at epochs 9 and 14 only.
