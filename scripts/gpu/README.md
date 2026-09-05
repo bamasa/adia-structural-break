@@ -42,8 +42,8 @@ The runner checks the box first (CUDA present, all matrices consistent,
 measured speed per member), prints what it found, and only then trains. Each
 member reports its private-holdout TS-AUC as it finishes:
 
-    plain member 0: holdout 0.6167  [1460s]
-    plain member 1: holdout 0.6302  [2910s]
+    plain member 0: done, 10 epochs  [1460s]
+    plain member 1: done, 10 epochs  [2910s]
 
 A smoke test — three hundred series, one epoch, two members — checks the
 plumbing in about a minute before you commit the GPU for a day:
@@ -72,11 +72,13 @@ differences — is kept behind `--variant diff` but not trained by default:
 its members reach spectacular holdouts (0.654) that do not transfer to the
 untouched fold (0.588). Plain members transfer; diff members do not.
 
-Each member trains on its own random 92% of the original series (fold 2 of
-the series split is held out entirely — it is the laptop's yardstick) and
-keeps the epoch that scores best on its private 8% holdout. Diversity comes
-from the data split — not from random seeds, which were measured and found
-to converge.
+Each member trains on every original series outside fold 2 (fold 2 of the
+series split is held out entirely — it is the laptop's yardstick) plus the
+augmentation, and ships its last epoch. There is no per-member holdout and
+no best-epoch pick: scored epoch by epoch on the untouched fold, these nets
+improve to the end of the schedule, while a small holdout of originals peaks
+at epoch zero and drifts down — as a selector it is noise with the wrong
+sign. Diversity comes from the data order and initialisation.
 
 ## Bringing it home
 
@@ -94,8 +96,9 @@ then submitted.
   word — five runs a day, so they are spent on real bets only.
 * **Short schedules.** Ten epochs over the augmented set; the best-epoch
   checkpoint is what ships.
-* **Holdouts rank plain members, not diff members.** A diff member's private
-  holdout says nothing about its fold-2 score; only the untouched fold does.
+* **Holdouts rank nothing.** A private holdout says nothing about a member's
+  fold-2 score — not for diff members, not for plain ones, not for epochs.
+  Only the untouched fold does, and it is measured on the laptop.
 * **More members beat bigger members.** Tripling capacity lost to the small
   architecture; the data, not the parameter count, is the binding
   constraint.

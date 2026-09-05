@@ -1,9 +1,9 @@
 """The GPU job: train the strong half of the ensemble — channel-trajectory nets.
 
 Everything the laptop era established is baked in: the ranking loss the metric
-actually measures, per-member private holdouts (the CV folds are burnt by
-selection and must not be used), short schedules with best-epoch checkpoints,
-and diversity through data rather than seeds.
+actually measures, short cosine schedules with the *last* epoch shipped (a
+private holdout turned out to be noise as an epoch selector — see the
+experiment log, 081), and diversity through data rather than seeds.
 
 The data is the lever. The nets are data-bound: training on the original ten
 thousand series plateaued at holdout 0.635; adding *boundary augmentation* —
@@ -27,9 +27,8 @@ Usage on the Linux box (CUDA):
 
 Expects in --data-dir the matrices listed in scripts/gpu/README.md, including
 the 8.3 GB ``AUG3_X.npy`` (memory-mapped, read series by series). Members
-land as out-dir/plain_member_N.pt with holdout scores printed per line; copy
-the whole out-dir back to the laptop, where they are measured on fold 2 and
-assembled into the shipped ensemble.
+land as out-dir/plain_member_N.pt; copy the whole out-dir back to the laptop,
+where they are measured on fold 2 and assembled into the shipped ensemble.
 """
 
 from __future__ import annotations
@@ -143,11 +142,8 @@ def main() -> None:
     np.save(args.out_dir / "sd200.npy", sd)
     assignment = split_by_series(g)
     fold_by_sid = {int(g[a]): int(assignment[a]) for a in starts}
-    series, series_sid = [], []
-    for a, b in zip(starts, bounds[1:]):
-        if int(assignment[a]) != 2:
-            series.append((((X[a:b] - mu) / sd), y[a:b].astype("float32")))
-            series_sid.append(int(g[a]))
+    series = [(((X[a:b] - mu) / sd), y[a:b].astype("float32"))
+              for a, b in zip(starts, bounds[1:]) if int(assignment[a]) != 2]
     del X
 
     augmented = []
@@ -224,16 +220,12 @@ def main() -> None:
             continue
         rng = np.random.default_rng(20000 + member)
         torch.manual_seed(20000 + member)
-        idx = rng.permutation(len(series))
-        hold_n = int(0.08 * len(series))
-        # The holdout is original series only, and the augmented copies of a
-        # holdout series stay out of training: with them in, a long schedule
-        # memorises the copies, the holdout inflates (0.7255 was seen), and
-        # best-epoch selection picks the most memorised epoch.
-        hold = [series[i] for i in idx[:hold_n]]
-        hold_sids = {series_sid[i] for i in idx[:hold_n]}
-        train_set = [series[i] for i in idx[hold_n:]] + [
-            (f, lab) for f, lab, parent in augmented if parent not in hold_sids]
+        # No holdout and no best-epoch selection. Scored epoch by epoch on the
+        # untouched fold, these nets improve monotonically to the end of the
+        # cosine schedule, while an 8% holdout of originals peaks at epoch
+        # zero and drifts down — as a selector it is noise with the wrong
+        # sign. So every series trains, and the last epoch ships.
+        train_set = list(series) + [(f, lab) for f, lab, parent in augmented]
         rng.shuffle(train_set)
         model = ChanTCN(n_in).to(device)
         opt = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
@@ -241,7 +233,6 @@ def main() -> None:
         order = sorted(range(len(train_set)), key=lambda i: len(train_set[i][0]))
         batches = [[train_set[i] for i in order[k:k + args.batch]]
                    for k in range(0, len(order), args.batch)]
-        best = (0.0, None)
         for epoch in range(args.epochs):
             model.train()
             for bi in rng.permutation(len(batches)):
@@ -253,11 +244,8 @@ def main() -> None:
                 loss.backward()
                 opt.step()
             sched.step()
-            a = holdout_auc(model, hold, n_in)
-            if a > best[0]:
-                best = (a, {k: v.cpu().clone() for k, v in model.state_dict().items()})
-        torch.save(best[1], path)
-        print(f"{variant} member {member}: holdout {best[0]:.4f}  [{time.time()-t0:.0f}s]",
+        torch.save({k: v.cpu().clone() for k, v in model.state_dict().items()}, path)
+        print(f"{variant} member {member}: done, {args.epochs} epochs  [{time.time()-t0:.0f}s]",
               flush=True)
     print("done", flush=True)
 
