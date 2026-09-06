@@ -1634,3 +1634,16 @@ read the run length off the channels they already have.
 Verdict: kept as an ingredient — the classifier ships with 206 channels
 in the next assembly, the ranker and the nets stay at 200 — but not worth
 a submission slot on its own at +0.0005.
+
+---
+
+## A check on the cloud gap: train and test are the same population
+
+Before spending more on the fold, the obvious alternative explanation for
+the 0.016 fold-2 → cloud gap: the platform's series differ from ours. The
+local test sample (100 series) says no. History length median 3014 vs
+2998, online length 510 vs 502, share with a break 0.53 vs 0.50, break
+position at 0.42 vs 0.48 of the online part, value scale identical. The
+gap is fold-2's accumulated optimism plus sampling noise, not a shift —
+which means a gain has to be large to be seen at all, and small ones
+(the +0.0005 of 085) will not be.
