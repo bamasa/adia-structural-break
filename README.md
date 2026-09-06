@@ -135,7 +135,7 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | 082b | last-epoch rule on the six #28 seeds | five of six members improve, ensemble 0.6157 vs 0.6163; twelve together 0.6163 | neutral — the recipe's ceiling is ≈0.616 fold-2; #28 stands |
 | 083 | ranking loss with the metric's step weights (n_pos·n_neg) | 0.6049 / 0.6049 / 0.6031 vs pairs 0.6057 / 0.6065 / 0.6051 | killed — slightly worse every time |
 | 084 | raw series as two extra input channels (z against history, asinh) | 0.5937 / 0.6036 / 0.6011 vs pairs 0.6057 / 0.6065 / 0.6051 | killed — worse on every seed |
-| 085 | Bayesian online change-point channels (run-length posterior, hazard 1/50) | classifier +0.0046, ranker −0.0014, nets worse; blend **+0.0005** (0.6169) | real but small — lands on the lightest member of the ensemble |
+| 085 | Bayesian online change-point channels (run-length posterior, hazard 1/50) | classifier +0.0046, ranker −0.0014, nets worse; blend **+0.0005** (0.6169) | kept for the classifier only (+0.0005 in the blend); not a submission on its own |
 | — | #25: broken upload, do not run | — | a `channels[:186]` slice survived the spectral upgrade; the push followed the check with `;` instead of `&&` |
 | — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |
 | — | 015: forecaster horizons 1+5 and signed error | 0.5751 vs 0.5779 | **killed by pre-stated condition**: the extensions dilute the compact four channels |

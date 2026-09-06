@@ -1625,6 +1625,12 @@ across series — and the six extra columns only dilute its column sampling.
 
 Blended with the six #28 nets (0.55): classifier at 206 and ranker at 200
 lifts the ensemble from 0.6164 to **0.6169**, +0.0005. The modality is
-real, and it lands on the one member that carries the least weight. Nets:
-first member with the six channels 0.5985 against its pair's 0.6057 —
-the trajectory networks do not need a run-length posterior either.
+real, and it lands on the one member that carries the least weight.
+
+Nets with the six channels, three paired seeds: 0.5985 / 0.6076 / 0.6000
+against 0.6057 / 0.6065 / 0.6051 — mean −0.003. The trajectory networks
+read the run length off the channels they already have.
+
+Verdict: kept as an ingredient — the classifier ships with 206 channels
+in the next assembly, the ranker and the nets stay at 200 — but not worth
+a submission slot on its own at +0.0005.
