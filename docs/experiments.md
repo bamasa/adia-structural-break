@@ -1612,5 +1612,19 @@ eight shards.
 First screen, classifier on fold 2, same configuration with 200 and 206
 channels: 0.5953 → 0.5963, **+0.0010**. Below the +0.002 acceptance line,
 but two of the six — P(r<200) and E[r]/t — rank 31st and 33rd of 206 by
-gain. Running next: the same channels for the nets (built for the triple
-augmentation too), and a hazard of 1/50 for the trees.
+gain. The hazard sweep, classifier on fold 2 against the same 200-channel
+baseline (0.5953): 1/200 → +0.0010; **1/50 → +0.0046** (E[r]/t sixth of
+206 by gain); 1/20 → +0.0023 (E[r]/t first by gain, but the rest weaker);
+both 1/50 and 1/20 together, twelve channels → +0.0018. One hazard, 1/50.
+
+The ranker does not want them: same configuration as #28's, on originals
+plus the single augmentation, 200 channels 0.6043 against 206 channels
+0.6029, **−0.0014**. A cross-sectional ranker already has what an absolute
+run-length posterior adds to a classifier — a scale that is comparable
+across series — and the six extra columns only dilute its column sampling.
+
+Blended with the six #28 nets (0.55): classifier at 206 and ranker at 200
+lifts the ensemble from 0.6164 to **0.6169**, +0.0005. The modality is
+real, and it lands on the one member that carries the least weight. Nets:
+first member with the six channels 0.5985 against its pair's 0.6057 —
+the trajectory networks do not need a run-length posterior either.

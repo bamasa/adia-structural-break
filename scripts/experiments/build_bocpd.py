@@ -63,6 +63,8 @@ if sys.argv[1] == "merge":
     parts = [np.load(f"{PARTS}/part_{i}.npz", allow_pickle=True) for i in range(n)]
     if OUT.startswith("AUG3"):
         g = np.load("AUG3_G.npy"); s = np.load("AUG3_S.npy")
+    elif OUT.startswith("AUG_"):
+        g = np.load("AUG_G.npy"); s = np.load("AUG_S.npy")
     else:
         g = np.load("G40.npy"); s = np.load("S40.npy")
     starts = np.flatnonzero(np.concatenate([[True], g[1:] != g[:-1]])); bounds = np.append(starts, len(g))
@@ -86,15 +88,17 @@ x = pd.read_parquet("structural-break-real-time-test/data/X_train.parquet")
 ids = x.index.get_level_values("id")
 x = x[(ids % n_shards) == shard]
 sids, arrs = [], []
-if OUT.startswith("AUG3"):
-    # псевдоряды: history + online[:k], k = len(online) - длина псевдоряда; группы 100000+sid*10+j
-    AG = np.load("AUG3_G.npy")
+if OUT.startswith("AUG"):
+    # псевдоряды: history + online[:k], k = len(online) - длина псевдоряда;
+    # группы AUG3: 100000+sid*10+j, AUG: 100000+sid
+    AG = np.load("AUG3_G.npy") if OUT.startswith("AUG3") else np.load("AUG_G.npy")
+    to_sid = (lambda gid: (gid - 100000) // 10) if OUT.startswith("AUG3") else (lambda gid: gid - 100000)
     a_starts = np.flatnonzero(np.concatenate([[True], AG[1:] != AG[:-1]])); a_bounds = np.append(a_starts, len(AG))
     series = {int(sid): (part.loc[part.period == 1, "value"].to_numpy("float64"),
                          part.loc[part.period == 2, "value"].to_numpy("float64"))
               for sid, part in x.groupby(level="id")}
     for i, (a, b) in enumerate(zip(a_starts, a_bounds[1:])):
-        gid = int(AG[a]); sid = (gid - 100000) // 10
+        gid = int(AG[a]); sid = to_sid(gid)
         if sid % n_shards != shard:
             continue
         hist, online = series[sid]
