@@ -1647,3 +1647,16 @@ position at 0.42 vs 0.48 of the online part, value scale identical. The
 gap is fold-2's accumulated optimism plus sampling noise, not a shift —
 which means a gain has to be large to be seen at all, and small ones
 (the +0.0005 of 085) will not be.
+
+---
+
+## 086 — a recurrent family, not feasible on the laptop
+
+A two-layer GRU (96 units, ~85k parameters) on the same 200-channel
+trajectories, same data and recipe as 082b — the one model family the
+project had not tried. On Apple's MPS backend the recurrence has no fused
+kernel: twelve hours of wall-clock did not finish the first ten-epoch
+member, where a convolutional member takes thirty minutes. Stopped
+without a number. The script (`nets_gru.py`) runs unchanged on CUDA,
+where cuDNN makes it a twenty-minute member; it belongs to the GPU box,
+not here.
