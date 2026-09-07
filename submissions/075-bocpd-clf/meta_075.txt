@@ -1,0 +1,10 @@
+#28 with a run-length posterior for the classifier and twelve nets.
+---
+Two ingredients on top of #28, both measured on the untouched fold. The
+classifier reads six extra channels — the run-length posterior of a
+Bayesian online change-point filter (hazard 1/50): +0.0046 for the
+classifier alone, nothing for the ranker or the nets, so only the
+classifier gets them. And twelve trajectory networks instead of six: #28's
+members plus six trained under the last-epoch rule, equal in quality and
+halving the member variance. Trees 0.45 (augmented ranker 0.7, classifier
+0.3), nets 0.55; fold-2 0.6169 against 0.6163 for #28.

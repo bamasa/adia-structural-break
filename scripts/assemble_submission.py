@@ -19,7 +19,7 @@ ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "src" / "structural_break"
 
 #: Dependency order matters: later modules use earlier names.
-MODULES = ["features.py", "detectors.py", "retrospective.py", "retro2.py", "multiscale.py"]
+MODULES = ["features.py", "detectors.py", "retrospective.py", "retro2.py", "multiscale.py", "bocpd.py"]
 
 HEADER = '''"""{title}
 
@@ -39,6 +39,7 @@ from typing import Iterable, List, Optional, Tuple
 import joblib
 import json
 import numpy as np
+from scipy.special import gammaln
 
 #: One worker per pair of cores. Left unset, the platform runs a single worker
 #: on a sixteen-core machine, and quota is billed in wall-clock hours.
@@ -94,6 +95,12 @@ def verify_channels(assembled: str, target: Path) -> None:
     if not m:
         return
     declared = {"NET_CHANNELS": int(m.group(1))}
+    # The classifier and the rankers may read a different width (a suffix the
+    # nets never see); each group is checked against its own declaration.
+    width = {}
+    for group, key in (("clf", "CLF_CHANNELS"), ("rank", "RANK_CHANNELS")):
+        mm = re.search(rf"^{key} = (\d+)", assembled, re.M)
+        width[group] = int(mm.group(1)) if mm else declared["NET_CHANNELS"]
 
     artifact = target.parent / "resources" / "model.joblib"
     if not artifact.exists():
@@ -103,18 +110,24 @@ def verify_channels(assembled: str, target: Path) -> None:
     import joblib
 
     model = joblib.load(artifact)
-    found = dict(declared)
-    boosters = [b for b in [model.get("booster")] + list(model.get("rankers", [])) if b is not None]
-    for i, booster in enumerate(boosters):
-        found[f"tree[{i}]"] = getattr(booster, "booster_", booster).num_feature()
+    found, bad = dict(declared), []
+    def check(name, got, want):
+        found[name] = got
+        if got != want:
+            bad.append(f"{name}={got} (expected {want})")
+    if model.get("booster") is not None:
+        check("clf", getattr(model["booster"], "booster_", model["booster"]).num_feature(), width["clf"])
+    for i, r in enumerate(model.get("rankers", [])):
+        check(f"rank[{i}]", getattr(r, "booster_", r).num_feature(), width["rank"])
     for i, state in enumerate(model.get("nets", [])):
-        found[f"net[{i}]"] = state["inp.weight"].shape[1]
+        check(f"net[{i}]", state["inp.weight"].shape[1], declared["NET_CHANNELS"])
     for key in ("net_mu", "net_sd"):
         if key in model:
-            found[key] = len(model[key])
-    if len(set(found.values())) > 1:
-        raise SystemExit(f"channel counts disagree between interface and artifact: {found}")
-    print(f"channel check passed: {len(found)} counts, all {declared['NET_CHANNELS']}")
+            check(key, len(model[key]), declared["NET_CHANNELS"])
+    if bad:
+        raise SystemExit("channel counts disagree between interface and artifact: " + "; ".join(bad))
+    print(f"channel check passed: {len(found)} counts — nets {declared['NET_CHANNELS']}, "
+          f"classifier {width['clf']}, rankers {width['rank']}")
 
 
 if __name__ == "__main__":

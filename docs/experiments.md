@@ -1709,3 +1709,16 @@ full fold, so a hundred-series cross-section is far too small to read
 anyway; and the reduced labels, though internally consistent with their
 `tau_index`, may well be placeholders. Either way: not a third fold. The
 cloud remains the only judge outside fold 2.
+
+---
+
+## 088 — submission #30: the run-length posterior ships, for the classifier
+
+The two ingredients measured since #28, assembled: the classifier reads
+206 channels (the BOCPD suffix, hazard 1/50, now a streaming module in the
+library — `bocpd.py`, verified against the batch builder to 5e-7), the
+ranker and the nets stay at 200, and twelve trajectory networks replace
+six — #28's members and the six trained under the last-epoch rule. Fold-2
+0.6169 against 0.6163. The assembler's channel check now reads each group
+against its own width (nets 200, classifier 206, rankers 200: seventeen
+counts). 1.7–2.4 ms per step. Shipped as **#30**, resources075.
