@@ -1697,3 +1697,15 @@ early ones — they are where the network learns what a break looks like,
 and the early steps borrow that. The early region is information-limited,
 not attention-limited: a few post-break points are a few post-break
 points, whichever loss is looking at them.
+
+---
+
+## The local test sample is not a yardstick
+
+The workspace ships a hundred labelled test series (`y_test.reduced`).
+Scored through the assembled #28: **0.4958** — chance. The same pipeline
+on a hundred fold-2 training series reads 0.7534, against 0.616 on the
+full fold, so a hundred-series cross-section is far too small to read
+anyway; and the reduced labels, though internally consistent with their
+`tau_index`, may well be placeholders. Either way: not a third fold. The
+cloud remains the only judge outside fold 2.
