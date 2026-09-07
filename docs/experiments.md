@@ -1660,3 +1660,27 @@ member, where a convolutional member takes thirty minutes. Stopped
 without a number. The script (`nets_gru.py`) runs unchanged on CUDA,
 where cuDNN makes it a twenty-minute member; it belongs to the GPU box,
 not here.
+
+---
+
+## Where the metric's weight is, and where the ensemble is blind
+
+Fold 2, the #28 blend, by step of the online part (weight = share of
+positive–negative pairs the metric counts there):
+
+| steps | trees | nets | blend | weight |
+|---|---|---|---|---|
+| 0–25 | 0.536 | 0.550 | 0.541 | 1% |
+| 25–50 | 0.556 | 0.558 | 0.559 | 3% |
+| 50–100 | 0.567 | 0.563 | 0.568 | 8% |
+| 100–200 | 0.573 | 0.577 | 0.580 | 20% |
+| 200–400 | 0.616 | 0.619 | 0.626 | 36% |
+| 400–800 | 0.637 | 0.644 | 0.652 | 30% |
+| 800+ | 0.620 | 0.631 | 0.635 | 1% |
+
+A step-dependent blend weight buys nothing (the best schedule is the
+constant 0.55). But a third of the metric's weight sits below step 200,
+where both halves score 0.54–0.58 — near chance — while past step 200
+they read 0.62–0.65. The early region is where the boundary augmentation
+paid, and it is the only region with room. 087 tests early specialists:
+members whose ranking loss is taken on the first 200 steps only.
