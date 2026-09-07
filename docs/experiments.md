@@ -1684,3 +1684,16 @@ where both halves score 0.54–0.58 — near chance — while past step 200
 they read 0.62–0.65. The early region is where the boundary augmentation
 paid, and it is the only region with room. 087 tests early specialists:
 members whose ranking loss is taken on the first 200 steps only.
+
+---
+
+## 087 — early specialists, killed at one member
+
+A member whose ranking loss is taken on the first 200 steps only, to
+attack the region where the ensemble is near chance. It is worse *there*:
+early-step AUC 0.5489 against 0.5692–0.5756 for the ordinary members, and
+0.5790 over the whole fold. The late pairs are not a distraction from the
+early ones — they are where the network learns what a break looks like,
+and the early steps borrow that. The early region is information-limited,
+not attention-limited: a few post-break points are a few post-break
+points, whichever loss is looking at them.
