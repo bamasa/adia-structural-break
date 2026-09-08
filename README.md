@@ -155,6 +155,16 @@ series carrying high scores — not another within-series channel.
     cp submissions/001-classical-detectors/main.py <workspace>/
     cd <workspace> && crunch test
 
+### Tests
+
+    PYTHONPATH=src python -m unittest discover -s tests -v
+
+Standard library only. The tests guard the two places where a submission
+can silently disagree with its training: the streaming change-point monitor
+is checked against the batch filter that built the training channels, and
+the assembler's channel check is exercised on fake artifacts — including
+the exact mismatch that killed submission #25.
+
 ## Relationship to the organisers' quickstarter
 
 The EWMA baseline published by CrunchDAO is used as a reference point and is
