@@ -1,0 +1,8 @@
+#30 with the blend turned toward the trees: 0.55 trees, 0.45 nets.
+---
+Identical to #30 in every member and every channel; only the blend weight
+moves, from 0.45 trees / 0.55 nets to 0.55 / 0.45. Fold 2 cannot tell the
+two apart (0.6162 against 0.6163), so this is a paired question for the
+cloud alone: the fold-2 → cloud gap has widened as the nets took more of
+the blend, and if the fold overstates them, the platform will prefer the
+trees. No local number is claimed beyond the tie.

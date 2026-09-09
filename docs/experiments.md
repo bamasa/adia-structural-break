@@ -1729,3 +1729,16 @@ the same coin as before: real ingredients, small ones, read through noise
 of about ±0.001. Three cloud readings of this recipe (#28, #29, #30) now
 sit at 0.5996–0.6007. That is the recipe's number, and the platform's
 distance from 0.61 remains a new-modality-sized 0.009.
+
+---
+
+## 089 — submission #31: the blend turned toward the trees
+
+Every cloud reading since the nets took over the blend has sat 0.016 below
+fold 2, against 0.009 when the trees led (#23). Fold 2 cannot say whether
+that is the nets overstating — at 0.55 trees / 0.45 nets it reads 0.6162,
+at 0.45 / 0.55 it reads 0.6163. So the question goes to the cloud as a
+paired test: #31 is #30 in every member and channel, with the blend at
+0.55 trees / 0.45 nets. If the platform prefers the trees, the blend is
+a lever the fold cannot see; if it does not, the gap is the fold's
+optimism about everything equally, and the blend stays where it is.
