@@ -1722,3 +1722,10 @@ six — #28's members and the six trained under the last-epoch rule. Fold-2
 0.6169 against 0.6163. The assembler's channel check now reads each group
 against its own width (nets 200, classifier 206, rankers 200: seventeen
 counts). 1.7–2.4 ms per step. Shipped as **#30**, resources075.
+
+**Cloud: 0.6007** (1 h 2 min) — the project's best, by 0.0003 over #28's
+0.6004. Fold 2 had promised +0.0006; the cloud paid half of it, which is
+the same coin as before: real ingredients, small ones, read through noise
+of about ±0.001. Three cloud readings of this recipe (#28, #29, #30) now
+sit at 0.5996–0.6007. That is the recipe's number, and the platform's
+distance from 0.61 remains a new-modality-sized 0.009.
