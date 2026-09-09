@@ -1772,3 +1772,26 @@ inference — which also says the leaderboard's 0.65 is not built on it.
 
 Recorded so nobody rediscovers it: the strongest single signal in the
 dataset is the one the protocol withholds.
+
+---
+
+## 091 — the 2025 edition's series as training data (prepared)
+
+The organisers' documentation admits the first edition's dataset — ten
+thousand labelled series from the same family of generators ("changes in
+mean, variance, distributional shape, dependence structure, and tail
+behaviour") — as prior data, "not officially encouraged". For a data-bound
+net half whose only real gain came from more series, that is the largest
+untouched lever there is: it doubles the originals.
+
+Two things had to be built before the data arrives. The first edition puts
+its break exactly at the period boundary; to give it the real-time
+edition's uniform tau, the boundary is moved *back* — the last k points of
+the pre-break segment open the online part, so tau = k, with k uniform and
+the history kept above a thousand points, then standardised on the history
+as the platform does (`convert_first_edition.py`). And the channels are
+built by the shipped monitor itself — the assembled #30's `TriMonitor`,
+sharded eight ways — which reproduces the training matrices to 1e-6 and
+covers ten thousand series in about twelve minutes
+(`build_channels_fe.py`). What remains is the clone token for the 2025
+competition, which only the account holder can fetch.
