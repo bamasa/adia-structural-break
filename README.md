@@ -139,7 +139,7 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | 086 | GRU (recurrent) members on the same trajectories | no number — twelve hours on MPS did not finish one member | deferred to CUDA |
 | 087 | early specialists — ranking loss on the first 200 steps only | early-step AUC 0.5489 vs 0.569–0.576 for ordinary members | killed — the early region is information-limited |
 | 088 | #28 + BOCPD suffix for the classifier + twelve nets | fold-2 **0.6169** vs 0.6163 | shipped as **#30** — **cloud 0.6007**, project best (+0.0003 over #28) |
-| 089 | #30 with the blend at 0.55 trees / 0.45 nets | fold-2 tie (0.6162 vs 0.6163) | shipped as **#31** — paired cloud test of the blend weight |
+| 089 | #30 with the blend at 0.55 trees / 0.45 nets | fold-2 tie (0.6162 vs 0.6163) | shipped as **#31** — cloud **0.6000** vs 0.6007 for #30: the platform does not prefer the trees; blend stays 0.45/0.55 |
 | — | #25: broken upload, do not run | — | a `channels[:186]` slice survived the spectral upgrade; the push followed the check with `;` instead of `&&` |
 | — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |
 | — | 015: forecaster horizons 1+5 and signed error | 0.5751 vs 0.5779 | **killed by pre-stated condition**: the extensions dilute the compact four channels |

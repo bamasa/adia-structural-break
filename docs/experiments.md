@@ -1742,3 +1742,10 @@ paired test: #31 is #30 in every member and channel, with the blend at
 0.55 trees / 0.45 nets. If the platform prefers the trees, the blend is
 a lever the fold cannot see; if it does not, the gap is the fold's
 optimism about everything equally, and the blend stays where it is.
+
+**Cloud: 0.6000** against 0.6007 for #30. The platform does not prefer the
+trees — if anything the reverse, by a hair inside the noise. The gap is
+the fold's optimism about the whole ensemble, not about the nets, and
+the blend stays at 0.45 / 0.55. Four cloud readings of the recipe now:
+0.5996, 0.6000, 0.6004, 0.6007 — a spread of 0.001, which is also the
+resolution below which the cloud cannot be asked anything.
