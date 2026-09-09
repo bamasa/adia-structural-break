@@ -1749,3 +1749,26 @@ the fold's optimism about the whole ensemble, not about the nets, and
 the blend stays at 0.45 / 0.55. Four cloud readings of the recipe now:
 0.5996, 0.6000, 0.6004, 0.6007 — a spread of 0.001, which is also the
 resolution below which the cloud cannot be asked anything.
+
+---
+
+## 090 — the prior that cannot be observed
+
+Break positions are uniform in the online part: tau/L sits at 0.47–0.50 in
+every quintile of L, and tau correlates 0.64 with L. So at step t, the
+probability that a breaking series has already broken is t/L — and a
+series close to its end is far more likely to be past its break than one
+with a long way to go. As a score, (t+1)/L alone reads **0.6288** on fold 2
+— above the entire ensemble — and blended 0.4 with #30 it reads 0.68.
+
+It is not usable. A probe submission run through the platform's own
+runner shows `x_online` arriving as a generator with no length: the
+points are streamed over a connection one at a time, by design. Nor is L
+recoverable from what *is* observed: the history length is uncorrelated
+with it (0.005), and a regressor on eleven history statistics or on the
+two hundred channels of the first step reaches R² ≈ 0 out of fold. The
+prior exists in the data-generating process and is invisible at
+inference — which also says the leaderboard's 0.65 is not built on it.
+
+Recorded so nobody rediscovers it: the strongest single signal in the
+dataset is the one the protocol withholds.
