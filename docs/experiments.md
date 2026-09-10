@@ -1973,3 +1973,18 @@ on coarser bins, and the prefix-wide versions decay with the prefix
 length, teaching the classifier a time dependence the cross-sections do
 not reward. The winners' block was decisive on full segments at a known
 boundary; on a growing prefix it is redundant with what is here.
+
+---
+
+## 098 — is the score comparable across series? (calibration, closed)
+
+The metric ranks series against each other at every step, so a model
+that runs systematically hot on some kinds of series — heavy-tailed or
+autocorrelated histories, where two-sample statistics in "history sigmas"
+are miscalibrated — would lose AUC without losing detection. Checked on
+fold 2's 1,005 non-breaking series: the mean #30 score moves only from
+0.27 to 0.31 across quintiles of history autocorrelation, kurtosis or
+volatility clustering (correlations 0.05–0.08), and removing a cross-
+fitted bias predicted from history shape lifts fold 2 by 0.0003. The
+trees have already learned the calibration from the channels; a
+series-specific null distribution is not the missing piece.
