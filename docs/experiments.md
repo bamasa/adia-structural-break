@@ -1988,3 +1988,30 @@ volatility clustering (correlations 0.05–0.08), and removing a cross-
 fitted bias predicted from history shape lifts fold 2 by 0.0003. The
 trees have already learned the calibration from the channels; a
 series-specific null distribution is not the missing piece.
+
+---
+
+## 099 — stacking, the winners' way (tier 1: block-wise level-0 models)
+
+Alphabot's published lesson: diversity at level 0 is what a meta-model
+pays for. Eleven LightGBM classifiers, each on its own channel block —
+stream detectors, CNN + now-channels, retro/multiscale, forecaster, the
+two batteries, spectral, BOCPD, the raw and asinh halves, and the full
+206 — with out-of-fold predictions over the four training folds and a
+final fit for fold 2. Blocks alone: 0.53–0.59 on fold 2 (retro/multiscale
+0.5815 the strongest family, the full set 0.5904 under the lighter
+stacking configuration).
+
+Level 1, on fold 2: the plain mean of the eleven 0.5923; a logistic meta
+0.5833; a LightGBM meta on the predictions 0.5812; a LightGBM meta on
+predictions plus the 206 channels 0.5942 — every learned meta below the
+plain mean, and all below the single standard classifier's 0.5999. In
+the #30 blend, replacing the classifier by the best meta reads **0.6161**
+against 0.6167; the plain mean 0.6159.
+
+The blocks do not complement each other the way rival solutions did for
+Alphabot: they are views of the same series computed by the same
+pipeline, and a single model with column sampling over all of them
+already performs the fusion the meta-model was asked to learn. Tiers 2
+(other model families, an explicit KS/Mann–Whitney/Levene/Fligner test
+block) and 3 (an out-of-fold ranker member) run next.
