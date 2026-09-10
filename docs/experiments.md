@@ -2015,3 +2015,16 @@ pipeline, and a single model with column sampling over all of them
 already performs the fusion the meta-model was asked to learn. Tiers 2
 (other model families, an explicit KS/Mann–Whitney/Levene/Fligner test
 block) and 3 (an out-of-fold ranker member) run next.
+
+**Tier 2.** Seven more level-0 members on the full channels: a wide
+LightGBM (255 leaves, depth 8) 0.6005, DART 0.5916, ExtraTrees 0.5962,
+random forest 0.5943, a logistic model 0.5626, the explicit test block
+alone 0.5481, and the full set with the tests 0.5946. The plain mean of
+all eighteen members 0.5989; the logistic meta 0.5890; the LightGBM meta
+0.5866. In the #30 blend the best tier-2 composition reads 0.6161 against
+0.6167. One crumb: the classifier averaged with the wide LightGBM and
+ExtraTrees lifts its slot from 0.5999 to 0.6056 and the blend to 0.6174
+(+0.0007) — two genuinely different tree families agree with the
+classifier almost everywhere and disagree usefully in a few places.
+Diversity of model family buys a little; diversity of feature block buys
+nothing; a learned meta-model buys less than a mean.
