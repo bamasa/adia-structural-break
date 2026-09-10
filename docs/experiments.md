@@ -1793,5 +1793,20 @@ as the platform does (`convert_first_edition.py`). And the channels are
 built by the shipped monitor itself — the assembled #30's `TriMonitor`,
 sharded eight ways — which reproduces the training matrices to 1e-6 and
 covers ten thousand series in about twelve minutes
-(`build_channels_fe.py`). What remains is the clone token for the 2025
-competition, which only the account holder can fetch.
+(`build_channels_fe.py`).
+
+The data arrived by download instead of token: 10,001 series, 29% with a
+break, pre-segments 1000–2499 and post-segments 250–999, unstandardised.
+Converted: 9,948 series, online 252–999, tau/L median 0.27 (the backward
+shift is bounded by the thousand-point history floor). The two editions
+are relatives, not twins: the 2025 histories carry heavier tails (kurtosis
+median 3.3 against 0.3) and weaker autocorrelation (95th percentile 0.46
+against 0.59). Channels built in eleven minutes on eight shards, 7.77M
+rows.
+
+The honest cross-dataset reading: #30, trained on the real-time edition
+only, scores **0.5668** on all 9,948 converted series — the ranker 0.5623,
+the classifier 0.5607, the nets 0.5638. It transfers, with a loss of about
+0.03 to the domain shift. Running now, paired against 082b and the 200-
+channel ranker: three nets and one ranker with the 2025 series added to
+training.
