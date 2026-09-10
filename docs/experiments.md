@@ -2044,3 +2044,19 @@ channels off the same growing prefix, and the best combination is the
 one already shipped — a ranker built for the cross-section, a classifier
 for calibration, the networks for motion — mixed by hand on the untouched
 fold.
+
+---
+
+## 100 — submission #33: the classifier slot as a pair
+
+The one crumb the stacking programme left: a wide LightGBM (255 leaves,
+depth 8, 250 trees) averaged with the standard classifier in probability
+lifts that slot from 0.5999 to 0.6036 on fold 2, and the full blend — with
+the augmented ranker, the run-length suffix, twelve networks and the
+self-normalisation of #32 — from 0.6180 to **0.6184**. The eighteen-member
+network pool was measured on the way and adds nothing to twelve (0.6100
+against 0.6107 as the net half), so the pool stays at twelve. ExtraTrees,
+the other family that helped, is left out: it would cost milliseconds per
+step for the same gain the wide model gives. Assembled, verified against
+the training matrices (7.9e-07 / 4.6e-07), 1.9–2.5 ms per step, nineteen
+channel counts checked. Shipped as **#33**, resources078.

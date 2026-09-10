@@ -1,0 +1,10 @@
+#32 with a second classifier: the standard one averaged with a wide LightGBM.
+---
+Identical to #32 except in the classifier slot, which is now the average of
+two tree models on the same 206 channels: the standard classifier (63
+leaves) and a wide one (255 leaves, depth 8). The one thing the stacking
+programme (099) found: two tree families agree almost everywhere and
+disagree usefully in a few places, lifting the slot from 0.5999 to 0.6036
+on fold 2 and the whole blend by 0.0004–0.0007. Everything else — the
+augmented ranker, the run-length suffix, twelve trajectory networks, the
+self-normalisation by the first ten steps — is as shipped in #32.
