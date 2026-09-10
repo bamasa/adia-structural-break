@@ -146,6 +146,7 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | 093–095 | history-shape prior (AUC 0.511, closed); self-normalisation by the early baseline (+0.0005–0.0013) | fold-2 0.6172 | shipped as **#32**; an 18-member pool trains overnight |
 | 096 | change-point filter with an AR(1) observation model + P(break occurred) | classifier −0.0040 / −0.0033 | killed — the posterior accumulates with time, not evidence |
 | 097 | the 2025 winners' divergence block (JS, Hellinger, Wasserstein, entropy) as streaming channels | classifier −0.0056, ranker −0.0008 | killed — redundant with the two-sample battery on a growing prefix |
+| 099 | stacking the winners' way: 11 block models, 7 model families, an OOF ranker, four kinds of meta | best meta in the blend 0.6161 vs 0.6167; as the whole tree half 0.6140; +0.0007 from averaging the classifier with wide LightGBM and ExtraTrees | closed — level-0 members read the same channels; the hand blend stands |
 | — | #25: broken upload, do not run | — | a `channels[:186]` slice survived the spectral upgrade; the push followed the check with `;` instead of `&&` |
 | — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |
 | — | 015: forecaster horizons 1+5 and signed error | 0.5751 vs 0.5779 | **killed by pre-stated condition**: the extensions dilute the compact four channels |

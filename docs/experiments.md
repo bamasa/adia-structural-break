@@ -2028,3 +2028,19 @@ ExtraTrees lifts its slot from 0.5999 to 0.6056 and the blend to 0.6174
 classifier almost everywhere and disagree usefully in a few places.
 Diversity of model family buys a little; diversity of feature block buys
 nothing; a learned meta-model buys less than a mean.
+
+**Tier 3.** A lambdarank ranker (the #28 configuration, originals only) as
+an out-of-fold member: 0.5967 on fold 2. The mean of all nineteen members
+0.6001; as the entire tree half of the blend it reads **0.6140** against
+0.6167 for the hand blend of the augmented ranker and the classifier —
+the augmented ranker alone (0.6043) is worth more than any average that
+dilutes it. Learned metas 0.5859–0.5883.
+
+Closed. Stacking, in the form that won the 2025 edition, does not
+transfer: there the level-0 models came from independent pipelines and
+independent people, and a meta-model learned genuinely different views
+of a fixed segment pair; here every member reads the same two hundred
+channels off the same growing prefix, and the best combination is the
+one already shipped — a ranker built for the cross-section, a classifier
+for calibration, the networks for motion — mixed by hand on the untouched
+fold.
