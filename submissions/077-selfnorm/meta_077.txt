@@ -1,0 +1,7 @@
+#30 with the score self-normalised by each series' early baseline.
+---
+Identical to #30 in members, channels and blend; the only change is a
+past-only transform of the output: half of the blend's mean over the
+series' first ten steps — before any break can have happened, so a high
+value there is the model's bias toward that series, not evidence — is
+subtracted from every score. Fold 2 reads 0.6172 against 0.6167.

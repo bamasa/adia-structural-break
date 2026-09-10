@@ -1892,3 +1892,15 @@ fold-2 trajectories of #30: the best of forty settings (first five steps,
 sensible middle (ten steps, λ = 0.5) reads 0.6172; per half, the nets are
 indifferent and the trees lose. +0.001 at the grid's peak, from a search
 on the same fold — an ingredient at most, not a lever.
+
+---
+
+## 095 — submission #32, and an overnight pool
+
+#32 is #30 with the self-normalisation of 094 in its moderate setting —
+half of the blend's mean over the first ten steps subtracted from every
+later score, clipped at zero — the only change; fold 2 0.6172 against
+0.6167, a paired cloud read of an ingredient worth +0.0005. In parallel
+the laptop trains eighteen more members under the last-epoch rule
+(seeds 51006–51023) toward a twenty-four-member pool: not a lever for the
+mean, but the cheapest variance reduction available without the GPU box.
