@@ -1929,4 +1929,37 @@ evidence, and the classifier learns a time-dependence that reshuffles
 the cross-sections instead of sharpening them. Dependence-structure
 breaks are too faint in these windows for a first-order model to read,
 and the "break has occurred" posterior is a worse feature than the
-recent-run-length masses that made 085 work. Killed.
+recent-run-length masses that made 085 work. Killed. The same
+continuation hypothesis on the mean/variance model (096b): −0.0011 with
+its seven channels, −0.0032 with the two "break occurred" posteriors
+alone — the whole family of accumulated-evidence posteriors is closed.
+
+---
+
+## 097 — what the 2025 winners did, and what this project never built
+
+The 2025 edition (break at a known boundary, ROC-AUC) was won at 0.9014
+by Alphabot's stacking: eight level-0 tree models (XGBoost, random
+forest) over four independent feature blocks, a meta-model above them,
+and — the published lesson — three rival solutions added at level 0 took
+cross-validation from 0.9065 to 0.9199. No deep learning in the top ten;
+the 2nd place is 2,408 segment-comparison features into LightGBM with a
+TabPFN feature; the 5th and 4th are of the same kind. Their feature
+blocks: local t-tests, variance/Fligner/Levene/F tests, KS and
+Mann–Whitney, CUSUM statistics, entropy differentials, Jensen–Shannon,
+Hellinger and Wasserstein divergences, wavelet-denoised / cumulative-sum
+/ percentage-change / rank / moving-mean / moving-std views, and
+non-linear composites found by an evolutionary search.
+
+Against this project: the two-sample battery (B40/B2) covers location,
+scale and shape statistics history-vs-prefix; CUSUM is Page–Hinkley in
+the detectors; the rank view (009), wavelets (066) and TabPFN (#20) were
+built and killed; stacking over score trajectories (092) was killed.
+Never built: **the divergence family** — Jensen–Shannon, Hellinger,
+Wasserstein-1 and entropy differentials between the history's
+distribution and the prefix's (and a recent window's), the block the
+winning team's leader wrote himself. Streaming version on 32 history-
+quantile bins, 0.04 ms per step; on a synthetic shape change at constant
+variance the window Wasserstein more than doubles. Eight channels,
+screened now on the classifier (206 → 214) and, paired without
+augmentation, on the ranker (200 → 208).
