@@ -1877,3 +1877,18 @@ spectral mass and entropy, roughness, zero crossings, nonlinearity — into
 a small gradient-boosted classifier, five folds by series: ROC-AUC
 **0.5112**. Break presence is independent of the history's shape, as the
 protocol intends. Closed.
+
+---
+
+## 094 — self-normalisation by the series' own early baseline
+
+A series the model already scores high in its first steps — before any
+break can have happened — is a series the model finds noisy, and it will
+keep scoring high for the wrong reason. Subtracting a fraction of the
+score's own early mean is a legitimate online transform (past only) and a
+series-level bias correction the cross-section might reward. On the
+fold-2 trajectories of #30: the best of forty settings (first five steps,
+λ = 0.75, applied to the blend) reads **0.6180** against 0.6167; the
+sensible middle (ten steps, λ = 0.5) reads 0.6172; per half, the nets are
+indifferent and the trees lose. +0.001 at the grid's peak, from a search
+on the same fold — an ingredient at most, not a lever.
