@@ -142,6 +142,7 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | 089 | #30 with the blend at 0.55 trees / 0.45 nets | fold-2 tie (0.6162 vs 0.6163) | shipped as **#31** — cloud **0.6000** vs 0.6007 for #30: the platform does not prefer the trees; blend stays 0.45/0.55 |
 | 090 | the online-length prior: tau is uniform in the online part, (t+1)/L alone reads 0.6288 on fold 2 | unobservable — `x_online` is a length-less generator, and L is unpredictable from history (R² ≈ 0) | closed, and recorded |
 | 091 | the 2025 edition's 9,948 series as extra data: mixed into nets, into the ranker, and as pretraining | nets 0.6020/0.5940 and 0.6047/0.6012 vs pairs 0.606; ranker 0.6043 → 0.5882 | killed in all three forms — a shifted domain, its volume buys nothing |
+| 092 | entry/exit over the score trajectory: peak-hold, reset rules, learned verifiers (trees, linear) | all below the raw score: rules ≤ 0.6163, verifiers 0.579–0.610 vs 0.6167 | killed — the score already carries its memory |
 | — | #25: broken upload, do not run | — | a `channels[:186]` slice survived the spectral upgrade; the push followed the check with `;` instead of `&&` |
 | — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |
 | — | 015: forecaster horizons 1+5 and signed error | 0.5751 vs 0.5779 | **killed by pre-stated condition**: the extensions dilute the compact four channels |

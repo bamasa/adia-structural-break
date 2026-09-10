@@ -1834,3 +1834,32 @@ uniform in the online part, half the series breaking), and the sibling's
 mixture is different enough in tails, dependence and break rate that its
 volume buys nothing here. The data lever, in every form the laptop can
 pull it, is now measured flat.
+
+---
+
+## 092 — entry and exit over the score trajectory, killed
+
+The trading framing: the ensemble's score is a position — enter the
+anomaly when the detector fires, hold it, and let a second, backward-
+looking verifier with more data close it if the evidence does not hold.
+Implemented as a second layer over the fold-2 trajectories of the shipped
+#30 score, its tree half and its net half, and judged by series-grouped
+cross-validation inside fold 2.
+
+Rules first — peak-hold with decay, entry/exit (hold the peak, reset when
+the recent mean falls below a fraction of it), EMA and running-mean
+mixes, cumulative max: every variant lands below the raw score, the best
+(EMA 0.9 at 0.3) at 0.6163 against 0.6167, the entry/exit rules at
+0.6136–0.6138. Then learned verifiers over 34 trajectory features (score,
+running max, means at 20/60/200, slopes, time since the peak, log step,
+for all three signals, plus the tree–net disagreement): gradient-boosted
+0.5994 / 0.5925 / 0.5786 as capacity grows, and a linear one 0.6096;
+even a linear re-blend of the three current scores reads 0.6128 against
+the hand blend's 0.6167, because a per-step probability objective is not
+the cross-sectional ranking objective.
+
+The score already carries its memory — the ranker was chosen for it in
+#16, the nets see 127 steps — and a verifier reading only the score's
+past has nothing the score does not. Exit, in this metric, is what the
+channels do when evidence reverts; a second model on top cannot do it
+better than the first.
