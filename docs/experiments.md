@@ -1961,5 +1961,15 @@ distribution and the prefix's (and a recent window's), the block the
 winning team's leader wrote himself. Streaming version on 32 history-
 quantile bins, 0.04 ms per step; on a synthetic shape change at constant
 variance the window Wasserstein more than doubles. Eight channels,
-screened now on the classifier (206 → 214) and, paired without
+screened on the classifier (206 → 214) and, paired without
 augmentation, on the ranker (200 → 208).
+
+Killed on both. Classifier: **−0.0056** with the eight, −0.0058 with the
+four prefix-wide ones, −0.0041 with the four stationary window ones,
+which the trees rank 124th–161st of 210. Ranker, paired: 0.5967 → 0.5959,
+−0.0008. The divergence family measures what the two-sample battery
+already measures — differences of quantiles between history and prefix —
+on coarser bins, and the prefix-wide versions decay with the prefix
+length, teaching the classifier a time dependence the cross-sections do
+not reward. The winners' block was decisive on full segments at a known
+boundary; on a growing prefix it is redundant with what is here.
