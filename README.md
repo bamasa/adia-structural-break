@@ -144,6 +144,7 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | 091 | the 2025 edition's 9,948 series as extra data: mixed into nets, into the ranker, and as pretraining | nets 0.6020/0.5940 and 0.6047/0.6012 vs pairs 0.606; ranker 0.6043 → 0.5882 | killed in all three forms — a shifted domain, its volume buys nothing |
 | 092 | entry/exit over the score trajectory: peak-hold, reset rules, learned verifiers (trees, linear) | all below the raw score: rules ≤ 0.6163, verifiers 0.579–0.610 vs 0.6167 | killed — the score already carries its memory |
 | 093–095 | history-shape prior (AUC 0.511, closed); self-normalisation by the early baseline (+0.0005–0.0013) | fold-2 0.6172 | shipped as **#32**; an 18-member pool trains overnight |
+| 096 | change-point filter with an AR(1) observation model + P(break occurred) | classifier −0.0040 / −0.0033 | killed — the posterior accumulates with time, not evidence |
 | — | #25: broken upload, do not run | — | a `channels[:186]` slice survived the spectral upgrade; the push followed the check with `;` instead of `&&` |
 | — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |
 | — | 015: forecaster horizons 1+5 and signed error | 0.5751 vs 0.5779 | **killed by pre-stated condition**: the extensions dilute the compact four channels |

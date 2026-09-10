@@ -1904,3 +1904,29 @@ later score, clipped at zero — the only change; fold 2 0.6172 against
 the laptop trains eighteen more members under the last-epoch rule
 (seeds 51006–51023) toward a twenty-four-member pool: not a lever for the
 mean, but the cheapest variance reduction available without the GPU box.
+
+---
+
+## 096 — the change-point filter with an AR(1) observation model, killed
+
+Half the labelled breaks change neither mean nor variance nor first-lag
+autocorrelation in a 300-point window (see the data notes under 090), and
+the filter that helped the classifier in 085 models only mean and
+variance. So: the same run-length machinery over a Bayesian AR(1)
+regression of each point on its predecessor — a conjugate
+Normal–inverse-Gamma per run length, prior fitted to the history — which
+sees changes in the dependence structure. Two corrections on the way:
+run lengths tracked to 1000 (the online part's maximum), and a proper
+"the history's regime continues" hypothesis carrying the full-history
+posterior, which yields the direct channel P(a break has occurred in the
+online part) — 0.80 → 0.99 across a synthetic AR change.
+
+Classifier on fold 2, paired: 206 channels 0.5999; with the seven AR
+channels **0.5959** (−0.0040); with only P(break occurred) 0.5966
+(−0.0033), even though the trees rank that channel 21st of 213 by gain.
+The posterior accumulates with t under a 1/50 hazard regardless of
+evidence, and the classifier learns a time-dependence that reshuffles
+the cross-sections instead of sharpening them. Dependence-structure
+breaks are too faint in these windows for a first-order model to read,
+and the "break has occurred" posterior is a worse feature than the
+recent-run-length masses that made 085 work. Killed.
