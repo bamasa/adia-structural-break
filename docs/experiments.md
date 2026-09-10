@@ -1807,6 +1807,12 @@ rows.
 The honest cross-dataset reading: #30, trained on the real-time edition
 only, scores **0.5668** on all 9,948 converted series — the ranker 0.5623,
 the classifier 0.5607, the nets 0.5638. It transfers, with a loss of about
-0.03 to the domain shift. Running now, paired against 082b and the 200-
-channel ranker: three nets and one ranker with the 2025 series added to
-training.
+0.03 to the domain shift. Paired against 082b, nets with the 2025 series simply added to training
+read **0.6020 / 0.5940** against 0.6057 / 0.6065 — worse on both seeds,
+killed at two. Doubling the originals does not help when the doubling
+comes from a shifted domain: the nets spend capacity on tails and
+dependence structures the platform does not show them. The standard
+remedy runs next as 091p — pretrain on the 2025 series, then fine-tune on
+the real-time edition alone, so the shifted domain shapes the
+initialisation rather than the final fit. The ranker with the 2025 rows
+added is still training on the CPU.
