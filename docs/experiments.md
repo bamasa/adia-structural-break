@@ -1863,3 +1863,17 @@ The score already carries its memory — the ranker was chosen for it in
 past has nothing the score does not. Exit, in this metric, is what the
 channels do when evidence reverts; a second model on top cannot do it
 better than the first.
+
+---
+
+## 093 — is the break itself predictable from the history?
+
+If the platform's mixture of synthetic families carried different break
+rates, the history's shape alone would be a series-level prior, valid at
+every step and invisible to channels that only compare prefix with
+history. Nineteen history statistics — length, skew, kurtosis, five
+autocorrelations, volatility clustering, residual kurtosis, tail mass,
+spectral mass and entropy, roughness, zero crossings, nonlinearity — into
+a small gradient-boosted classifier, five folds by series: ROC-AUC
+**0.5112**. Break presence is independent of the history's shape, as the
+protocol intends. Closed.
