@@ -117,6 +117,8 @@ def verify_channels(assembled: str, target: Path) -> None:
             bad.append(f"{name}={got} (expected {want})")
     if model.get("booster") is not None:
         check("clf", getattr(model["booster"], "booster_", model["booster"]).num_feature(), width["clf"])
+    for i, c in enumerate(model.get("classifiers", [])):
+        check(f"clf[{i}]", getattr(c, "booster_", c).num_feature(), width["clf"])
     for i, r in enumerate(model.get("rankers", [])):
         check(f"rank[{i}]", getattr(r, "booster_", r).num_feature(), width["rank"])
     for i, state in enumerate(model.get("nets", [])):

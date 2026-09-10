@@ -61,6 +61,15 @@ class ChannelCheck(unittest.TestCase):
         with self.assertRaises(SystemExit):
             self._run("NET_CHANNELS = 200\n", _artifact(200, [200], [200], 186))
 
+    def test_classifier_list_is_checked(self):
+        text = "NET_CHANNELS = 200\nCLF_CHANNELS = 206\n"
+        art = _artifact(206, [200], [200] * 2, 200)
+        art["classifiers"] = [_Booster(206), _Booster(206)]
+        self._run(text, art)
+        art["classifiers"] = [_Booster(206), _Booster(200)]   # a wide model built at the wrong width
+        with self.assertRaises(SystemExit):
+            self._run(text, art)
+
     def test_no_artifact_is_not_an_error(self):
         self._run("NET_CHANNELS = 200\n", None)
 
