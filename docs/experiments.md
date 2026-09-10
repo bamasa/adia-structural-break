@@ -1814,5 +1814,12 @@ comes from a shifted domain: the nets spend capacity on tails and
 dependence structures the platform does not show them. The standard
 remedy runs next as 091p — pretrain on the 2025 series, then fine-tune on
 the real-time edition alone, so the shifted domain shapes the
-initialisation rather than the final fit. The ranker with the 2025 rows
-added is still training on the CPU.
+initialisation rather than the final fit.
+
+The ranker's verdict is harsher than the nets': with the 7.8M rows of the
+2025 edition added to its cross-sections, 0.6043 → **0.5882**. A
+cross-sectional ranker is hurt twice by a shifted domain — by the tails
+it learns to rank on, and by a break rate of 29% against 50% that
+rebalances every step's positives and negatives. The trees will not see
+this data again. 091p (pretrain, then fine-tune): the first member reads
+0.6047 against its pair's 0.6057 — neutral so far.
