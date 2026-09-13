@@ -27,6 +27,27 @@ Two properties of that metric shape every design decision here:
   no evidence exists. A detector that is only right after two hundred
   observations scores poorly however certain it eventually becomes.
 
+## Where it stands
+
+Five weeks, a hundred logged experiments, thirty-three submissions. The
+platform moved four times, each time for a different reason:
+
+| Cloud | Submission | What moved it |
+|---|---|---|
+| 0.5877 | #18 | the channel–trajectory networks joined the trees |
+| 0.5893 | #23 | a new channel family — fourteen spectral bands |
+| 0.6004 | #28 | boundary augmentation, tripled: pseudo-series with early breaks |
+| 0.6007 | #30 | a run-length posterior for the classifier, twelve networks |
+
+Everything else measured on the untouched fold since #28 — more members,
+more or other data, capacity, schedule, loss, input, verifiers, stacking
+in the winners' form, the sibling competition's ten thousand series — sits
+within ±0.001 of the recipe. The strongest single signal in the data, the
+position of a series inside its own online part, is exactly what the
+real-time protocol withholds. The record of what was tried, in what order,
+and why each was kept or killed is the point of this repository as much as
+the score.
+
 ## Layout
 
     src/structural_break/    the library: normalisation, streaming detectors,
@@ -163,6 +184,15 @@ series carrying high scores — not another within-series channel.
     crunch setup structural-break-real-time <name> --token <token>
     cp submissions/001-classical-detectors/main.py <workspace>/
     cd <workspace> && crunch test
+
+### Shipping a submission
+
+    scripts/ship_submission.sh 078-two-classifiers interface_078.py meta_078.txt ../resources078 "message"
+
+Assembles from the library, refuses a channel-width mismatch, verifies the
+assembled monitor against the training matrices with the verifier that
+lives next to the interface, profiles milliseconds per step, and only then
+pushes. Nothing reaches the platform unverified.
 
 ### Tests
 
