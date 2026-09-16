@@ -2060,3 +2060,20 @@ the other family that helped, is left out: it would cost milliseconds per
 step for the same gain the wide model gives. Assembled, verified against
 the training matrices (7.9e-07 / 4.6e-07), 1.9–2.5 ms per step, nineteen
 channel counts checked. Shipped as **#33**, resources078.
+
+---
+
+## 101 — submission #34: the final assembly, twenty-four networks
+
+The day before the deadline, everything measured as an ingredient in one
+artifact: the augmented ranker, the run-length suffix read by the
+classifier pair (standard + wide), the self-normalisation of #32, and the
+network pool doubled from twelve to twenty-four — #33's twelve, the six
+trained on every series (#29 read the same as #28 on the platform, so
+they are members of equal quality that fold 2 simply cannot score), and
+the six of the 095 pool. Fold 2 says the extra members change nothing
+(the net half reads 0.610 with twelve or with eighteen); the platform,
+whose readings of this recipe span 0.001, is where halved member variance
+would show. Thirty-one channel counts checked, matrices matched to 8e-7,
+2.5–3.2 ms per step. Shipped as **#34**, resources079 — the last
+submission of the project unless the cloud says otherwise.

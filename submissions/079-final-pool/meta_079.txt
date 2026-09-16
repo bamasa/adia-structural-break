@@ -1,0 +1,9 @@
+#33 with twenty-four trajectory networks instead of twelve.
+---
+Everything in #33 — the augmented ranker, the run-length suffix, the pair of
+classifiers, the self-normalisation — with the network pool doubled: the
+twelve of #33, six members trained on every series (#29 read the same as
+#28 in the cloud), and six from the last pool. On the untouched fold the
+extra twelve change nothing (the net half reads 0.610 either way); on the
+platform they halve the member variance, which is the one thing left that
+a bigger pool buys. Final assembly before the deadline.
