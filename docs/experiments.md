@@ -2165,3 +2165,35 @@ Together with 102 this closes the idea on both halves: the rows right
 after a break are not label noise. Weak as the evidence in them is, a
 model that is never asked to rank them ranks them worse, and the metric
 still counts those steps.
+
+---
+
+## 105 — two more ways to change the training distribution (running)
+
+The one lever that ever moved the platform by a readable amount was a
+change in what the networks train on: boundary augmentation, +0.011 in
+the cloud. Its own axis is closed (more slices hurt, variety is neutral,
+the sibling competition's series are a shifted domain). Two directions of
+the same kind were never built.
+
+**105a — mirrored series.** x -> -x is as valid a series as x, with the
+same break at the same step, the same online length and the same uniform
+tau. It doubles the *originals* — ten thousand to twenty thousand — where
+every earlier augmentation added pseudo-series with a shortened online
+part. The risk is the mixture's asymmetry: history skew runs slightly
+positive, so the mirror image is a mildly shifted domain, far milder than
+the 2025 edition that hurt in 091.
+
+**105b — the boundary moved backwards.** Every augmentation so far moved
+the break *earlier* (history + online[:k] as the new history). Moving the
+boundary the other way — the last m history points open the online part,
+the history re-standardised as the platform would — yields late breaks
+after a long quiet stretch: 9,397 series, online median 696, tau/L median
+0.69. That is the regime of steps 200-800, which carries two thirds of
+the metric's weight.
+
+Channels for both are built by the shipped #30 monitor (verified against
+the training matrices to 1e-6). Three networks on each set, same seeds as
+082b (0.6057 / 0.6065 / 0.6051), parents from fold 2 excluded. Given what
+#32 and #33 taught about fold 2, only a member-level gain of 0.003 or
+more counts as evidence here.
