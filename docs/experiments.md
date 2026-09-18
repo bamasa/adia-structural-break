@@ -2118,3 +2118,28 @@ the single model elsewhere: classifier alone 0.6004 (+0.0005), the full
 0.5532 -> 0.5550. A real +0.012 on the classifier's weakest region is
 worth one ten-thousandth once it passes through a 30% share of a 45%
 half on steps that carry little of the metric's weight. Not shipped.
+
+---
+
+## Cloud readings for #32 and #33 (run on 10 September, read on 18 September)
+
+| Submission | What it added | Fold 2 | Cloud |
+|---|---|---|---|
+| #30 | — (reference) | 0.6167 | **0.6007** |
+| #32 | #30 + self-normalisation by the first ten steps | 0.6172 | 0.5991 |
+| #33 | #32 + a wide LightGBM averaged into the classifier slot | 0.6184 at the grid's peak setting | 0.5991 |
+
+Self-normalisation does not transfer: fold 2 promised +0.0005, the
+platform returned **−0.0016**, outside the 0.001 spread of the four
+earlier readings of this recipe. Note 094 had already flagged it as the
+peak of a forty-setting grid searched on the same fold; the cloud agrees
+that it was the fold being fitted, not the series. The wide classifier is
+a null: #33 equals #32 to four digits, where fold 2 had promised +0.0004.
+
+Two consequences. Gains under about 0.002 on fold 2 are no longer
+evidence — the fold has carried too many small decisions, and the last
+two it approved were worth nothing and less than nothing. And #34 is
+#33 plus twelve networks, so it carries the self-normalisation with it:
+the expectation written under 101 (0.601–0.603) was wrong, and the honest
+one is ≈0.599. It had not been run when these readings were taken.
+#30 remains the project's best and is the one marked Selected.
