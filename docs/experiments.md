@@ -2095,3 +2095,26 @@ baseline, one tie. The rows just after a break are not noise the trees
 were wasting themselves on — down-weighting them only removes the little
 early evidence there is. The same idea for the networks (103: the first
 fifteen post-break steps masked out of the loss) is still training.
+
+---
+
+## 104 — step-range tree specialists, killed
+
+The step index as a feature was killed long ago (it teaches the base
+rate). Specialisation is a different claim: early steps are read by short
+windows, late steps by long ones, and one model splits its capacity
+between the regimes. Separate classifiers per step range, each trained on
+its range with a 20% overlap and scoring only its own steps.
+
+Three ranges (t < 50, 50-200, 200+): **0.5957** against 0.5999 for the
+single classifier. Two ranges (cut at 150): 0.5991. By range, the
+specialist wins only where t < 50 — 0.5451 against 0.5328 — and loses on
+both later ranges (0.5519 vs 0.5597, 0.6172 vs 0.6209): the late
+specialists lose more from seeing fewer rows than they gain from focus.
+
+The early win was checked as a hybrid — the specialist below step 50,
+the single model elsewhere: classifier alone 0.6004 (+0.0005), the full
+#30 blend 0.6168 against 0.6167, the blend on the early steps themselves
+0.5532 -> 0.5550. A real +0.012 on the classifier's weakest region is
+worth one ten-thousandth once it passes through a 30% share of a 45%
+half on steps that carry little of the metric's weight. Not shipped.
