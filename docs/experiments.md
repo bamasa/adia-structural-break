@@ -2077,3 +2077,21 @@ whose readings of this recipe span 0.001, is where halved member variance
 would show. Thirty-one channel counts checked, matrices matched to 8e-7,
 2.5–3.2 ms per step. Shipped as **#34**, resources079 — the last
 submission of the project unless the cloud says otherwise.
+
+---
+
+## 102 — evidence-weighted positives for the classifier, killed
+
+Right after a break there is nothing to see, yet the label is already 1:
+the competition's own illustration shows the score climbing over dozens
+of steps while the ideal step function jumps at once. Hypothesis: those
+rows are label noise that costs the classifier capacity, so positive rows
+get the weight min(1, (t - tau + 1) / W), floored at 0.05, negatives stay
+at 1. Kill condition: no W above the unweighted classifier on fold 2.
+
+Classifier on 206 channels, paired: unweighted 0.5999; W = 20 0.5942;
+W = 50 0.5999; W = 100 0.5988; W = 200 0.5968. Nothing above the
+baseline, one tie. The rows just after a break are not noise the trees
+were wasting themselves on — down-weighting them only removes the little
+early evidence there is. The same idea for the networks (103: the first
+fifteen post-break steps masked out of the loss) is still training.
