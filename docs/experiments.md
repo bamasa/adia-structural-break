@@ -2143,3 +2143,25 @@ two it approved were worth nothing and less than nothing. And #34 is
 the expectation written under 101 (0.601–0.603) was wrong, and the honest
 one is ≈0.599. It had not been run when these readings were taken.
 #30 remains the project's best and is the one marked Selected.
+
+---
+
+## 103 — undetectable positives masked out of the net loss, killed
+
+The network half of the idea tested on the trees in 102: for the first
+fifteen steps after a break there is nothing to see, so those positive
+positions were removed from both the ranking loss and the BCE term
+(mask: Y = 1 and cumsum(Y) <= 15). Everything else as 082b, same three
+seeds for a paired comparison.
+
+| seed | 082b | 103 |
+|---|---|---|
+| 51000 | 0.6057 | 0.6061 |
+| 51001 | 0.6065 | 0.6021 |
+| 51002 | 0.6051 | 0.6005 |
+
+One tie and two losses of about 0.0045; mean 0.6058 -> 0.6029. Killed.
+Together with 102 this closes the idea on both halves: the rows right
+after a break are not label noise. Weak as the evidence in them is, a
+model that is never asked to rank them ranks them worse, and the metric
+still counts those steps.
