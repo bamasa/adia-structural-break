@@ -2,7 +2,7 @@
 
 Solutions for the [ADIA Lab Structural Break Challenge: Real-Time
 Edition](https://hub.crunchdao.com/competitions/structural-break-real-time)
-(CrunchDAO, May–September 2026).
+(CrunchDAO, May–October 2026; the deadline was extended from 17 September to 1 October).
 
 ## The task
 
