@@ -2476,3 +2476,20 @@ That is the fourth channel family in a row (096 AR-BOCPD, 097
 divergences, 110 autocorrelation, 112 GLR) to measure a real property,
 work on synthetic data, and lose in the cross-section. The pattern is
 now the finding: this ensemble is not short of detectors.
+
+---
+
+## 113 — the output space, checked and clean
+
+If the members disagree in scale rather than in judgement, averaging them
+as probabilities loses what averaging as ranks would keep — and the metric
+only ever reads ranks. Checked three ways on fold 2: averaging the twelve
+networks by their global quantiles instead of their probabilities gives
+0.6103 against 0.6107; doing the same for the tree half gives 0.6065
+against 0.6068; putting the whole ensemble in quantile space gives 0.6170
+against 0.6167. Within-series ranking — each series normalised against its
+own trajectory — collapses to 0.5657, as it must, since it discards
+exactly the between-series information the metric is made of.
+
+The output space is not the problem either. The members agree in scale;
+the blend is already as good as its parts allow.
