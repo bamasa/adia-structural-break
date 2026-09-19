@@ -2197,3 +2197,13 @@ the training matrices to 1e-6). Three networks on each set, same seeds as
 082b (0.6057 / 0.6065 / 0.6051), parents from fold 2 excluded. Given what
 #32 and #33 taught about fold 2, only a member-level gain of 0.003 or
 more counts as evidence here.
+
+**105a killed.** Mirrored series, paired on the three 082b seeds:
+0.6030 / 0.6024 / 0.6013 against 0.6057 / 0.6065 / 0.6051 — every member
+lower, mean 0.6058 -> 0.6022. Doubling the originals by reflection costs
+what the 2025 edition cost, in miniature: the mixture is not symmetric
+(history skew runs slightly positive, and the break types are not
+sign-invariant either), so half the training set now argues for a
+distribution the platform does not show. Volume of *originals* is not
+the axis; the augmentation gain came from where the break sits, not from
+how many series there are.
