@@ -50,6 +50,21 @@ plumbing in about a minute before you commit the GPU for a day:
 
     python scripts/gpu/train_nets_cuda.py --data-dir /path/to/matrices --smoke
 
+## Two architectures
+
+`run.sh` trains the convolutional pool and then six recurrent members.
+The recurrent family is the one architecture the laptop could never test:
+Apple's MPS backend has no fused GRU kernel, so a single member ran twelve
+hours without finishing (experiment 086), while cuDNN makes it comparable
+to a convolutional member. Same inputs, same loss, same schedule, so its
+members are directly comparable and can join the same ensemble. Set
+`GRU_MEMBERS=0` to skip them, or train them alone:
+
+    python scripts/gpu/train_nets_cuda.py --data-dir /data --out-dir nets_cuda \
+        --members 6 --arch gru
+
+Members are written as `nets_cuda/<arch>_plain_member_N.pt`.
+
 Interrupting is safe: finished members are skipped on the next run, so you
 can stop, reboot, and continue.
 

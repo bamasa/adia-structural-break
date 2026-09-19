@@ -11,5 +11,12 @@ echo "Training $MEMBERS members into $OUT/ — safe to interrupt and rerun,"
 echo "finished members are skipped."
 python scripts/gpu/train_nets_cuda.py \
     --data-dir "$DATA" --out-dir "$OUT" --members "$MEMBERS" --variant plain
+
+echo
+echo "Training ${GRU_MEMBERS:-6} recurrent members — the one family the laptop"
+echo "could not reach (twelve hours per member on Apple's MPS, minutes here)."
+python scripts/gpu/train_nets_cuda.py \
+    --data-dir "$DATA" --out-dir "$OUT" --members "${GRU_MEMBERS:-6}" --variant plain --arch gru
+
 echo
 echo "Done. Copy $OUT/ back to the laptop workspace root."

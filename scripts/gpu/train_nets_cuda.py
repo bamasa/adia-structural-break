@@ -90,6 +90,29 @@ class ChanTCN(nn.Module):
         return self.head(h).squeeze(1)
 
 
+class ChanGRU(nn.Module):
+    """The recurrent family, the one architecture the laptop could never test.
+
+    Apple's MPS backend has no fused GRU kernel: a single member ran for
+    twelve hours without finishing an epoch schedule that takes a
+    convolutional member half an hour (experiment 086). On CUDA, cuDNN makes
+    it comparable. Same inputs, same loss, same schedule as ChanTCN, so a
+    member trained here is directly comparable to the convolutional pool and
+    can join the same ensemble — if it earns its place on fold 2.
+    """
+
+    def __init__(self, n_in, ch=64):
+        super().__init__()
+        self.inp = nn.Linear(n_in, ch)
+        self.gru = nn.GRU(ch, ch, num_layers=2, batch_first=True, dropout=0.1)
+        self.head = nn.Linear(ch, 1)
+
+    def forward(self, x):                      # x: (B, C, L) as for ChanTCN
+        h = F.gelu(self.inp(x.transpose(1, 2)))
+        h, _ = self.gru(h)
+        return self.head(h).squeeze(-1)
+
+
 def split_by_series(groups, folds=5, seed=0):
     """The laptop's fold assignment, reproduced exactly (combiners.split_by_series)."""
     series = np.unique(groups)
@@ -119,6 +142,8 @@ def main() -> None:
     ap.add_argument("--device", default="cuda")
     ap.add_argument("--variant", choices=["plain", "diff", "both"], default="plain",
                     help="diff members are kept only as an option; their holdouts do not transfer")
+    ap.add_argument("--arch", choices=["tcn", "gru"], default="tcn",
+                    help="gru trains the recurrent family, which no laptop run could reach")
     ap.add_argument("--no-augmentation", action="store_true",
                     help="train on the original series only (for comparison; expect weaker members)")
     ap.add_argument("--smoke", action="store_true",
@@ -215,7 +240,7 @@ def main() -> None:
             variant, n_in = ("plain", 200) if member % 2 == 0 else ("diff", 600)
         else:
             variant, n_in = args.variant, (200 if args.variant == "plain" else 600)
-        path = args.out_dir / f"{variant}_member_{member}.pt"
+        path = args.out_dir / f"{args.arch}_{variant}_member_{member}.pt"
         if path.exists():
             continue
         rng = np.random.default_rng(20000 + member)
@@ -227,7 +252,7 @@ def main() -> None:
         # sign. So every series trains, and the last epoch ships.
         train_set = list(series) + [(f, lab) for f, lab, parent in augmented]
         rng.shuffle(train_set)
-        model = ChanTCN(n_in).to(device)
+        model = (ChanTCN(n_in) if args.arch == "tcn" else ChanGRU(n_in)).to(device)
         opt = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
         sched = torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=args.epochs)
         order = sorted(range(len(train_set)), key=lambda i: len(train_set[i][0]))
@@ -245,7 +270,7 @@ def main() -> None:
                 opt.step()
             sched.step()
         torch.save({k: v.cpu().clone() for k, v in model.state_dict().items()}, path)
-        print(f"{variant} member {member}: done, {args.epochs} epochs  [{time.time()-t0:.0f}s]",
+        print(f"{args.arch} {variant} member {member}: done, {args.epochs} epochs  [{time.time()-t0:.0f}s]",
               flush=True)
     print("done", flush=True)
 
