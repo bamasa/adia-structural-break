@@ -2360,3 +2360,11 @@ came from variance-sensitive families (spectral bands, the battery) and
 from augmentation that moved breaks to where evidence accumulates, while
 everything aimed at dependence or distributional shape — the AR filter,
 the divergence block, the raw network — returned nothing.
+
+**The window is not the answer either.** The obvious escape is that 300
+points is simply too short. Repeated at 600 points: 62 qualifying breaks,
+the same picture — rolling-mean variance at 1.17, everything else at or
+below 1.0, and the fraction beyond two control sigmas lower for the
+breaks than for the controls. At 1000 points the question dissolves,
+because almost no online segment is long enough to hold two such windows.
+Length does not recover the signal; there is nothing there to recover.
