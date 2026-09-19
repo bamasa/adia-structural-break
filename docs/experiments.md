@@ -2368,3 +2368,32 @@ below 1.0, and the fraction beyond two control sigmas lower for the
 breaks than for the controls. At 1000 points the question dissolves,
 because almost no online segment is long enough to hold two such windows.
 Length does not recover the signal; there is nothing there to recover.
+
+---
+
+## 110 — a direct autocorrelation comparison, killed
+
+109 named the weakest region precisely: breaks that change dependence
+read 0.583 against 0.686 for variance breaks, and dependence is the one
+property the channels touch only indirectly — through `whiten`, which
+removes the *historical* one-step coefficient and lets a changed
+dependence show up as residual scale. There is no channel anywhere in the
+two hundred that says "the current autocorrelation differs from the
+history's by this much".
+
+Built as eight streaming channels: EWMA estimates of the autocorrelation
+at lags 1, 2, 5 and 10 over a fast window (50) and a slow one (200),
+each minus the history's value at that lag, at 0.019 ms per step. On a
+synthetic change of rho from 0.1 to 0.6 the channels move from 0.00 to
++0.38 (slow) and +0.51 (fast), so they measure what they claim.
+
+Classifier on fold 2: 206 channels 0.5999, with the eight **0.5954**,
+minus 0.0045. The trees rank the new channels 60th to 190th of 214 — they
+are used, and they still cost. The same pattern as 096 and 097: a channel
+family that measures a real property, added to a set that already
+captures its consequences, trades a little signal for a lot of variance
+in a cross-section where every series contributes its own noise.
+
+The blind region named in 109 stays blind, and the reason is now
+narrower than "we lack a dependence channel": we had one, in the form
+that matters, and a second, more direct one does not help.
