@@ -2262,6 +2262,16 @@ weights: six blocks and twelve nets 0.77 ms/step, six and twenty-four
 1.47, eight and twelve 1.02, eight and twenty-four 1.88. Reach costs
 0.25-0.41 ms, and the budget holds.
 
+**Killed after one member.** Seed 51000: **0.5906** against 0.6057 for
+its pair — minus 0.015, three times the spread between seeds and five
+times the acceptance bar. Stopped there rather than spending two more
+GPU-hours to confirm the sign. Reach is not merely useless here, it
+hurts: eight blocks over the same ten epochs give each layer less
+gradient, and the far half of a 511-step window is mostly the channels'
+own smoothed past, which the six-block network was already reading
+through its inputs. The channel networks look back 127 steps because
+that is what their inputs make meaningful, not by accident.
+
 ---
 
 ## 108 — a network on the raw signal (queued)
