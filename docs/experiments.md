@@ -2256,3 +2256,35 @@ question with almost the same parameter count.
 Inference cost is the thing to watch — two more layers of streaming
 convolution on top of the 2.5 ms/step that #35 profiles. Three members,
 the 082b seeds, acceptance at +0.003 per member.
+
+Cost measured up front on the shipped streaming class with random
+weights: six blocks and twelve nets 0.77 ms/step, six and twenty-four
+1.47, eight and twelve 1.02, eight and twenty-four 1.88. Reach costs
+0.25-0.41 ms, and the budget holds.
+
+---
+
+## 108 — a network on the raw signal (queued)
+
+The third direction, and the only one whose ceiling is not set by the
+channels: a model that never sees the two hundred engineered channels and
+learns its own representation from the series itself. 084 is not this
+experiment — there the raw values were appended to the channels, and the
+network was free to ignore them or be confused by them; here the raw
+network is trained alone and enters the ensemble as a member of a
+different modality, which is what every gain in this project has come
+from.
+
+Input: two rows, the z-score against the history and its asinh, over the
+last 512 points of the history followed by the whole online part, so the
+network sees both what normal looked like and what came after. Loss only
+on the online positions. Ten dilated blocks, dilations 1 to 512, 48
+channels: a receptive field of 2047 steps for about 150k parameters — the
+opposite trade from the channel networks, which spend their parameters on
+two hundred inputs and see 127 steps. Three members on the 082b seeds;
+queued behind 107 so they do not share the GPU.
+
+The honest prior is poor. Handcrafted channels beat raw signals in this
+competition's 2025 edition across the whole top ten, and our own spectral
+and battery families exist because raw comparisons were not enough. But
+this is the one axis where a different ceiling is even possible.
