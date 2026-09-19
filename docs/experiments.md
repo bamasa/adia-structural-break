@@ -2298,3 +2298,19 @@ The honest prior is poor. Handcrafted channels beat raw signals in this
 competition's 2025 edition across the whole top ten, and our own spectral
 and battery families exist because raw comparisons were not enough. But
 this is the one axis where a different ceiling is even possible.
+
+**Killed after one member.** The network plateaus early — fold 2 0.5315
+at epoch 5, **0.5329** at epoch 10 — against 0.6057 for a channel network
+on the same seed. Weak is not by itself disqualifying: a weak member that
+errs elsewhere can still pay in a blend. It does not. Spearman
+correlation with the shipped ensemble is 0.60 (0.68 with the network
+half), and every share of it lowers the blend: 0.6167 at 2%, 0.6166 at
+10%, 0.6158 at 25%. It is not an independent modality, it is a worse view
+of the same thing — the first thing the raw network learns is a crude
+version of what the channels already compute, which is exactly what the
+engineered families were built to replace.
+
+That closes the third direction, and with it every hypothesis this
+laptop can pose. The channels are the ceiling: ten thousand series is
+enough to learn summaries of a window, and not enough to learn the
+window itself.

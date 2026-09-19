@@ -176,6 +176,7 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | 105 | mirrored series (x → −x) and a backward-shifted boundary as extra training data | mirrors 0.6030 / 0.6024 / 0.6013, backward 0.6059 / 0.6009 / 0.6042 vs paired 0.6057 / 0.6065 / 0.6051 | both killed — the augmentation axis is exhausted |
 | 106 | #30 with twenty-four networks instead of twelve, nothing else changed | fold 2 cannot separate them | shipped as **#35** — the pool size measured on its own |
 | 107 | a 511-step receptive field (8 blocks) instead of 127 | 0.5906 vs 0.6057 paired, killed after one member | reach hurts — 127 steps is what the channels make meaningful |
+| 108 | a network on the raw signal alone (2047-step field, no channels) | solo 0.5329, Spearman 0.60 with the ensemble, every blend share negative | killed — a worse view of what the channels already compute |
 | — | #25: broken upload, do not run | — | a `channels[:186]` slice survived the spectral upgrade; the push followed the check with `;` instead of `&&` |
 | — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |
 | — | 015: forecaster horizons 1+5 and signed error | 0.5751 vs 0.5779 | **killed by pre-stated condition**: the extensions dilute the compact four channels |
