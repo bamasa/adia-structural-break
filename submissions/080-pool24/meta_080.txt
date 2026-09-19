@@ -1,0 +1,10 @@
+#30 with twenty-four trajectory networks instead of twelve.
+---
+The pool size measured on its own. Everything is #30 — the augmented
+ranker, the run-length suffix read by a single classifier, the same blend
+weights — with twelve more networks of equal quality: six trained on
+every series and six from the last pool. The two ingredients that fold 2
+liked and the platform did not, self-normalisation and a second
+classifier, are left out: #32 and #33 both read 0.5991 against #30's
+0.6007. If a bigger pool is worth anything, this submission is where it
+shows; if it is not, the recipe is finished.

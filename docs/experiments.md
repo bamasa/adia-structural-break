@@ -2219,3 +2219,22 @@ younger than the originals' at the same step.
 Both directions closed. The augmentation axis is now exhausted in every
 form the laptop can build: more slices, fewer, different, mirrored,
 shifted forward, shifted backward, and a sibling competition's data.
+
+---
+
+## 106 — submission #35: the pool size, measured on its own
+
+Everything the cloud has said about this recipe comes from readings that
+differ in several things at once. #34 doubled the pool but also carried
+the self-normalisation that #32 showed costs 0.0016, so its number could
+never have answered the question. This one is #30 with one thing changed:
+twelve networks become twenty-four — six trained on every series, six
+from the 095 pool, all of equal quality on their own.
+
+Fold 2 cannot see the difference (0.6107 with twelve, 0.6100 with
+eighteen; the members are that close). The platform is where a halved
+member variance would show, and its four readings of this recipe span
+0.001, so the question is worth exactly one run. Verified against the
+matrices to 8e-7, twenty-nine channel counts, 2.5-3.1 ms per step.
+Shipped as **#35**, resources080. If it does not beat #30's 0.6007, the
+recipe is finished and the pool is not the lever.
