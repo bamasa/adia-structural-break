@@ -2207,3 +2207,15 @@ sign-invariant either), so half the training set now argues for a
 distribution the platform does not show. Volume of *originals* is not
 the axis; the augmentation gain came from where the break sits, not from
 how many series there are.
+
+**105b killed.** The backward-shifted boundary, same three seeds:
+0.6059 / 0.6009 / 0.6042 against 0.6057 / 0.6065 / 0.6051 — one tie, two
+losses, mean 0.6058 -> 0.6037. Late breaks after a long quiet stretch do
+not teach the networks anything the forward augmentation had not; and the
+shifted series carry a second difference the mirror did not, a history
+shortened by up to four hundred points, which makes their channels
+younger than the originals' at the same step.
+
+Both directions closed. The augmentation axis is now exhausted in every
+form the laptop can build: more slices, fewer, different, mirrored,
+shifted forward, shifted backward, and a sibling competition's data.

@@ -173,6 +173,7 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | 102 | positive rows weighted by post-break evidence, min(1, (t − tau + 1)/W) | classifier 0.5999 unweighted vs 0.5942 / 0.5999 / 0.5988 / 0.5968 for W = 20 / 50 / 100 / 200 | killed — no W beats the unweighted classifier |
 | 104 | tree specialists per step range (t < 50, 50-200, 200+) | 0.5957 / 0.5991 vs 0.5999; the early specialist alone +0.012 on t < 50, hybrid blend 0.6168 vs 0.6167 | killed — the early gain dissolves in the blend |
 | 103 | nets with the first 15 post-break steps masked out of the loss | 0.6061 / 0.6021 / 0.6005 vs paired 0.6057 / 0.6065 / 0.6051 | killed — one tie, two losses; the post-break rows are not label noise |
+| 105 | mirrored series (x → −x) and a backward-shifted boundary as extra training data | mirrors 0.6030 / 0.6024 / 0.6013, backward 0.6059 / 0.6009 / 0.6042 vs paired 0.6057 / 0.6065 / 0.6051 | both killed — the augmentation axis is exhausted |
 | — | #25: broken upload, do not run | — | a `channels[:186]` slice survived the spectral upgrade; the push followed the check with `;` instead of `&&` |
 | — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |
 | — | 015: forecaster horizons 1+5 and signed error | 0.5751 vs 0.5779 | **killed by pre-stated condition**: the extensions dilute the compact four channels |
