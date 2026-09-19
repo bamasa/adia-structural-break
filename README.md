@@ -180,6 +180,7 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | 109 | anatomy of the blindness: what each break changes vs the ensemble's per-series AUC | variance breaks 0.69, dependence 0.58, and 40% of breaks change nothing measurable — AUC 0.542 there; nineteen further statistics separate them no better than a random cut | the ceiling is the task's, not the recipe's |
 | 110 | direct autocorrelation-vs-history channels (lags 1/2/5/10, two windows) | classifier 0.5954 vs 0.5999 | killed — the dependence gap is not a missing channel |
 | 111 | the near-null history prior on the earliest steps | ensemble 0.5373 vs prior 0.5385 over steps 0-30; blending buys +0.0006 | not shipped — below the fold's trust threshold, but it dates the blindness |
+| 112 | full GLR scan over every candidate break position (6 channels, 0.02 ms/step) | classifier 0.5974 vs 0.5999; alone 0.5569; blended +0.0005; argmax position reads 0.4994 | killed — works as a detector, adds nothing in the cross-section |
 | — | #25: broken upload, do not run | — | a `channels[:186]` slice survived the spectral upgrade; the push followed the check with `;` instead of `&&` |
 | — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |
 | — | 015: forecaster horizons 1+5 and signed error | 0.5751 vs 0.5779 | **killed by pre-stated condition**: the extensions dilute the compact four channels |

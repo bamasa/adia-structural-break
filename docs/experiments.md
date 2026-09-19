@@ -2431,3 +2431,48 @@ breaks leave no signature in any window we can measure, and the opening
 steps of *every* series carry no evidence regardless of the break type.
 Together they account for the distance between 0.60 and a perfect
 detector, and neither is a property of the model.
+
+---
+
+## 112 — the full GLR scan, and where the leaderboard actually stands
+
+A correction first. This log claimed the ~0.60 cloud ceiling belongs to
+the task. The leaderboard says otherwise: fifty entries sit between 64.0
+and 66.4, so whatever is missing is not exotic and not a property of the
+data. Weight analysis on fold 2 says where: 83% of the metric's weight
+lies on steps 100-700, where this ensemble reads 0.58 to 0.65. Reaching
+0.65 needs about +0.04 *everywhere*, not a patch on one region —
+perfecting steps below 100 would give 0.628 and no more.
+
+One resource was visibly unused: the shipped submission costs 2.5 ms per
+step against a budget near 80 (15 hours a week over ten thousand series).
+Three percent. Every channel in this project is an O(1) incremental
+approximation because of the seven-hour timeout of run #109121, and that
+caution had never been revisited.
+
+So: the honest detector. At every step t, scan *all* candidate break
+positions k in [0, t], score each segment [k..t] against the history
+under a normal model (mean shift plus variance change), take the
+maximum — a textbook GLR change-point test, never once computed properly
+here. Six channels: the maximum, the position of the argmax, the mean-only
+and variance-only maxima, the maximum restricted to the last 200 points,
+and the excess over a null expectation. Cost 0.02 ms per step.
+
+It works as a detector. On a +0.4σ shift the maximum goes 0.093 -> 0.640
+and the argmax lands at 0.601 against a true 0.60; on a 1.4× variance
+change the variance term goes 0.061 -> 0.886.
+
+It adds nothing. Classifier 206 -> 212: **0.5974** against 0.5999. Alone
+the six channels reach 0.5569 — respectable for six columns against 206,
+but Spearman 0.62 with the ensemble, and blended in at its best share
++0.0005, inside the noise the fold cannot resolve. The single strongest
+channel, the maximum itself, reads 0.5381; the argmax position, which
+locates the break almost exactly on synthetic data, reads **0.4994** —
+nothing at all, because on real series the ranking that matters is
+between series at a fixed step, and where a break sits inside one series
+says nothing about whether another has broken.
+
+That is the fourth channel family in a row (096 AR-BOCPD, 097
+divergences, 110 autocorrelation, 112 GLR) to measure a real property,
+work on synthetic data, and lose in the cross-section. The pattern is
+now the finding: this ensemble is not short of detectors.
