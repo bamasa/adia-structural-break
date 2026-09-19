@@ -2238,3 +2238,21 @@ member variance would show, and its four readings of this recipe span
 matrices to 8e-7, twenty-nine channel counts, 2.5-3.1 ms per step.
 Shipped as **#35**, resources080. If it does not beat #30's 0.6007, the
 recipe is finished and the pool is not the lever.
+
+---
+
+## 107 — a four-times wider field of view (running)
+
+Every network in this project has looked back exactly 127 steps: six
+dilated blocks, dilations 1 to 32. Two thirds of the metric's weight sits
+on steps 200-800, which the network sees only through the channels' own
+memory — EWMAs out to 200 points, the prefix batteries, the retro scans —
+never as a trajectory. Eight blocks, dilations out to 128, put the
+receptive field at 511 steps for 125k convolutional parameters instead of
+110k, so this is reach rather than capacity: 077 showed capacity (96
+channels instead of 64) is not the constraint, and this asks a different
+question with almost the same parameter count.
+
+Inference cost is the thing to watch — two more layers of streaming
+convolution on top of the 2.5 ms/step that #35 profiles. Three members,
+the 082b seeds, acceptance at +0.003 per member.
