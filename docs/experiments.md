@@ -2314,3 +2314,49 @@ That closes the third direction, and with it every hypothesis this
 laptop can pose. The channels are the ceiling: ten thousand series is
 enough to learn summaries of a window, and not enough to learn the
 window itself.
+
+---
+
+## 109 — where the ensemble is blind, and why
+
+Not a model experiment: a question to the data that was never asked
+directly. For every breaking series in fold 2, classify what the break
+changed (300-point windows either side of tau), then measure the
+ensemble's per-series AUC — that series against every non-breaking series
+at the same steps.
+
+| what changed | series | AUC |
+|---|---|---|
+| variance and shape | 72 | 0.705 |
+| variance only | 130 | 0.686 |
+| shape only | 48 | 0.649 |
+| dependence only | 125 | 0.583 |
+| **none of the above** | **353 (40%)** | **0.542** |
+
+Variance breaks we read well, dependence breaks poorly, and two fifths of
+all breaks change none of mean, variance, autocorrelation or kurtosis in
+a 300-point window — and there the ensemble is near chance.
+
+**109b asks what those breaks do change.** Nineteen further statistics on
+the same windows — autocorrelations to lag 30, volatility clustering,
+absolute-value memory, differenced scale and kurtosis, reversal,
+spectral mass low/mid/high, spectral entropy and peak, tail quantiles,
+zero crossings, a nonlinearity term, and the variance of 50-point rolling
+means — each compared against a control: non-breaking series cut at a
+random point.
+
+Nothing separates them. The largest ratio of break-spread to
+control-spread is 1.11 (the rolling-mean variance), most sit at or below
+1.0, and the share of series moving more than two control sigmas is 0.04
+to 0.06 on both sides — exactly the false-positive rate of the threshold
+itself. These breaks are not merely hard for our channels; within 300
+points they leave no signature any second-to-fourth-order statistic can
+see.
+
+That is the ceiling, and it is the task's, not the recipe's. Two fifths
+of the label mass sits on changes that a 300-point window does not
+contain. It also explains the shape of every result in this log: gains
+came from variance-sensitive families (spectral bands, the battery) and
+from augmentation that moved breaks to where evidence accumulates, while
+everything aimed at dependence or distributional shape — the AR filter,
+the divergence block, the raw network — returned nothing.
