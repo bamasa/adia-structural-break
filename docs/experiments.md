@@ -2397,3 +2397,37 @@ in a cross-section where every series contributes its own noise.
 The blind region named in 109 stays blind, and the reason is now
 narrower than "we lack a dependence channel": we had one, in the form
 that matters, and a second, more direct one does not help.
+
+---
+
+## 111 — the early steps are not a modelling problem either
+
+093 found that break presence is not predictable from the history's shape
+(AUC 0.511) and closed the question. It deserved one more look, because
+the first steps of a series carry no evidence at all, and there even a
+near-null prior could rank better than nothing.
+
+On fold 2, by step range, the shipped ensemble against that prior:
+
+| steps | ensemble | history prior |
+|---|---|---|
+| 0-10 | 0.5324 | 0.5327 |
+| 0-30 | 0.5373 | 0.5385 |
+| 30-100 | 0.5669 | 0.5198 |
+| 100-300 | 0.6010 | 0.5064 |
+
+For the first thirty steps the whole apparatus — two hundred channels, a
+ranker, a classifier, twelve networks — ranks no better than a small
+classifier that has seen only the history's shape and nothing of the
+online part at all. The ensemble overtakes it by step thirty and leaves
+it behind by a hundred.
+
+Blending the prior in with a step-decaying weight buys +0.0006 at the
+best of nine settings, chosen on the fold that #32 and #33 taught us not
+to trust below 0.002. Not shipped.
+
+What it adds to 109: the blindness has two separate causes. Two fifths of
+breaks leave no signature in any window we can measure, and the opening
+steps of *every* series carry no evidence regardless of the break type.
+Together they account for the distance between 0.60 and a perfect
+detector, and neither is a property of the model.
