@@ -1,0 +1,12 @@
+#30 with a mass battery trained as its own member.
+---
+The ensemble of #30 — the augmented ranker, the run-length suffix, twelve
+trajectory networks — with one addition: ninety plain statistics built
+independently of the two hundred channels, trained as their own classifier
+and blended in at a quarter weight. Six representations of the series over
+six rolling windows, each compared with the history; nothing clever, and
+weaker alone (0.5830 against 0.5999). What matters is that it disagrees:
+Spearman 0.68 with the ensemble, against 0.84 for the same features poured
+into the existing model. Fold 2 reads 0.6205 against 0.6167, the first
+gain above the trust threshold since the run-length suffix, and it grows
+monotonically with the member's share from 0.10 to 0.30.

@@ -2529,4 +2529,15 @@ The mechanism is visible in the correlation column: a model built on
 separate features disagrees with the ensemble where it matters (0.68),
 while the same features poured into the same model do not (0.84). What
 099 could not find with blocks of shared channels, independent features
-provide. A ranker on the same ninety channels is training now.
+provide. A ranker on the same ninety channels was trained and is worse: 0.5772
+alone, and at best +0.0016 in the blend against the classifier's +0.0040.
+Its correlation with the ensemble is 0.395 — more independent still, and
+too weak to convert that into a gain. The classifier's share tunes to
+0.25-0.30, where fold 2 reads **0.6205-0.6207**, the gain rising
+monotonically from 0.10.
+
+Shipped as **#36**, resources081: the ensemble of #30 with the mass member
+at a quarter weight. The battery moved into the library as a streaming
+class (`mass.py`), verified against the batch build to 1e-6, and the
+assembler now checks a member that reads its own suffix. 2.0-2.6 ms per
+step.

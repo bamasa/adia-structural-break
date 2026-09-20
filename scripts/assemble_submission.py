@@ -13,13 +13,16 @@ from __future__ import annotations
 
 import re
 import sys
+
+#: Channels the mass battery emits (src/structural_break/mass.py).
+MASS_CHANNELS_CONST = 90
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "src" / "structural_break"
 
 #: Dependency order matters: later modules use earlier names.
-MODULES = ["features.py", "detectors.py", "retrospective.py", "retro2.py", "multiscale.py", "bocpd.py"]
+MODULES = ["features.py", "detectors.py", "retrospective.py", "retro2.py", "multiscale.py", "bocpd.py", "mass.py"]
 
 HEADER = '''"""{title}
 
@@ -101,6 +104,9 @@ def verify_channels(assembled: str, target: Path) -> None:
     for group, key in (("clf", "CLF_CHANNELS"), ("rank", "RANK_CHANNELS")):
         mm = re.search(rf"^{key} = (\d+)", assembled, re.M)
         width[group] = int(mm.group(1)) if mm else declared["NET_CHANNELS"]
+    # A member reading its own suffix declares where that suffix starts.
+    mo = re.search(r"^MASS_OFFSET = (\d+)", assembled, re.M)
+    width["mass"] = MASS_CHANNELS_CONST if mo else None
 
     artifact = target.parent / "resources" / "model.joblib"
     if not artifact.exists():
@@ -115,6 +121,8 @@ def verify_channels(assembled: str, target: Path) -> None:
         found[name] = got
         if got != want:
             bad.append(f"{name}={got} (expected {want})")
+    if model.get("mass_classifier") is not None and width.get("mass"):
+        check("mass", getattr(model["mass_classifier"], "booster_", model["mass_classifier"]).num_feature(), width["mass"])
     if model.get("booster") is not None:
         check("clf", getattr(model["booster"], "booster_", model["booster"]).num_feature(), width["clf"])
     for i, c in enumerate(model.get("classifiers", [])):
@@ -126,6 +134,7 @@ def verify_channels(assembled: str, target: Path) -> None:
     for key in ("net_mu", "net_sd"):
         if key in model:
             check(key, len(model[key]), declared["NET_CHANNELS"])
+    found.pop("mass", None) if False else None
     if bad:
         raise SystemExit("channel counts disagree between interface and artifact: " + "; ".join(bad))
     print(f"channel check passed: {len(found)} counts — nets {declared['NET_CHANNELS']}, "
