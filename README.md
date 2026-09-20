@@ -184,6 +184,7 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | 113 | averaging members in rank space instead of probability space | 0.6170 vs 0.6167 overall; within-series ranks 0.5657 | no gain — members agree in scale |
 | 114 | 90 independently-built mass-battery channels as a separate member | alone 0.5830, Spearman 0.68, blended **0.6205 vs 0.6167** | shipped as **#36** — first gain above threshold since #30 |
 | 115-116 | the rejected detectors, and the raw window, each as their own member | detectors Spearman 0.80 and no gain; raw window Spearman 0.32, 0.5319 alone, no gain | independence is necessary, not sufficient — a member must also be strong |
+| 117 | a non-parametric rank battery as a second independent member | 0.5632 alone, Spearman 0.77, +0.0001 at best | no gain — the paying zone is narrower than independence plus strength |
 | — | #25: broken upload, do not run | — | a `channels[:186]` slice survived the spectral upgrade; the push followed the check with `;` instead of `&&` |
 | — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |
 | — | 015: forecaster horizons 1+5 and signed error | 0.5751 vs 0.5779 | **killed by pre-stated condition**: the extensions dilute the compact four channels |

@@ -2571,3 +2571,28 @@ independent and weak; neither pays.
 That also retires the search for "another modality": the space of cheap
 independent members has now been probed at both ends, and only the middle
 paid.
+
+---
+
+## 117 — a second member in the paying zone, and why it does not pay
+
+If the mass battery works because it is independent *and* strong, the way
+to another gain is to build a second member with both properties. The
+obvious candidate: the same construction made non-parametric. Each point
+becomes its rank in the history — uniform on [0,1] under the null — and
+the six windows compare mean, variance and decile occupancy against what
+uniformity predicts. Five representations, 72 channels, 0.019 ms/step.
+
+It lands between the two failures and still does not pay: 0.5632 alone,
+Spearman **0.766** with the shipped ensemble, and +0.0001 at its best
+share. Stronger than the raw window and more independent than the
+detectors, yet the gain is nothing.
+
+Reading 114-117 together, the zone is narrower than "independent and
+strong". The mass battery's channels are *parametric summaries over many
+scales* — the same thing the engineered families do, but taken to a
+different place: every window, no cleverness, no modelling of the break.
+The rank battery is the same idea in a different metric, and the ensemble
+apparently already contains what that metric can add. One gain, four
+failures, and the mechanism behind the gain is still not general enough
+to build a second one on purpose.
