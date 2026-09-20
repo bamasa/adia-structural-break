@@ -2541,3 +2541,33 @@ at a quarter weight. The battery moved into the library as a streaming
 class (`mass.py`), verified against the batch build to 1e-6, and the
 assembler now checks a member that reads its own suffix. 2.0-2.6 ms per
 step.
+
+---
+
+## 115-116 — the principle, tested twice more
+
+114 says a member pays when it disagrees. Two immediate tests of that.
+
+**115: the rejected detectors as their own member.** GLR, autocorrelation,
+divergences, explicit tests and the AR filter — 37 channels, every family
+killed as an addition to the 206. Trained as one classifier: 0.5731 alone,
+Spearman **0.801** with the shipped ensemble, and nothing at any share
+(0.6205 at 5%, falling to 0.6185 at 25%). They were never independent;
+they measure what the channels already carry, which is why they lost the
+first time and lose again.
+
+**116: the raw window as features.** The opposite extreme — no summary at
+all, just the last 32 standardised values and the same 32 sorted, so the
+trees see the piece of series itself. Spearman **0.323**, by far the most
+independent member ever built here. It still gives nothing: 0.5319 alone,
+and every share subtracts (0.6203 at 5%, 0.6188 at 25%).
+
+Between them the rule sharpens. Independence is necessary and not
+sufficient: a member must also be strong enough to convert disagreement
+into a gain. The mass battery sits where both hold — 0.5830 alone, 0.68
+correlated. The detectors are strong and redundant; the raw window is
+independent and weak; neither pays.
+
+That also retires the search for "another modality": the space of cheap
+independent members has now been probed at both ends, and only the middle
+paid.
