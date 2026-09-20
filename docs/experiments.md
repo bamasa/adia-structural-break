@@ -2493,3 +2493,40 @@ exactly the between-series information the metric is made of.
 
 The output space is not the problem either. The members agree in scale;
 the blend is already as good as its parts allow.
+
+---
+
+## 114 — volume of features, as a separate member
+
+Four detector families in a row measured something real and added nothing
+(096, 097, 110, 112), and every one was tested the same way: appended to
+the 206 channels of a single model. The 2025 runner-up had 2,408 features
+to our 200, and the winner's published lesson was diversity at level 0 —
+but 099 tested that with blocks that were *subsets of the same channels*,
+which is not the same thing at all.
+
+So: ninety new channels built independently of the existing pipeline — six
+representations of the series (z, |z|, z², increment, cumulative-sum
+deviation, sign) over six rolling windows (10 to 500), each compared with
+the history by standardised mean gap and log variance ratio, plus
+exceedance rates of the history's 75th, 95th and 99th percentiles. All
+through rolling sums, 0.028 ms per step.
+
+The result depends entirely on how they are used:
+
+| configuration | fold 2 | Spearman with the ensemble |
+|---|---|---|
+| the 206 channels (reference) | 0.5999 | — |
+| the 90 new channels alone | 0.5830 | 0.680 |
+| all 296 together | 0.5965 | 0.838 |
+
+Appended to the 206 they lose, exactly as the four detector families did.
+Trained as their *own* classifier they are weaker alone — and blend in at
+**0.6201 against the ensemble's 0.6167, +0.0034**, the first gain above
+the 0.002 threshold since the run-length suffix.
+
+The mechanism is visible in the correlation column: a model built on
+separate features disagrees with the ensemble where it matters (0.68),
+while the same features poured into the same model do not (0.84). What
+099 could not find with blocks of shared channels, independent features
+provide. A ranker on the same ninety channels is training now.
