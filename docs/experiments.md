@@ -2596,3 +2596,26 @@ The rank battery is the same idea in a different metric, and the ensemble
 apparently already contains what that metric can add. One gain, four
 failures, and the mechanism behind the gain is still not general enough
 to build a second one on purpose.
+
+---
+
+## 118 — more of what worked, and the discipline to refuse it
+
+The one gain came from ninety plain statistics over six windows. The
+obvious next move is more of exactly that: eight windows from 5 to 1000,
+and third and fourth moments added to the comparison — 216 channels,
+0.042 ms/step.
+
+Alone it is marginally worse than the ninety (0.5809 against 0.5830) and
+correlates **0.935** with them: the same member, described at more length.
+Both together read 0.6214 against 0.6205 for one, +0.0009, found by
+sweeping nine weight combinations on the fold that #32 and #33 proved
+cannot resolve anything under 0.002.
+
+Refused. A member correlated 0.935 with one already in the blend is not
+new information, and a gain of that size chosen from nine options on a
+tired fold is the exact shape of the thing that cost us 0.0016 in the
+cloud last time. #36 ships with the ninety.
+
+This is the boundary of what the principle from 114 can give: widening a
+paying member reproduces it, not extends it.
