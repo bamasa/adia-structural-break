@@ -2680,3 +2680,17 @@ worth four thousandths on ten thousand unseen series.
 Selected should move to #36. #37, the same member with the pool doubled
 to twenty-four networks, is the outstanding question: fold 2 is blind to
 the pool by construction, so only the platform can price it.
+
+---
+
+## 121 — networks on the mass battery (running)
+
+#36 proved on the platform that an independently built member pays. The
+strongest members this project has are the trajectory networks; they have
+only ever read the two hundred engineered channels. Here the same network
+— ChanTCN, ranking loss, last epoch, triple augmentation — reads the ninety
+mass-battery channels as trajectories instead. A different model family on
+independent features: it should disagree with the tree ensemble *and* with
+the mass classifier, which is the combination 115-118 could not produce.
+Three members on the 082b seeds; the mass channels for the augmented
+pseudo-series were already built for 119.
