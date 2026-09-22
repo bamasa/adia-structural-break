@@ -38,6 +38,7 @@ platform moved four times, each time for a different reason:
 | 0.5893 | #23 | a new channel family — fourteen spectral bands |
 | 0.6004 | #28 | boundary augmentation, tripled: pseudo-series with early breaks |
 | 0.6007 | #30 | a run-length posterior for the classifier, twelve networks |
+| 0.6046 | #36 | a mass battery of plain statistics trained as its own member |
 
 Everything else measured on the untouched fold since #28 — more members,
 more or other data, capacity, schedule, loss, input, verifiers, stacking
@@ -182,7 +183,7 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | 111 | the near-null history prior on the earliest steps | ensemble 0.5373 vs prior 0.5385 over steps 0-30; blending buys +0.0006 | not shipped — below the fold's trust threshold, but it dates the blindness |
 | 112 | full GLR scan over every candidate break position (6 channels, 0.02 ms/step) | classifier 0.5974 vs 0.5999; alone 0.5569; blended +0.0005; argmax position reads 0.4994 | killed — works as a detector, adds nothing in the cross-section |
 | 113 | averaging members in rank space instead of probability space | 0.6170 vs 0.6167 overall; within-series ranks 0.5657 | no gain — members agree in scale |
-| 114 | 90 independently-built mass-battery channels as a separate member | alone 0.5830, Spearman 0.68, blended **0.6205 vs 0.6167** | shipped as **#36** — first gain above threshold since #30 |
+| 114 | 90 independently-built mass-battery channels as a separate member | alone 0.5830, Spearman 0.68, blended **0.6205 vs 0.6167** | shipped as **#36** — **cloud 0.6046**, project best; the +0.0038 promised by fold 2 paid +0.0039 |
 | 115-116 | the rejected detectors, and the raw window, each as their own member | detectors Spearman 0.80 and no gain; raw window Spearman 0.32, 0.5319 alone, no gain | independence is necessary, not sufficient — a member must also be strong |
 | 117 | a non-parametric rank battery as a second independent member | 0.5632 alone, Spearman 0.77, +0.0001 at best | no gain — the paying zone is narrower than independence plus strength |
 | 118 | the mass battery widened to 216 channels (8 windows, four moments) | 0.5809 alone, Spearman 0.935 with the ninety, +0.0009 together | refused — a duplicate member, and the gain is below the fold's resolution |

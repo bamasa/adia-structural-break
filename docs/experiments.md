@@ -2653,3 +2653,30 @@ by construction.
 
 Verified against the matrices to 1e-6 on all three channel groups, thirty
 channel counts, 2.7-3.3 ms per step. Shipped as **#37**, resources082.
+
+---
+
+## Cloud: #36 scores 0.6046 — the gain transfers
+
+| | fold 2 | cloud |
+|---|---|---|
+| #30 | 0.6167 | 0.6007 |
+| #36 (mass member) | 0.6205 | **0.6046** |
+| difference | +0.0038 | **+0.0039** |
+
+The project's best, and the first time a local gain has crossed to the
+platform at full size. Every earlier candidate lost something on the way:
+self-normalisation promised +0.0005 and cost 0.0016, the wide classifier
+promised +0.0004 and gave nothing. This one was promised at +0.0038 and
+paid +0.0039.
+
+Two things follow. The fold-2 → cloud offset is stable at 0.016 across
+six readings now, so a local number can be converted to an expected
+platform number and the conversion has just been validated on a real
+gain, not on noise. And the principle behind 114 — an independently built
+member that disagrees with the ensemble — is not a fold-2 artefact: it is
+worth four thousandths on ten thousand unseen series.
+
+Selected should move to #36. #37, the same member with the pool doubled
+to twenty-four networks, is the outstanding question: fold 2 is blind to
+the pool by construction, so only the platform can price it.
