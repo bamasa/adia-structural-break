@@ -1,0 +1,8 @@
+#36 with the network pool doubled to twenty-four.
+---
+Two changes to #30, each justified on its own, in one artifact: the mass
+battery trained as a separate member (fold-2 0.6205 against 0.6167, the
+first gain above threshold since the run-length suffix), and the network
+pool doubled from twelve to twenty-four — #29 showed the extra members
+match in the cloud, and fold 2 cannot tell twelve from twenty-four, so the
+pool is a bet on variance rather than on the fold. Nothing else differs.

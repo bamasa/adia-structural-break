@@ -187,6 +187,7 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | 117 | a non-parametric rank battery as a second independent member | 0.5632 alone, Spearman 0.77, +0.0001 at best | no gain — the paying zone is narrower than independence plus strength |
 | 118 | the mass battery widened to 216 channels (8 windows, four moments) | 0.5809 alone, Spearman 0.935 with the ninety, +0.0009 together | refused — a duplicate member, and the gain is below the fold's resolution |
 | 119 | boundary augmentation for the mass member | 0.5837 alone vs 0.5830, blend 0.6201 vs 0.6205 | killed — augmentation helps trajectory readers, not rolling summaries |
+| 120 | #36 with the pool doubled to twenty-four networks | fold-2 0.6205 (the pool is invisible to the fold) | shipped as **#37** (resources082) |
 | — | #25: broken upload, do not run | — | a `channels[:186]` slice survived the spectral upgrade; the push followed the check with `;` instead of `&&` |
 | — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |
 | — | 015: forecaster horizons 1+5 and signed error | 0.5751 vs 0.5779 | **killed by pre-stated condition**: the extensions dilute the compact four channels |

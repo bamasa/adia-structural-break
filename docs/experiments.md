@@ -2638,3 +2638,18 @@ are what they are, wherever the break sits.
 
 Consistent with 102-104: what helps the networks does not transfer to the
 trees, and the reverse.
+
+---
+
+## 120 — submission #37: both justified changes at once
+
+Two independent improvements to #30 assembled together: the mass battery
+as its own member, which fold 2 puts at 0.6205 against 0.6167, and the
+network pool doubled from twelve to twenty-four, which fold 2 cannot
+resolve at all and which #29 showed to be of matching quality in the
+cloud. Neither is a weight tuned on a tired fold: one is a member with a
+measured, monotone gain, the other is a variance bet the fold is blind to
+by construction.
+
+Verified against the matrices to 1e-6 on all three channel groups, thirty
+channel counts, 2.7-3.3 ms per step. Shipped as **#37**, resources082.
