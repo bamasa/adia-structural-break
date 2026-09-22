@@ -2619,3 +2619,22 @@ cloud last time. #36 ships with the ninety.
 
 This is the boundary of what the principle from 114 can give: widening a
 paying member reproduces it, not extends it.
+
+---
+
+## 119 — boundary augmentation for the mass member, killed
+
+Augmentation was the single largest gain the networks ever got (+0.011 in
+the cloud), and the mass member of #36 had never seen it. Its channels
+built for all 26,887 pseudo-series — 8.9M rows after excluding fold-2
+parents — and the classifier retrained on originals plus augmentation.
+
+Nothing: 0.5837 alone against 0.5830, correlation with the ensemble
+unchanged at 0.69, and in the blend **0.6201 against 0.6205**. The
+augmentation works by moving breaks early, where evidence accumulates
+slowly — which helps a model that reads trajectories and does nothing for
+one that reads rolling summaries at a fixed step. Its channels at step t
+are what they are, wherever the break sits.
+
+Consistent with 102-104: what helps the networks does not transfer to the
+trees, and the reverse.
