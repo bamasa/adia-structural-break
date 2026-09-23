@@ -2726,3 +2726,28 @@ Tally for the principle: 118 (wider, 0.935), 121 (a network, 0.893), 122
 (whitened, 0.939). Three ways of rebuilding the paying member all land
 above 0.89 with it. The next member needs a different *reference*, not a
 different transform of the same comparison.
+
+---
+
+## 123 — the mass battery against an online reference, killed
+
+A different reference instead of a different transform: the same ninety
+summaries, but each window compared with the online part's own past —
+the longest EWMA lagged by the window's length — rather than with the
+history, which only sets the standardisation. On a synthetic shift the
+channels still move (+0.24 -> +1.32 on the 100-point mean), and they
+should part company with the mass member wherever the online part has
+already drifted.
+
+They part company least of all: Spearman **0.952** with the mass
+classifier, the highest of the series. Alone 0.5782, blend +0.0001 at 5%
+and negative beyond. The trees read a level shift the same way whichever
+baseline it is measured against; changing the reference changes the
+numbers, not the ranking.
+
+Five rebuilds of the paying member — wider (0.935), a network (0.893),
+whitened (0.939), augmented (0.693 but no gain), online-referenced
+(0.952) — and none is a second member. The mass battery's independence
+came from one thing that cannot be repeated by construction: it was the
+first set of features built *outside* the engineered pipeline, and every
+variation of it is inside the new pipeline instead. This axis is closed.
