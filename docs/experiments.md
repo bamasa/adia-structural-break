@@ -2706,3 +2706,23 @@ inputs*, not from a different model on the same inputs: the mass member
 paid because its ninety channels were built apart from the two hundred,
 and a network on those ninety is the mass member again, at 0.89. The next
 member has to see something the ensemble does not.
+
+---
+
+## 122 — the mass battery on the whitened series, killed
+
+Different inputs, then: the same ninety-channel construction on the
+series' innovations — the historical AR(1) coefficient removed, so the
+channels should diverge from the mass member wherever the dependence
+structure moves, which 109 named as the weakest region.
+
+They do not diverge. Correlation with the mass classifier **0.939**: the
+histories' one-step autocorrelation has a median of 0.007 (109), so for
+most series whitening is the identity, and the member is the mass member
+with a little extra noise. Alone 0.5848, blend +0.0015 at 20%, under the
+bar. Killed.
+
+Tally for the principle: 118 (wider, 0.935), 121 (a network, 0.893), 122
+(whitened, 0.939). Three ways of rebuilding the paying member all land
+above 0.89 with it. The next member needs a different *reference*, not a
+different transform of the same comparison.

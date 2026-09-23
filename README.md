@@ -190,6 +190,7 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | 119 | boundary augmentation for the mass member | 0.5837 alone vs 0.5830, blend 0.6201 vs 0.6205 | killed — augmentation helps trajectory readers, not rolling summaries |
 | 120 | #36 with the pool doubled to twenty-four networks | fold-2 0.6205 (the pool is invisible to the fold) | shipped as **#37** (resources082) |
 | 121 | trajectory networks on the ninety mass-battery channels | 0.5914 together, Spearman 0.82 with #36 and 0.89 with the mass classifier, blend +0.0014 | killed — a second model on the same inputs is not an independent member |
+| 122 | the mass battery on the whitened series | 0.5848 alone, Spearman 0.94 with the mass classifier, blend +0.0015 | killed — whitening is the identity for most series |
 | — | #25: broken upload, do not run | — | a `channels[:186]` slice survived the spectral upgrade; the push followed the check with `;` instead of `&&` |
 | — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |
 | — | 015: forecaster horizons 1+5 and signed error | 0.5751 vs 0.5779 | **killed by pre-stated condition**: the extensions dilute the compact four channels |
