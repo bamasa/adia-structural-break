@@ -39,6 +39,7 @@ platform moved four times, each time for a different reason:
 | 0.6004 | #28 | boundary augmentation, tripled: pseudo-series with early breaks |
 | 0.6007 | #30 | a run-length posterior for the classifier, twelve networks |
 | 0.6046 | #36 | a mass battery of plain statistics trained as its own member |
+| 0.6048 | #37 | the same, with the network pool doubled — +0.0002, the pool priced at nothing |
 
 Everything else measured on the untouched fold since #28 — more members,
 more or other data, capacity, schedule, loss, input, verifiers, stacking
@@ -188,7 +189,7 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | 117 | a non-parametric rank battery as a second independent member | 0.5632 alone, Spearman 0.77, +0.0001 at best | no gain — the paying zone is narrower than independence plus strength |
 | 118 | the mass battery widened to 216 channels (8 windows, four moments) | 0.5809 alone, Spearman 0.935 with the ninety, +0.0009 together | refused — a duplicate member, and the gain is below the fold's resolution |
 | 119 | boundary augmentation for the mass member | 0.5837 alone vs 0.5830, blend 0.6201 vs 0.6205 | killed — augmentation helps trajectory readers, not rolling summaries |
-| 120 | #36 with the pool doubled to twenty-four networks | fold-2 0.6205 (the pool is invisible to the fold) | shipped as **#37** (resources082) |
+| 120 | #36 with the pool doubled to twenty-four networks | fold-2 0.6205 (the pool is invisible to the fold) | shipped as **#37** — cloud **0.6048** vs 0.6046 for #36: the doubled pool is worth +0.0002, inside noise; Selected |
 | 121 | trajectory networks on the ninety mass-battery channels | 0.5914 together, Spearman 0.82 with #36 and 0.89 with the mass classifier, blend +0.0014 | killed — a second model on the same inputs is not an independent member |
 | 122 | the mass battery on the whitened series | 0.5848 alone, Spearman 0.94 with the mass classifier, blend +0.0015 | killed — whitening is the identity for most series |
 | 123 | the mass battery against an online reference instead of the history | 0.5782 alone, Spearman 0.95 with the mass member, +0.0001 | killed — five rebuilds of the paying member, none independent; the axis is closed |

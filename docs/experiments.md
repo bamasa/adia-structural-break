@@ -2751,3 +2751,25 @@ whitened (0.939), augmented (0.693 but no gain), online-referenced
 came from one thing that cannot be repeated by construction: it was the
 first set of features built *outside* the engineered pipeline, and every
 variation of it is inside the new pipeline instead. This axis is closed.
+
+---
+
+## Cloud: #37 scores 0.6048 — the pool is priced
+
+| | fold 2 | cloud |
+|---|---|---|
+| #36 — mass member, twelve networks | 0.6205 | 0.6046 |
+| #37 — mass member, twenty-four networks | 0.6205 (blind to the pool) | **0.6048** |
+
++0.0002 for doubling the network pool: inside the 0.001 spread the
+platform shows for one recipe, and consistent with 076b and 095, where
+more members of the same recipe never moved the untouched fold. The pool
+axis is now closed on the platform as well as locally — halved member
+variance is worth nothing readable, which also says the twelve were
+already averaging out what there was to average.
+
+#37 is the project's best by the thinnest of margins and is the one
+marked Selected. With the pool question answered, every cheap lever this
+laptop can pull has a cloud reading behind it: the recipe stands at
+0.6046-0.6048 with the mass member, 0.6007 without it, and the remaining
+distance to 0.62 is not in any of the axes measured here.
