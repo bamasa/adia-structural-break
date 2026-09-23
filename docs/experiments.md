@@ -2694,3 +2694,15 @@ independent features: it should disagree with the tree ensemble *and* with
 the mass classifier, which is the combination 115-118 could not produce.
 Three members on the 082b seeds; the mass channels for the augmented
 pseudo-series were already built for 119.
+
+**Killed.** Alone the three read 0.5873 / 0.5835 / 0.5931, together
+0.5914 — stronger than the mass classifier's 0.5830, as a trajectory
+reader should be. But Spearman **0.822** with #36 and **0.893** with the
+mass classifier: it reads the same ninety features and reaches the same
+verdicts, only a little better. Blend +0.0014 at best, under the bar.
+
+The principle sharpens once more. Independence comes from *different
+inputs*, not from a different model on the same inputs: the mass member
+paid because its ninety channels were built apart from the two hundred,
+and a network on those ninety is the mass member again, at 0.89. The next
+member has to see something the ensemble does not.
