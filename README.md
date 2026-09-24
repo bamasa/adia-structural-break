@@ -193,6 +193,7 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | 121 | trajectory networks on the ninety mass-battery channels | 0.5914 together, Spearman 0.82 with #36 and 0.89 with the mass classifier, blend +0.0014 | killed — a second model on the same inputs is not an independent member |
 | 122 | the mass battery on the whitened series | 0.5848 alone, Spearman 0.94 with the mass classifier, blend +0.0015 | killed — whitening is the identity for most series |
 | 123 | the mass battery against an online reference instead of the history | 0.5782 alone, Spearman 0.95 with the mass member, +0.0001 | killed — five rebuilds of the paying member, none independent; the axis is closed |
+| 125 | the six weak members combined | mutual Spearman 0.83-0.93, mean +0.0005, logistic meta 0.6147 vs 0.6205 | no gain — redundancy does not average away |
 | — | #25: broken upload, do not run | — | a `channels[:186]` slice survived the spectral upgrade; the push followed the check with `;` instead of `&&` |
 | — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |
 | — | 015: forecaster horizons 1+5 and signed error | 0.5751 vs 0.5779 | **killed by pre-stated condition**: the extensions dilute the compact four channels |

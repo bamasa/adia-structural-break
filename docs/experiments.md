@@ -2773,3 +2773,20 @@ marked Selected. With the pool question answered, every cheap lever this
 laptop can pull has a cloud reading behind it: the recipe stands at
 0.6046-0.6048 with the mass member, 0.6007 without it, and the remaining
 distance to 0.62 is not in any of the axes measured here.
+
+---
+
+## 125 — the weak members combined
+
+Six members tested one at a time against #36 and found wanting — the rank
+battery, the raw window, the rejected detectors, the wide battery, the
+whitened and the online-referenced ones — put together, on the cached
+fold-2 predictions. Their mutual correlations explain the outcome before
+the blend does: five of the six sit at 0.83-0.93 with one another, and the
+raw window at 0.30 with everything, because it is nearly noise. The mean
+of the six reads 0.5939 alone, 0.841 with #36, +0.0005 at its best share;
+the two least correlated (ranks + window) add nothing; a logistic meta
+over #36 and all six, cross-validated by series inside the fold, reads
+0.6147 — below the hand blend, as every learned meta has (092, 099).
+Combining members that were individually redundant does not manufacture
+independence.
