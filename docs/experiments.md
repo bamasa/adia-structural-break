@@ -2816,3 +2816,17 @@ does measure it (on a white-to-AR(0.7) switch the low band moves −0.29 →
 +1.03). Two attempts at strength run next: longer windows with finer
 bands (126), and the spectrum joined with the mass channels under one set
 of trees (127), since the two sets are almost orthogonal.
+
+---
+
+## 127 — spectrum and mass channels under one set of trees, killed
+
+The two most independent feature sets the project has (Spearman 0.077
+between them) given to one classifier, in the hope that trees would find
+interactions neither member sees alone. The classifier is a little
+stronger — 0.5874 against 0.5830 for the mass channels by themselves, and
+seven spectral channels reach the top thirty by gain — but its correlation
+with the mass member is **0.955**: the trees read the mass channels and
+treat the spectrum as a garnish. Swapped in for the mass member it reads
+0.6202 against 0.6205. The same lesson as 114 from the other side: a
+model on the union is the stronger set's model, not a new member.
