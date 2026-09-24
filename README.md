@@ -194,6 +194,7 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | 122 | the mass battery on the whitened series | 0.5848 alone, Spearman 0.94 with the mass classifier, blend +0.0015 | killed — whitening is the identity for most series |
 | 123 | the mass battery against an online reference instead of the history | 0.5782 alone, Spearman 0.95 with the mass member, +0.0001 | killed — five rebuilds of the paying member, none independent; the axis is closed |
 | 125 | the six weak members combined | mutual Spearman 0.83-0.93, mean +0.0005, logistic meta 0.6147 vs 0.6205 | no gain — redundancy does not average away |
+| 124 | multi-window spectral battery (32-256 points, 6 bands) as its own member | Spearman **0.12** with the ensemble — the most independent member ever built — but 0.5285 alone, blend +0.0009 | independent and weak; strengthening attempts follow |
 | — | #25: broken upload, do not run | — | a `channels[:186]` slice survived the spectral upgrade; the push followed the check with `;` instead of `&&` |
 | — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |
 | — | 015: forecaster horizons 1+5 and signed error | 0.5751 vs 0.5779 | **killed by pre-stated condition**: the extensions dilute the compact four channels |

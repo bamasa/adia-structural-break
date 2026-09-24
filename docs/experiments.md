@@ -2790,3 +2790,29 @@ over #36 and all six, cross-validated by series inside the fold, reads
 0.6147 — below the hand blend, as every learned meta has (092, 099).
 Combining members that were individually redundant does not manufacture
 independence.
+
+---
+
+## 124 — the multi-window spectrum: independent at last, and weak
+
+The mass battery's independence came from being built outside the
+engineered pipeline, and every rebuild of it landed back inside. So a
+different raw material altogether: the frequency domain, treated the way
+114 treated the time domain — many windows, plain comparisons. Rolling
+spectra on 32/64/128/256-point windows, six log-spaced bands each against
+the history's band profile in its own spread, plus spectral entropy and
+centroid: 32 channels, 0.13 ms/step (an FFT per window per step).
+
+Spearman with #36: **0.123**. With the mass classifier: 0.077. This is by
+a wide margin the most independent member the project has produced —
+the previous best was the raw window at 0.32, and every other candidate
+sat above 0.68. It reads what nothing else in the ensemble reads.
+
+It is also weak: 0.5285 alone, and the blend gains +0.0009 at a 20%
+share. Exactly the shape 116 defined — independence without strength —
+but where the raw window was independent because it was noise, the
+spectrum is independent because it measures a different thing, and it
+does measure it (on a white-to-AR(0.7) switch the low band moves −0.29 →
++1.03). Two attempts at strength run next: longer windows with finer
+bands (126), and the spectrum joined with the mass channels under one set
+of trees (127), since the two sets are almost orthogonal.
