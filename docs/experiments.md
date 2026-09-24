@@ -2867,3 +2867,22 @@ weak: forty percent of breaks change nothing a window can measure, and
 the ones that change dependence are read at 0.58 by the whole ensemble.
 The independent members are independent because they look at the hard
 part of the problem.
+
+---
+
+## 130 — the independent members combined, and the bar comes into view
+
+125 combined six *redundant* weak members and got nothing. This combines
+the three *independent* weak ones — the two spectral batteries and the
+autocorrelation channels, a hundred columns — under one classifier.
+Unlike 127, there is no strong set here for the trees to collapse onto.
+
+Alone 0.5357, above any of its parts (0.5285 / 0.5261 / 0.5248).
+Spearman with #36 **0.363**, with the mass member 0.377 — the combination
+stays independent. Blend: +0.0009 at 5%, +0.0015 at 10%, **+0.0018 at
+15-20%**, falling beyond. Monotone to a plateau, the shape 114 had — and
+just under the 0.002 bar.
+
+For the first time the independent side of the map has a member that
+nearly pays. The question is whether it can be made a little stronger
+without losing its independence; three attempts run next.
