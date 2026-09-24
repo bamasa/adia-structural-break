@@ -22,7 +22,7 @@ ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "src" / "structural_break"
 
 #: Dependency order matters: later modules use earlier names.
-MODULES = ["features.py", "detectors.py", "retrospective.py", "retro2.py", "multiscale.py", "bocpd.py", "mass.py"]
+MODULES = ["features.py", "detectors.py", "retrospective.py", "retro2.py", "multiscale.py", "bocpd.py", "mass.py", "freqdep.py"]
 
 HEADER = '''"""{title}
 
@@ -123,6 +123,8 @@ def verify_channels(assembled: str, target: Path) -> None:
             bad.append(f"{name}={got} (expected {want})")
     if model.get("mass_classifier") is not None and width.get("mass"):
         check("mass", getattr(model["mass_classifier"], "booster_", model["mass_classifier"]).num_feature(), width["mass"])
+    if model.get("freqdep_classifier") is not None and re.search(r"^FREQDEP_OFFSET = ", assembled, re.M):
+        check("freqdep", getattr(model["freqdep_classifier"], "booster_", model["freqdep_classifier"]).num_feature(), 100)
     if model.get("booster") is not None:
         check("clf", getattr(model["booster"], "booster_", model["booster"]).num_feature(), width["clf"])
     for i, c in enumerate(model.get("classifiers", [])):
