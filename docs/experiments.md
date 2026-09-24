@@ -2907,3 +2907,20 @@ The trade is now measured from both sides: on the independent side of
 the map, every addition that raises strength raises correlation faster,
 and the gain shrinks. 130 as first built — two spectra and eight
 autocorrelations — remains the best point, at +0.0018.
+
+---
+
+## 131b — the independent member crosses the bar
+
+The hundred channels of 130 unchanged; the classifier changed to suit a
+weak, noisy signal — 1500 trees at learning rate 0.015 with 31 leaves and
+300 rows per leaf, instead of 600 at 0.03 with 63 and 100. Alone 0.5400
+(from 0.5357). Spearman with #36 **0.368** — unchanged; the extra strength
+came from reading the same independent signal more carefully, not from
+drifting toward the ensemble. Blend: **+0.0025 at a 20% share**, 0.6230
+against 0.6205.
+
+That is above the 0.002 bar with independence intact, the combination
+that 115-129 could not produce and that 114 produced once. Two members of
+the independent kind are now on the table, and their shares tune jointly
+before anything ships.
