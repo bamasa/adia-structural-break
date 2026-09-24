@@ -2951,3 +2951,18 @@ channel counts checked. Shipped as **#38**, resources083.
 
 If the fold-2 → cloud offset holds at 0.016, as it did for #36, the
 platform should read about 0.607.
+
+---
+
+## 134 — a third independent input? The raw window, killed twice
+
+The slow classifier turned a hundred weak channels into a paying member;
+the raw window (116) was the other independent input on the map, at
+Spearman 0.32. Under the same slow classifier: 0.5318 alone (0.5319
+before — the trees were never the problem), 0.321 with #38, 0.121 with the
+frequency member, and **−0.0002** on top of #38 at its best share. Joined
+to the frequency member's hundred channels it strengthens the union to
+0.5544 but pulls its correlation with #38 to 0.57; as a replacement for the
+frequency member the blend falls to 0.6225. The raw window carries no
+signal a slow learner can find either. There is no third independent input
+among the features this project has built.

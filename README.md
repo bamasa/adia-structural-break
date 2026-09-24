@@ -202,6 +202,7 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | 131a, 132 | 130 strengthened with AR-filter channels / a wider autocorrelation grid | stronger (0.549 / 0.539) but more correlated (0.72 / 0.45); gains +0.0005 / +0.0015 | on the independent side strength is bought with correlation |
 | 131b | the hundred channels of 130 under a slower, shallower classifier (1500 trees, lr 0.015, 31 leaves) | 0.5400 alone, Spearman 0.37, blend **+0.0025** at 20% | above the bar with independence intact — a second independent member |
 | 133 | #37 plus the frequency/dependence member at a fifth, mass at a quarter | fold-2 **0.6232** vs 0.6205 | shipped as **#38** (resources083) — two independent members |
+| 134 | the raw window under the slow classifier, alone and joined to the frequency member | 0.5318 alone, −0.0002 on #38; union 0.5544 at 0.57 correlation, replacement 0.6225 | killed — no third independent input among built features |
 | — | #25: broken upload, do not run | — | a `channels[:186]` slice survived the spectral upgrade; the push followed the check with `;` instead of `&&` |
 | — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |
 | — | 015: forecaster horizons 1+5 and signed error | 0.5751 vs 0.5779 | **killed by pre-stated condition**: the extensions dilute the compact four channels |
