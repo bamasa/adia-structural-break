@@ -199,6 +199,7 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | 126 | spectral battery on long windows (64-1024 points, 10 bands) | 0.5261 alone, Spearman 0.13, +0.0007 | killed — long windows trade noise for lag |
 | 129 | the eight autocorrelation channels alone as a member | Spearman 0.35, 0.5248 alone, +0.0005 | independent and weak — like every dependence/frequency reader |
 | 130 | the three independent weak members (two spectra + autocorrelation) under one classifier | 0.5357 alone, Spearman 0.36, blend **+0.0018** at 15-20% | just under the bar — the first near-paying member on the independent side |
+| 131a, 132 | 130 strengthened with AR-filter channels / a wider autocorrelation grid | stronger (0.549 / 0.539) but more correlated (0.72 / 0.45); gains +0.0005 / +0.0015 | on the independent side strength is bought with correlation |
 | — | #25: broken upload, do not run | — | a `channels[:186]` slice survived the spectral upgrade; the push followed the check with `;` instead of `&&` |
 | — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |
 | — | 015: forecaster horizons 1+5 and signed error | 0.5751 vs 0.5779 | **killed by pre-stated condition**: the extensions dilute the compact four channels |

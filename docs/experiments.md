@@ -2886,3 +2886,24 @@ just under the 0.002 bar.
 For the first time the independent side of the map has a member that
 nearly pays. The question is whether it can be made a little stronger
 without losing its independence; three attempts run next.
+
+---
+
+## 132 — a wider autocorrelation grid, and the first strengthening of 130
+
+Eight lags (1 to 30) over five windows (25 to 400) instead of four over
+two. Alone the forty channels are *weaker* than the eight (0.5205 against
+0.5248) and less independent (0.43 against 0.35); inside the combined
+member they raise its strength from 0.5357 to 0.5388 and its correlation
+from 0.36 to 0.45, and the blend gain falls from +0.0018 to +0.0015. The
+extra lags and windows add noise faster than signal.
+
+131(a), the AR-filter channels added to the hundred: strength 0.5491, the
+highest of any independent-side member — and correlation **0.718**,
+because those posteriors accumulate with time (096) and time is what the
+ensemble already reads. Gain +0.0005.
+
+The trade is now measured from both sides: on the independent side of
+the map, every addition that raises strength raises correlation faster,
+and the gain shrinks. 130 as first built — two spectra and eight
+autocorrelations — remains the best point, at +0.0018.
