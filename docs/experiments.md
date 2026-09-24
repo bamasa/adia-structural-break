@@ -2966,3 +2966,16 @@ to the frequency member's hundred channels it strengthens the union to
 frequency member the blend falls to 0.6225. The raw window carries no
 signal a slow learner can find either. There is no third independent input
 among the features this project has built.
+
+---
+
+## 135 — the slow classifier on the mass member, killed
+
+If a slower, shallower learner lifted the frequency member from +0.0018
+to +0.0025, the mass member — trained fast, at 600 trees and 63 leaves —
+might have the same headroom. It does not: 0.5826 alone against 0.5830,
+Spearman 0.990 with its fast version, and every blend with it lower
+(0.6222-0.6224 against 0.6232; averaging both versions 0.6229). The slow
+learner helps where the signal is weak and noisy and hurts nothing where
+it is clean; the mass channels are clean. The two members ship as they
+are.
