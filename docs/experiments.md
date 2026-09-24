@@ -2845,3 +2845,25 @@ from the time-domain channels long ago. Two guards were needed on the way
 profile is built with half-window overlap capped at the history's length,
 and the tail is zero-padded to the window. Killed; the spectral member's
 weakness is not window length.
+
+---
+
+## 129 — the autocorrelation channels alone, and the shape of the map
+
+The eight direct autocorrelation channels of 110 were killed as an
+addition and again inside the rejected group of 115 (where the GLR and
+test channels dominated). Alone as a member: Spearman **0.346** with #36,
+0.374 with the mass classifier — independent — and 0.5248 alone, +0.0005
+in the blend. Weak.
+
+The map of members now has a clear shape. Everything that reads the
+frequency or dependence structure — spectrum at 0.12, autocorrelation at
+0.35 — is independent and weak, at 0.52-0.53 alone. Everything that reads
+level and scale over windows — the mass battery and all its rebuilds, the
+detectors — is strong at 0.57-0.59 and redundant with each other at 0.8-
+0.95. The single paying member sat at the boundary: level-and-scale
+summaries, but built outside the pipeline. 109 said why the first group is
+weak: forty percent of breaks change nothing a window can measure, and
+the ones that change dependence are read at 0.58 by the whole ensemble.
+The independent members are independent because they look at the hard
+part of the problem.
