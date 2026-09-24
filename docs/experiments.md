@@ -2979,3 +2979,19 @@ Spearman 0.990 with its fast version, and every blend with it lower
 learner helps where the signal is weak and noisy and hurts nothing where
 it is clean; the mass channels are clean. The two members ship as they
 are.
+
+---
+
+## 128 — networks on the spectral channels, killed after one member
+
+On the mass channels a trajectory network beat the classifier (121: 0.5914
+against 0.5830), so the same might have lifted the spectral member. It does
+the opposite: the first member reads **0.5188** on fold 2 against 0.5285
+for the classifier on the same thirty-two channels, with the triple
+augmentation and the 082b recipe. Stopped after one member — a minus of
+0.01 against a classifier does not become a plus with two more seeds.
+
+Spectral channels are already a summary of a window's dynamics; a network
+that reads their trajectory over 127 steps is smoothing a smoothed signal
+and losing the little that was there. The frequency member stays a
+classifier, and a slow one (131b).
