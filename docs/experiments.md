@@ -2908,6 +2908,12 @@ the map, every addition that raises strength raises correlation faster,
 and the gain shrinks. 130 as first built — two spectra and eight
 autocorrelations — remains the best point, at +0.0018.
 
+131(c), the AR-filter channels under the slow classifier: 0.5539 alone,
+the strongest independent-side member ever — and 0.729 correlated, gain
++0.0006. The slow classifier lifts strength wherever it is applied; only
+on the hundred channels does the correlation stay low enough for the
+strength to pay. The AR posteriors are the contaminant, not the trees.
+
 ---
 
 ## 131b — the independent member crosses the bar
