@@ -1,0 +1,13 @@
+#37 with a second independent member: frequency and dependence channels.
+---
+The ensemble of #37 — augmented ranker, run-length suffix, twenty-four
+trajectory networks, the mass battery as its own member — plus a second
+member of the independent kind. A hundred channels the ensemble does not
+otherwise read: rolling spectra on nine windows from 32 to 1024 points, each
+against the history's band profile, and exponentially-weighted
+autocorrelations at four lags over two windows, minus the history's. Alone
+they are weak (0.5400) and almost uncorrelated with everything else (0.37);
+under a slow, shallow classifier they add +0.0025 on fold 2 at a fifth of
+the blend, on top of the mass member's +0.0038. Fold 2 reads 0.6232 against
+0.6205 for #37. Streamed by the library's freqdep module, verified against
+the training matrices to 1e-6.

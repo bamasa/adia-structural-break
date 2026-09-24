@@ -2924,3 +2924,24 @@ That is above the 0.002 bar with independence intact, the combination
 that 115-129 could not produce and that 114 produced once. Two members of
 the independent kind are now on the table, and their shares tune jointly
 before anything ships.
+
+---
+
+## 133 — submission #38: two independent members
+
+The ensemble of #37 with the second independent member added: the hundred
+frequency and dependence channels under the slow, shallow classifier of
+131b, at a fifth of the blend, the mass member at a quarter, the core at
+0.55. Shares tuned jointly on fold 2, which reads **0.6232** on a flat
+plateau (0.6230-0.6232 across mass 0.20-0.30 and frequency 0.15-0.25)
+against 0.6205 for #37 and 0.6167 for #30.
+
+Streamed by the new `freqdep` module — nine rolling spectra and eight
+exponentially-weighted autocorrelations — verified against the training
+matrices to 1e-6 on three series including the shortest history. The
+member costs about a millisecond per step (FFTs on nine windows): 3.8-4.3
+ms per step in all, still a small fraction of the budget. Thirty-one
+channel counts checked. Shipped as **#38**, resources083.
+
+If the fold-2 → cloud offset holds at 0.016, as it did for #36, the
+platform should read about 0.607.
