@@ -2830,3 +2830,18 @@ with the mass member is **0.955**: the trees read the mass channels and
 treat the spectrum as a garnish. Swapped in for the mass member it reads
 0.6202 against 0.6205. The same lesson as 114 from the other side: a
 model on the union is the stronger set's model, not a new member.
+
+---
+
+## 126 — longer spectral windows make the member weaker, killed
+
+Windows of 64 to 1024 points with ten bands instead of 32 to 256 with six:
+0.5261 alone against 0.5285, correlation with #36 unchanged at 0.127,
+blend +0.0007 at 15%. The estimation noise a long window removes is bought
+with lag: at step t a 1024-point window is mostly pre-break history until
+the break is a thousand points old, and by then the ensemble has read it
+from the time-domain channels long ago. Two guards were needed on the way
+— fifty-one histories are shorter than the longest window, so the history
+profile is built with half-window overlap capped at the history's length,
+and the tail is zero-padded to the window. Killed; the spectral member's
+weakness is not window length.
