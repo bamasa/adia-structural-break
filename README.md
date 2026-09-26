@@ -219,6 +219,7 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | 137 | five learner variants for the frequency member around 131b | alone 0.5404-0.5414, blend 0.6231-0.6233 | plateau — the fast-to-slow step was the whole gain |
 | 140 | window novelty against the history's own windows (kNN distance, empirical p-value; 20 channels) | 0.5469 alone, Spearman 0.46 with #38 and 0.21 with the frequency member; as a union with it, +0.0013 on a plateau | the best-shaped small gain in a week — below the bar alone; step-gating tested |
 | 140c | the union gated by step: frequency member below 100, frequency+novelty from 100 | **0.6251** vs 0.6232, flat across the gate | at the bar; **shipped as #39** (0.50 core + 0.25 mass + 0.25 union from step 100) |
+| 141 | the novelty matrix rebuilt with the median-distance rank alive (it was constant) | union 0.5657 vs 0.5670, gated blend 0.6243 vs 0.6251 | worse at every share — the nearest-neighbour rank carries the signal; #39 stands |
 | — | #25: broken upload, do not run | — | a `channels[:186]` slice survived the spectral upgrade; the push followed the check with `;` instead of `&&` |
 | — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |
 | — | 015: forecaster horizons 1+5 and signed error | 0.5751 vs 0.5779 | **killed by pre-stated condition**: the extensions dilute the compact four channels |

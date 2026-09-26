@@ -3129,3 +3129,22 @@ one NaN (the self-distance) and came out NaN for every history window, so
 the channel sits at a constant -0.5 in the matrix. A constant feature gets
 no splits, so #39 is unaffected and the streaming module reproduces the
 constant on purpose. The matrix is rebuilt with the fix as 141.
+
+---
+
+## 141 — the novelty matrix rebuilt with the median-distance channel alive
+
+The batch builder's third channel per window (the rank of the online
+window's median distance to the history windows) was constant in the
+matrix (140c). Rebuilt with the NaN fixed: the channel now varies
+(52 495 / 11 984 / 2 951 / 452 distinct values across the four windows),
+every other channel identical to the shipped matrix to 0.0.
+
+It does not help. Novelty alone under the slow learner: 0.5463 against
+0.5469 with the channel dead. The union: 0.5657 against 0.5670, Spearman
+0.981 between the two. In the blend, gated at 100: **0.6243 against
+0.6251** for #39's recipe, and the same -0.0008 at every share tried. The
+median distance to the history's windows is a blunter version of the
+nearest distance — it moves with the same shifts, less sharply, and the
+learner spends splits on it. The nearest-neighbour rank carries the
+signal; #39 stands as shipped. Closed.
