@@ -3014,3 +3014,18 @@ More useful is where the members pay, by step range, #38 against the core:
 battery's long windows have filled and the frequency member's spectra mean
 something; the ensemble's weakest region by weight, steps 100-200, is
 where they help least. Whatever comes next has to speak to that range.
+
+---
+
+## 138 — a tiny meta-model over the three blend inputs, killed
+
+With only three inputs — core, mass member, frequency member — and
+monotone constraints, a learned combiner has almost no room to overfit
+and might catch an interaction the linear blend cannot (trust the members
+more when the core is unsure). Cross-validated by series inside fold 2:
+seven leaves, monotone, 0.6122; with the log step added 0.6112; thirty-one
+leaves unconstrained 0.6035. All far below the hand blend's 0.6232, and
+averaging each with the hand blend only halves the loss. The fourth
+learned meta in this project (092, 099, 125, 138) and the fourth to lose:
+a per-step probability objective is not the cross-sectional ranking
+objective, and no amount of constraint fixes that.
