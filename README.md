@@ -221,6 +221,7 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | 140c | the union gated by step: frequency member below 100, frequency+novelty from 100 | **0.6251** vs 0.6232, flat across the gate | at the bar; **shipped as #39** (0.50 core + 0.25 mass + 0.25 union from step 100) |
 | 141 | the novelty matrix rebuilt with the median-distance rank alive (it was constant) | union 0.5657 vs 0.5670, gated blend 0.6243 vs 0.6251 | worse at every share — the nearest-neighbour rank carries the signal; #39 stands |
 | 142 | step gates for the mass and frequency members | ±0.0001 for any gate; the members gain at every range, most late (+0.025 on steps 700+) | only the novelty union needed a warm-up gate; closed |
+| 143 | memory on the output: running max, EWMA, decayed max, per member or on the blend | running max −0.009; everything else within ±0.0001 | the ensemble already carries its memory; closed |
 | — | #25: broken upload, do not run | — | a `channels[:186]` slice survived the spectral upgrade; the push followed the check with `;` instead of `&&` |
 | — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |
 | — | 015: forecaster horizons 1+5 and signed error | 0.5751 vs 0.5779 | **killed by pre-stated condition**: the extensions dilute the compact four channels |

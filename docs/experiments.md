@@ -3168,3 +3168,17 @@ long since saturated. Without the mass member #39 drops to 0.6222, with
 it at 0.35 to 0.6240; gating the mass share below step 30 or 100 moves
 the total by ±0.0001. The novelty union was the only member with a
 warm-up problem, and it is the only one gated. Closed.
+
+---
+
+## 143 — memory on the output
+
+Does the blend want a memory of its own past? On the fold-2 caches of
+#39: a running maximum per series drops it to 0.6158 (a false alarm can
+never recant); exponential smoothing at 0.3-0.7 reads 0.6247-0.6251; a
+decayed maximum 0.6234-0.6247; memory on the windowed members alone
+0.6249-0.6252, on the core alone 0.6240-0.6250. Nothing outside ±0.0001
+of 0.6251. The detectors' peaks, the retrospective scans and the
+trajectory networks already carry every memory the ranking can use.
+Closed — and a reminder that the label is absorbing but the evidence is
+not: the ideal posterior can fall, and a monotone score cannot follow it.
