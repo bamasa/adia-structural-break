@@ -3148,3 +3148,23 @@ median distance to the history's windows is a blunter version of the
 nearest distance — it moves with the same shifts, less sharply, and the
 learner spends splits on it. The nearest-neighbour rank carries the
 signal; #39 stands as shipped. Closed.
+
+---
+
+## 142 — do the other members want a gate too?
+
+A quick reading from the fold-2 caches. By step range, the core, #38 and
+#39:
+
+| | 0-30 | 30-100 | 100-300 | 300-700 | 700+ | all |
+|---|---|---|---|---|---|---|
+| core (#30) | 0.5373 | 0.5669 | 0.6010 | 0.6442 | 0.6416 | 0.6167 |
+| #38 | 0.5446 | 0.5709 | 0.6025 | 0.6538 | 0.6671 | 0.6232 |
+| #39 | 0.5446 | 0.5709 | 0.6047 | 0.6560 | 0.6691 | 0.6251 |
+
+The independent members earn their keep everywhere, and most of all late:
++0.025 on steps 700+ against the core, where the networks' memory has
+long since saturated. Without the mass member #39 drops to 0.6222, with
+it at 0.35 to 0.6240; gating the mass share below step 30 or 100 moves
+the total by ±0.0001. The novelty union was the only member with a
+warm-up problem, and it is the only one gated. Closed.
