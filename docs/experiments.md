@@ -3113,8 +3113,19 @@ on a plateau flat across T, with a mechanism behind it rather than a
 sweep. Expected on the platform, if the offset holds: about +0.002 over
 #38.
 
-Prepared as a submission — both classifiers in the artifact, the gate at
-step 100, the novelty channels streamed by a new library module verified
-against the matrix — and held until #38's cloud number says whether the
-second independent member transferred. If it did, a third view is worth a
-slot; if it did not, a union built on it is not.
+Re-run before shipping: the plateau holds at core 0.50-0.55, mass
+0.20-0.25, union 0.25-0.30 (0.6251-0.6252 gated), and the fold-2 union is
+reproduced exactly by the slow learner of 131b (Spearman 1.0000), so the
+final classifier on all series is the measured recipe. **Shipped as #39**:
+#38 unchanged before step 100; from step 100 the blend is 0.50 core +
+0.25 mass + 0.25 union, both classifiers in the artifact, the novelty
+channels streamed by the library's new novelty module (verified against
+the matrix to 1e-7; 4.0-4.8 ms/step). Expected on the platform, if the
+offset holds: about +0.002 over #38's number.
+
+One flaw found while streaming it: the batch builder's third channel per
+window, the median-distance rank, took the median over a row that held
+one NaN (the self-distance) and came out NaN for every history window, so
+the channel sits at a constant -0.5 in the matrix. A constant feature gets
+no splits, so #39 is unaffected and the streaming module reproduces the
+constant on purpose. The matrix is rebuilt with the fix as 141.

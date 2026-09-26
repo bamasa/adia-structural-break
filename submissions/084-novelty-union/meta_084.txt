@@ -1,0 +1,16 @@
+#38 with a third view joined to the frequency member from step 100 on.
+---
+The ensemble of #38 — augmented ranker, run-length suffix, twenty-four
+trajectory networks, the mass member, the frequency/dependence member — with
+the frequency member replaced, from step 100 on, by a union: its hundred
+channels plus twenty of window novelty. Each online window is summarised
+seven ways and ranked against the history's own windows of the same length:
+the distance to the nearest, its empirical p-value against the history's
+own nearest distances, and the same ranks for scale and first-lag
+dependence. Novelty alone reads 0.5469 and agrees with the frequency member
+at only 0.21; the union reads 0.5670 alone and, swapped in for the
+frequency member, lifts fold 2 from 0.6232 to 0.6244. Its windows are
+unfilled early, where it loses, so before step 100 the blend is exactly #38
+and from step 100 the union takes a quarter: fold 2 reads 0.6251, flat
+across gates 50-200. Streamed by the library's novelty module, verified
+against the training matrices to 1e-6.

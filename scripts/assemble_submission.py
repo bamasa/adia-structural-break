@@ -22,7 +22,7 @@ ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "src" / "structural_break"
 
 #: Dependency order matters: later modules use earlier names.
-MODULES = ["features.py", "detectors.py", "retrospective.py", "retro2.py", "multiscale.py", "bocpd.py", "mass.py", "freqdep.py"]
+MODULES = ["features.py", "detectors.py", "retrospective.py", "retro2.py", "multiscale.py", "bocpd.py", "mass.py", "freqdep.py", "novelty.py"]
 
 HEADER = '''"""{title}
 
@@ -125,6 +125,10 @@ def verify_channels(assembled: str, target: Path) -> None:
         check("mass", getattr(model["mass_classifier"], "booster_", model["mass_classifier"]).num_feature(), width["mass"])
     if model.get("freqdep_classifier") is not None and re.search(r"^FREQDEP_OFFSET = ", assembled, re.M):
         check("freqdep", getattr(model["freqdep_classifier"], "booster_", model["freqdep_classifier"]).num_feature(), 100)
+    # The union member reads the frequency/dependence hundred and the novelty
+    # twenty together; its classifier must have been built at that width.
+    if model.get("union_classifier") is not None and re.search(r"^NOVELTY_OFFSET = ", assembled, re.M):
+        check("union", getattr(model["union_classifier"], "booster_", model["union_classifier"]).num_feature(), 120)
     if model.get("booster") is not None:
         check("clf", getattr(model["booster"], "booster_", model["booster"]).num_feature(), width["clf"])
     for i, c in enumerate(model.get("classifiers", [])):
@@ -136,7 +140,6 @@ def verify_channels(assembled: str, target: Path) -> None:
     for key in ("net_mu", "net_sd"):
         if key in model:
             check(key, len(model[key]), declared["NET_CHANNELS"])
-    found.pop("mass", None) if False else None
     if bad:
         raise SystemExit("channel counts disagree between interface and artifact: " + "; ".join(bad))
     print(f"channel check passed: {len(found)} counts — nets {declared['NET_CHANNELS']}, "

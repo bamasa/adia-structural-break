@@ -41,10 +41,18 @@ platform moved four times, each time for a different reason:
 | 0.6046 | #36 | a mass battery of plain statistics trained as its own member |
 | 0.6048 | #37 | the same, with the network pool doubled — +0.0002, the pool priced at nothing |
 
-Everything else measured on the untouched fold since #28 — more members,
-more or other data, capacity, schedule, loss, input, verifiers, stacking
-in the winners' form, the sibling competition's ten thousand series — sits
-within ±0.001 of the recipe. The strongest single signal in the data, the
+Two more wait for their cloud numbers: #38, a second independent member
+(frequency and dependence channels under a slow learner), and #39, a third
+view — window novelty against the history's own windows — joined to it from
+step 100 on. Fold 2 reads 0.6232 and 0.6251 for them against 0.6205 for
+#37; the fold-to-cloud offset has held at 0.016 across six readings.
+
+Everything else measured on the untouched fold since #28 — more or other
+data, capacity, schedule, loss, input, verifiers, stacking in the winners'
+form, the sibling competition's ten thousand series — sits within ±0.001
+of the recipe. What moved it after #30 was one thing, found in 114 and
+confirmed by the cloud in #36: a member built on its own input and trained
+on its own, disagreeing with the ensemble where that pays. The strongest single signal in the data, the
 position of a series inside its own online part, is exactly what the
 real-time protocol withholds. The record of what was tried, in what order,
 and why each was kept or killed is the point of this repository as much as
@@ -210,7 +218,7 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | 139 | a tail-behaviour member (exceedance rates, excess scale, tail asymmetry, block maxima; 40 channels) | 0.5546 alone, Spearman 0.86 with the mass member, −0.0003 on #38 | killed — tail behaviour is already read through scale |
 | 137 | five learner variants for the frequency member around 131b | alone 0.5404-0.5414, blend 0.6231-0.6233 | plateau — the fast-to-slow step was the whole gain |
 | 140 | window novelty against the history's own windows (kNN distance, empirical p-value; 20 channels) | 0.5469 alone, Spearman 0.46 with #38 and 0.21 with the frequency member; as a union with it, +0.0013 on a plateau | the best-shaped small gain in a week — below the bar alone; step-gating tested |
-| 140c | the union gated by step: frequency member below 100, frequency+novelty from 100 | **0.6251** vs 0.6232, flat across the gate | at the bar; prepared as a submission, held for #38's cloud number |
+| 140c | the union gated by step: frequency member below 100, frequency+novelty from 100 | **0.6251** vs 0.6232, flat across the gate | at the bar; **shipped as #39** (0.50 core + 0.25 mass + 0.25 union from step 100) |
 | — | #25: broken upload, do not run | — | a `channels[:186]` slice survived the spectral upgrade; the push followed the check with `;` instead of `&&` |
 | — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |
 | — | 015: forecaster horizons 1+5 and signed error | 0.5751 vs 0.5779 | **killed by pre-stated condition**: the extensions dilute the compact four channels |

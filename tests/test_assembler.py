@@ -70,6 +70,15 @@ class ChannelCheck(unittest.TestCase):
         with self.assertRaises(SystemExit):
             self._run(text, art)
 
+    def test_member_suffix_widths_are_checked(self):
+        text = "NET_CHANNELS = 200\nCLF_CHANNELS = 206\nMASS_OFFSET = 206\nFREQDEP_OFFSET = 296\nNOVELTY_OFFSET = 396\n"
+        art = _artifact(206, [200], [200], 200)
+        art.update(mass_classifier=_Booster(90), freqdep_classifier=_Booster(100), union_classifier=_Booster(120))
+        self._run(text, art)
+        art["union_classifier"] = _Booster(100)   # built on the frequency hundred alone
+        with self.assertRaises(SystemExit):
+            self._run(text, art)
+
     def test_no_artifact_is_not_an_error(self):
         self._run("NET_CHANNELS = 200\n", None)
 
