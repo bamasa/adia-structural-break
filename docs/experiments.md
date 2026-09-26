@@ -3098,3 +3098,23 @@ blend 0.6231-0.6233 against 0.6232. The step from the fast learner (600
 trees, 63 leaves) to the slow one was the whole gain; beyond it the
 member's ceiling is set by its hundred channels, not by how they are
 read. 131b ships as trained.
+
+---
+
+## 140c — the union, gated by step
+
+The frequency+novelty union loses on steps 0-100 (its windows are
+unfilled and the classifier reads noise) and gains from 100 on. Tested as
+a ramp of its share from a low start to 0.25 over T steps: 0.6245-0.6247
+for every T and start, flat. Tested as a hybrid — the frequency member of
+#38 below step T, the union at 0.25 from T on: T=50 0.6248, **T=100
+0.6251**, T=200 0.6248. Against #38's 0.6232 that is +0.0019: at the bar,
+on a plateau flat across T, with a mechanism behind it rather than a
+sweep. Expected on the platform, if the offset holds: about +0.002 over
+#38.
+
+Prepared as a submission — both classifiers in the artifact, the gate at
+step 100, the novelty channels streamed by a new library module verified
+against the matrix — and held until #38's cloud number says whether the
+second independent member transferred. If it did, a third view is worth a
+slot; if it did not, a union built on it is not.
