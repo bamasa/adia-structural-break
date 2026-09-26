@@ -2995,3 +2995,22 @@ Spectral channels are already a summary of a window's dynamics; a network
 that reads their trajectory over 127 steps is smoothing a smoothed signal
 and losing the little that was there. The frequency member stays a
 classifier, and a slow one (131b).
+
+---
+
+## 136 — the blend re-examined with two members in it
+
+The core's 0.45/0.55 split dates from #30; the members' shares were tuned
+once. Everything cheap, on cached fold-2 predictions: the tree share of the
+core from 0.30 to 0.55 reads 0.6228-0.6232, flat; the frequency member's
+share as a function of step (ramping in over 50-400 steps, since its long
+windows are history until then) reads 0.6227-0.6232, flat; the same ramp on
+the mass member 0.6232-0.6234, flat. The blend as shipped sits on a plateau
+in every direction.
+
+More useful is where the members pay, by step range, #38 against the core:
+0-30 +0.007, 30-100 +0.004, 100-200 **+0.001**, 200-400 +0.003, 400-700
++0.013, 700-1000 +0.026. The independent members pay late, where the mass
+battery's long windows have filled and the frequency member's spectra mean
+something; the ensemble's weakest region by weight, steps 100-200, is
+where they help least. Whatever comes next has to speak to that range.
