@@ -209,6 +209,7 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | 138 | a monotone three-input meta-model over core, mass and frequency members | 0.6122 vs the hand blend's 0.6232 | killed — the fourth learned meta to lose to a hand blend |
 | 139 | a tail-behaviour member (exceedance rates, excess scale, tail asymmetry, block maxima; 40 channels) | 0.5546 alone, Spearman 0.86 with the mass member, −0.0003 on #38 | killed — tail behaviour is already read through scale |
 | 137 | five learner variants for the frequency member around 131b | alone 0.5404-0.5414, blend 0.6231-0.6233 | plateau — the fast-to-slow step was the whole gain |
+| 140 | window novelty against the history's own windows (kNN distance, empirical p-value; 20 channels) | 0.5469 alone, Spearman 0.46 with #38 and 0.21 with the frequency member; as a union with it, +0.0013 on a plateau | the best-shaped small gain in a week — below the bar alone; step-gating tested |
 | — | #25: broken upload, do not run | — | a `channels[:186]` slice survived the spectral upgrade; the push followed the check with `;` instead of `&&` |
 | — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |
 | — | 015: forecaster horizons 1+5 and signed error | 0.5751 vs 0.5779 | **killed by pre-stated condition**: the extensions dilute the compact four channels |

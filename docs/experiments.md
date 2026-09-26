@@ -3070,6 +3070,21 @@ between two volatility regimes, with a break into a third, the p-value at
 window 100 goes −0.26 → +0.47 where a mean-variance reference would be
 blind.
 
+The readings. Alone, under the slow learner, 0.5469 — stronger than the
+frequency member (0.5400) — with Spearman 0.458 with #38, 0.464 with the
+mass member and **0.213 with the frequency member**: a third view, not a
+copy of either. On top of #38 by itself it adds +0.0005. Joined to the
+frequency member's hundred channels, the union reads 0.5670 alone at 0.600
+with #38, and swapped in for the frequency member the blend reads
+**0.6244-0.6245** on a flat plateau (mass 0.20-0.25, union 0.20-0.30)
+against 0.6232 — +0.0013. As four separate members, +0.0005.
+
+By step range the union loses early (0-30: −0.006; 30-100: −0.005) and
+gains late (100-1000: +0.002 to +0.003): its windows are unfilled at the
+start and the classifier reads noise there. That is a shape a step-gated
+share can address, and the gate is tested next. As it stands, +0.0013 is
+below the bar that #32 and #33 set, and it is not shipped on its own.
+
 ---
 
 ## 137 — the frequency member's classifier is on a plateau
