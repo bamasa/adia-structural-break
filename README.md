@@ -41,10 +41,11 @@ platform moved four times, each time for a different reason:
 | 0.6046 | #36 | a mass battery of plain statistics trained as its own member |
 | 0.6048 | #37 | the same, with the network pool doubled — +0.0002, the pool priced at nothing |
 
-Two more wait for their cloud numbers: #38, a second independent member
-(frequency and dependence channels under a slow learner), and #39, a third
+Three more wait for their cloud numbers: #38, a second independent member
+(frequency and dependence channels under a slow learner); #39, a third
 view — window novelty against the history's own windows — joined to it from
-step 100 on. Fold 2 reads 0.6232 and 0.6251 for them against 0.6205 for
+step 100 on; and #40, the sequential test for dependence joining from step
+300. Fold 2 reads 0.6232, 0.6251 and 0.6265 for them against 0.6205 for
 #37; the fold-to-cloud offset has held at 0.016 across six readings.
 
 Everything else measured on the untouched fold since #28 — more or other
@@ -222,6 +223,7 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | 141 | the novelty matrix rebuilt with the median-distance rank alive (it was constant) | union 0.5657 vs 0.5670, gated blend 0.6243 vs 0.6251 | worse at every share — the nearest-neighbour rank carries the signal; #39 stands |
 | 142 | step gates for the mass and frequency members | ±0.0001 for any gate; the members gain at every range, most late (+0.025 on steps 700+) | only the novelty union needed a warm-up gate; closed |
 | 143 | memory on the output: running max, EWMA, decayed max, per member or on the blend | running max −0.009; everything else within ±0.0001 | the ensemble already carries its memory; closed |
+| 144 | the sequential test for dependence — Page's CUSUM on lagged products of history-AR residuals (23 channels) as a member | 0.5755 alone (strongest member), Spearman 0.75 with #39; gated at step 300: **0.6265** vs 0.6251 | +0.0014 on a broad plateau; **shipped as #40** |
 | — | #25: broken upload, do not run | — | a `channels[:186]` slice survived the spectral upgrade; the push followed the check with `;` instead of `&&` |
 | — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |
 | — | 015: forecaster horizons 1+5 and signed error | 0.5751 vs 0.5779 | **killed by pre-stated condition**: the extensions dilute the compact four channels |

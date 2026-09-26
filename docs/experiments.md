@@ -3182,3 +3182,50 @@ of 0.6251. The detectors' peaks, the retrospective scans and the
 trajectory networks already carry every memory the ranking can use.
 Closed — and a reminder that the label is absorbing but the evidence is
 not: the ideal posterior can fall, and a monotone score cannot follow it.
+
+---
+
+## 144 — the sequential test for dependence, as a member
+
+Where the ensemble is weakest (109): breaks that change only the
+dependence read 0.583-0.595 per series. The detectors it owns test
+level and scale; nothing in it is the *sequential* test for a change in
+autocorrelation. Built here: the history fits an AR(5); if the online
+dependence changes, residuals under the history's coefficients turn
+autocorrelated, and the score for a change in the lag-k coefficient is
+the sum of lagged residual products. Page's two-sided CUSUM on the
+standardised products (drift 0.25) is to dependence what the CUSUM on
+squares is to variance. Per lag 1, 2, 3, 5, 10: CUSUM peak and two
+exponential averages; a portmanteau over lags 1-10 at two horizons;
+absolute products at lags 1, 2, 5 for volatility clustering. Twenty-three
+channels, twelve seconds to build for all series, 0.19 ms per step
+streamed.
+
+Readings. Alone under the slow learner **0.5755** — the strongest
+independent member so far (mass 0.55, frequency 0.5400, novelty 0.5469,
+union 0.5670) — but also the most correlated: Spearman 0.747 with #39,
+0.742 with the mass member (the absolute-product channels are scale
+detectors too), 0.418 with the frequency member. Flat on top of #39:
++0.0007 at a tenth, negative beyond a fifth. By step range it costs on
+0-300 (−0.001 to −0.005) and pays on 300+ (+0.003, +0.004): the products
+need a few hundred post-break points before their sum stands out. Gated
+— silent before step T, a share w after — **0.6265** against 0.6251 at
+every T in 200-400 and w in 0.15-0.25, a linear ramp the same. Per break
+type it lifts variance+dependence breaks (0.642 → 0.650) and barely the
+dependence-only ones (0.595 → 0.598), while nudging shape breaks down —
+the dependence-only changes that a 300-point window can show are mostly
+too small for even the right statistic to catch in the steps the metric
+weighs.
+
++0.0014 on a broad plateau, with a mechanism. Below the 0.002 bar, above
+the noise, and the last member-shaped gain the fold has left to give.
+**Shipped as #40**: #39 unchanged before step 300; from step 300 the
+dependence member takes a fifth of the blend. Three members now join at
+three gates (0, 100, 300) — each where its evidence has had time to
+accumulate.
+
+Also checked on the way, and closed: the history length carries no
+information about the label at any step (AUC 0.49-0.51; Spearman with
+the online length 0.005, so it is no proxy for the withheld position);
+the series id carries none (AUC 0.500); the local hundred-series test
+sample remains unusable as a yardstick.

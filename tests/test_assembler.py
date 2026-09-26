@@ -75,6 +75,12 @@ class ChannelCheck(unittest.TestCase):
         art = _artifact(206, [200], [200], 200)
         art.update(mass_classifier=_Booster(90), freqdep_classifier=_Booster(100), union_classifier=_Booster(120))
         self._run(text, art)
+        art["dep_classifier"] = _Booster(23)
+        self._run(text + "DEP_OFFSET = 416\n", art)
+        art["dep_classifier"] = _Booster(20)      # the novelty twenty by mistake
+        with self.assertRaises(SystemExit):
+            self._run(text + "DEP_OFFSET = 416\n", art)
+        del art["dep_classifier"]
         art["union_classifier"] = _Booster(100)   # built on the frequency hundred alone
         with self.assertRaises(SystemExit):
             self._run(text, art)

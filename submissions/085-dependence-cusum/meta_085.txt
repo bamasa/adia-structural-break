@@ -1,0 +1,17 @@
+#39 with a fourth member from step 300 on: the sequential test for dependence.
+---
+The ensemble of #39 — augmented ranker, run-length suffix, twenty-four
+trajectory networks, the mass member, the frequency member, the
+frequency+novelty union from step 100 — plus a member built for the break
+type the ensemble reads worst. The history fits an AR(5); if the online
+dependence changes, residuals computed with the history's coefficients turn
+autocorrelated, and Page's two-sided CUSUM on their standardised lagged
+products is the sequential test with the best power for a small sustained
+change. Per lag 1, 2, 3, 5, 10 the CUSUM peak and two exponential averages;
+a portmanteau over lags 1-10 at two horizons; absolute products at lags
+1, 2, 5 for volatility clustering. Alone the strongest independent member
+so far (0.5755) and the most correlated (0.75 with #39): it costs on steps
+0-300 and pays from 300 on, so it joins at a fifth from step 300. Fold 2
+reads 0.6265 against 0.6251, flat across gates 200-400 and shares
+0.15-0.25. Streamed by the library's depcusum module, verified against the
+training matrix.
