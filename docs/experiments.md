@@ -3029,3 +3029,24 @@ averaging each with the hand blend only halves the loss. The fourth
 learned meta in this project (092, 099, 125, 138) and the fourth to lose:
 a per-step probability objective is not the cross-sectional ranking
 objective, and no amount of constraint fixes that.
+
+---
+
+## 139 — a tail-behaviour member, killed
+
+"Tail behaviour" is one of the organisers' listed break types and the
+ensemble had three channels for it among four hundred. Forty new ones over
+five windows: exceedance rates of the history's 90th, 97.5th and 99.5th
+absolute percentiles, the mean excess over the 90th in the history's own
+excess scale, upper- and lower-tail rates separately, clustering of
+exceedances, and a slowly decaying maximum against the history's expected
+block maximum. On a switch from normal to t(2.5) at equal variance the
+99.5th-percentile rate goes −0.005 → +0.017 and the maximum −0.21 → +0.68.
+
+As a member under the slow classifier: 0.5546 alone — strong for the
+independent side — but Spearman **0.859 with the mass member**. Exceedance
+rates over windows are the mass battery's own tail channels writ large,
+and the trees find the same series. On top of #38 it reads −0.0003; joined
+to the frequency member's hundred channels it pulls that member's
+correlation with the ensemble from 0.37 to 0.53 and the blend to 0.6190 as
+a replacement. Killed. Tail behaviour is already read, through scale.
