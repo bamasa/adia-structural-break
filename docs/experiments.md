@@ -3050,3 +3050,22 @@ and the trees find the same series. On top of #38 it reads −0.0003; joined
 to the frequency member's hundred channels it pulls that member's
 correlation with the ensemble from 0.37 to 0.53 and the blend to 0.6190 as
 a replacement. Killed. Tail behaviour is already read, through scale.
+
+---
+
+## 140 — window novelty against the history's own windows (running)
+
+Every member so far compares the online window with the history's mean
+and variance — one number per statistic. If a history is itself
+heterogeneous (regimes, changing volatility), that average is a poor null:
+a window that is ordinary for the history looks anomalous against its
+mean, and a break into a quiet regime looks like nothing. This member
+describes a window by seven summaries and compares it with *every*
+history window of the same length: distance to the nearest, the median
+distance, and the rank of those distances among history-against-history
+distances — an empirical p-value against the history's own variety. Four
+windows, twenty channels, 0.55 ms per step (nearest-neighbour search over
+up to two hundred history windows). On a synthetic history alternating
+between two volatility regimes, with a break into a third, the p-value at
+window 100 goes −0.26 → +0.47 where a mean-variance reference would be
+blind.
