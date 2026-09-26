@@ -208,6 +208,7 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | 136 | core split and step-dependent member shares re-tuned with two members in the blend | 0.6227-0.6234 in every direction | flat plateau — the blend as shipped is optimal; members pay late (700+: +0.026), least on steps 100-200 (+0.001) |
 | 138 | a monotone three-input meta-model over core, mass and frequency members | 0.6122 vs the hand blend's 0.6232 | killed — the fourth learned meta to lose to a hand blend |
 | 139 | a tail-behaviour member (exceedance rates, excess scale, tail asymmetry, block maxima; 40 channels) | 0.5546 alone, Spearman 0.86 with the mass member, −0.0003 on #38 | killed — tail behaviour is already read through scale |
+| 137 | five learner variants for the frequency member around 131b | alone 0.5404-0.5414, blend 0.6231-0.6233 | plateau — the fast-to-slow step was the whole gain |
 | — | #25: broken upload, do not run | — | a `channels[:186]` slice survived the spectral upgrade; the push followed the check with `;` instead of `&&` |
 | — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |
 | — | 015: forecaster horizons 1+5 and signed error | 0.5751 vs 0.5779 | **killed by pre-stated condition**: the extensions dilute the compact four channels |

@@ -3069,3 +3069,17 @@ up to two hundred history windows). On a synthetic history alternating
 between two volatility regimes, with a break into a third, the p-value at
 window 100 goes −0.26 → +0.47 where a mean-variance reference would be
 blind.
+
+---
+
+## 137 — the frequency member's classifier is on a plateau
+
+Five variants around 131b's slow learner (1500 trees, lr 0.015, 31 leaves,
+300 rows per leaf): twice the trees at half the rate, 15 leaves, 600 rows
+per leaf, column sampling 0.3, and a combination. Alone 0.5404-0.5414
+against 0.5400; correlation with the core 0.328-0.333 against 0.368 —
+every variant slightly more independent, none stronger enough to matter;
+blend 0.6231-0.6233 against 0.6232. The step from the fast learner (600
+trees, 63 leaves) to the slow one was the whole gain; beyond it the
+member's ceiling is set by its hundred channels, not by how they are
+read. 131b ships as trained.
