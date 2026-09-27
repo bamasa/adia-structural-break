@@ -235,6 +235,7 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | forensics | the generator taken apart: families, break menu, the invisible 40% | ARMA ± GARCH, Gaussian/t innovations; only variance increases and AR-coefficient shifts carry signal; ~30% of breaks unidentifiable | the whitened stream and Shiryaev-Roberts are the matched tools |
 | 145 | the whitened stream (AR(p) by BIC + conditional scale + innovation ECDF) with a 90-channel battery as a member | **0.6150 alone; blend 0.6369 vs 0.6251** (+0.0118), gaining on every step range | **shipped as #41** at a 0.30 share |
 | 146 | the mass battery referenced to the last 512 history points | 0.5665 alone, +0.0004 | the whole history is the better null; closed |
+| 147 | Shiryaev-Roberts odds on the whitened stream (variance up/down, mean, dependence grids + mixtures; 21 channels) | member 0.6172 vs 0.6150; blend +0.0010 | kept for the next build of the member |
 | — | #25: broken upload, do not run | — | a `channels[:186]` slice survived the spectral upgrade; the push followed the check with `;` instead of `&&` |
 | — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |
 | — | 015: forecaster horizons 1+5 and signed error | 0.5751 vs 0.5779 | **killed by pre-stated condition**: the extensions dilute the compact four channels |

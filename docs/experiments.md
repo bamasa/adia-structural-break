@@ -3398,3 +3398,23 @@ history" descriptors. The mass battery referenced to the last 512
 history points: 0.5665 alone against 0.5830 for the whole-history one,
 Spearman 0.87 between them, +0.0004 in the blend at a tenth, negative
 beyond. The whole history is the better null here. Closed.
+
+---
+
+## 147 — Shiryaev-Roberts on the whitened stream
+
+The forensics' third consequence: rank by the accumulated posterior odds
+of a change at some tau ≤ t. For i.i.d. normal scores the
+Shiryaev-Roberts statistic has a closed form — log R_t = L_t +
+logcumsumexp over tau of −L_{tau−1}, L the cumulative per-point log
+likelihood ratio — so it costs nothing to build and one recursion per
+step to stream. Alternatives on a grid: innovation variance ×1.25 to ×5
+(the forensics' one-sided increase) and ×0.7, ×0.5; mean ±0.3, ±0.6,
+±1.0; lag-1 dependence ±0.2, ±0.4; plus an equal-weight mixture per
+family. Twenty-one channels appended to the whitened member's ninety.
+
+Alone 0.6172 against 0.6150 (Spearman 0.987 between the two members);
+in the blend +0.0010 at every share (0.6379 / 0.6384 / 0.6386 at 0.30 /
+0.35 / 0.40 against 0.6369 / 0.6374 / 0.6376), the gain on steps 100+
+and a hair lost before 30. Small, cheap, and principled: kept for the
+next build of the member rather than shipped on its own.
