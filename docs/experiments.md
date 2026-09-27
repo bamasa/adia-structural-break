@@ -3260,3 +3260,50 @@ dependence member are) and its fold-2 gain clears 0.003. #40 — the
 dependence member gated at 300, +0.0014 — is already on the platform and
 is the last of the old bar; its cloud number, if run, reads that bar's
 worth one more time.
+
+---
+
+## Public research, 27 September — what the leaders do, and what the platform is
+
+A survey of everything public on the challenge (organiser pages and FAQ,
+the runner and scorer source, the forum, the 2025 winners' write-ups and
+code), done to find levers larger than a member. The full report with
+URLs is in the research notes; the facts that change the plan:
+
+**The board.** Top 0.680 / 0.673 / 0.672; rank 50 at 0.642; rank 200 at
+0.621; rank 300 at 0.6055. We sit at about rank 300 of 1,688. The two
+strongest entrants are the 2025 edition's heavy feature engineers.
+
+**The data.** A mix of synthetic and *real-world* series (returns, ECG,
+temperature), each z-scored on its history alone, history 1000-5000 and
+break-free "by definition, but with irregularities", online 10-1000,
+P(break) 0.5, at most one break, label 1 from tau on (tau = 0 exists).
+One participant's oracle mix of break types: dependence 54%, volatility
+24%, tails 11%, mean 8%, variance 3%. Our own anatomy called 40% of
+breaks invisible to second-to-fourth-order statistics in a 300-point
+window; the mix says most of those are dependence changes too small for
+an AR(1) whitening to expose.
+
+**The protocol.** `x_online` is a true generator with no length; the
+prediction is cast to float32; the scorer is exactly our `ts_auc` (per
+step AUC weighted by positives × negatives); reruns on the first 10% of
+series must agree to 1e-8, which rules out cross-series state; 15 hours
+of cloud per week.
+
+**What the leaders build that we do not.** The strongest public
+real-time approach (0.6263 public at the time) rests on one thing:
+*whitening the stream properly* — AR(p ≤ 12) by BIC, a conditional scale,
+and the empirical CDF of the innovations fitted on the history, then
+every test run on that stream; the same author measured raw statistics
+as "about 2.5x worse". Second: per-series null calibration of every
+channel against the history's own model. Third: Bayes factors integrated
+over the change time and amplitude, per dyadic scale. The 2025 winners
+were feature batteries of two-sample tests (KS, CvM, AD, Fligner, BDS,
+Wasserstein, entropy deltas) over many views, stacked. Measured dead
+ends on the forum match ours: networks over trees +0.0007 at most,
+features +0.0003 per doubling, training series +0.0008 per doubling,
+knowing the break type +0.0000, blend weights fitted on the fold 0.072
+of optimism.
+
+Our whole channel stack whitens with AR(1) and reads the raw and asinh
+views. That is the gap the survey points at, and 145 is built on it.

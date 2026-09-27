@@ -227,6 +227,7 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | 142 | step gates for the mass and frequency members | ±0.0001 for any gate; the members gain at every range, most late (+0.025 on steps 700+) | only the novelty union needed a warm-up gate; closed |
 | 143 | memory on the output: running max, EWMA, decayed max, per member or on the blend | running max −0.009; everything else within ±0.0001 | the ensemble already carries its memory; closed |
 | 144 | the sequential test for dependence — Page's CUSUM on lagged products of history-AR residuals (23 channels) as a member | 0.5755 alone (strongest member), Spearman 0.75 with #39; gated at step 300: **0.6265** vs 0.6251 | +0.0014 on a broad plateau; **shipped as #40** |
+| survey | public research: leaders, data, protocol, 2025 winners | the board's top is 0.68, rank 50 is 0.642; the strongest public real-time recipe is proper whitening (AR(p) by BIC + conditional scale + innovation ECDF) with every test on that stream | our stack whitens with AR(1) only — the lever for 145 |
 | — | #25: broken upload, do not run | — | a `channels[:186]` slice survived the spectral upgrade; the push followed the check with `;` instead of `&&` |
 | — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |
 | — | 015: forecaster horizons 1+5 and signed error | 0.5751 vs 0.5779 | **killed by pre-stated condition**: the extensions dilute the compact four channels |
