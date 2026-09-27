@@ -40,13 +40,16 @@ platform moved four times, each time for a different reason:
 | 0.6007 | #30 | a run-length posterior for the classifier, twelve networks |
 | 0.6046 | #36 | a mass battery of plain statistics trained as its own member |
 | 0.6048 | #37 | the same, with the network pool doubled — +0.0002, the pool priced at nothing |
+| 0.6056 | #39 | a frequency member and a gated frequency+novelty union — +0.0046 on the fold, +0.0008 in the cloud |
 
-Three more wait for their cloud numbers: #38, a second independent member
-(frequency and dependence channels under a slow learner); #39, a third
-view — window novelty against the history's own windows — joined to it from
-step 100 on; and #40, the sequential test for dependence joining from step
-300. Fold 2 reads 0.6232, 0.6251 and 0.6265 for them against 0.6205 for
-#37; the fold-to-cloud offset has held at 0.016 across six readings.
+#39 is Selected at 0.6056. Its two members beyond #37 — a frequency
+member under a slow learner, and a window-novelty view joined to it from
+step 100 — were worth +0.0046 on fold 2 and +0.0008 on the platform: the
+mass member transferred one-for-one, the weaker members at a sixth, and
+the fold-to-cloud gap widened from 0.016 to 0.0195. The bar for shipping
+is now a member strong on its own (0.57+) with a fold-2 gain above 0.003.
+#40, the sequential test for dependence joining from step 300 (fold 2
+0.6265), waits for its cloud number.
 
 Everything else measured on the untouched fold since #28 — more or other
 data, capacity, schedule, loss, input, verifiers, stacking in the winners'
@@ -219,7 +222,7 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | 139 | a tail-behaviour member (exceedance rates, excess scale, tail asymmetry, block maxima; 40 channels) | 0.5546 alone, Spearman 0.86 with the mass member, −0.0003 on #38 | killed — tail behaviour is already read through scale |
 | 137 | five learner variants for the frequency member around 131b | alone 0.5404-0.5414, blend 0.6231-0.6233 | plateau — the fast-to-slow step was the whole gain |
 | 140 | window novelty against the history's own windows (kNN distance, empirical p-value; 20 channels) | 0.5469 alone, Spearman 0.46 with #38 and 0.21 with the frequency member; as a union with it, +0.0013 on a plateau | the best-shaped small gain in a week — below the bar alone; step-gating tested |
-| 140c | the union gated by step: frequency member below 100, frequency+novelty from 100 | **0.6251** vs 0.6232, flat across the gate | at the bar; **shipped as #39** (0.50 core + 0.25 mass + 0.25 union from step 100) |
+| 140c | the union gated by step: frequency member below 100, frequency+novelty from 100 | **0.6251** vs 0.6232, flat across the gate | **shipped as #39: cloud 0.6056, Selected** (0.50 core + 0.25 mass + 0.25 union from step 100) |
 | 141 | the novelty matrix rebuilt with the median-distance rank alive (it was constant) | union 0.5657 vs 0.5670, gated blend 0.6243 vs 0.6251 | worse at every share — the nearest-neighbour rank carries the signal; #39 stands |
 | 142 | step gates for the mass and frequency members | ±0.0001 for any gate; the members gain at every range, most late (+0.025 on steps 700+) | only the novelty union needed a warm-up gate; closed |
 | 143 | memory on the output: running max, EWMA, decayed max, per member or on the blend | running max −0.009; everything else within ±0.0001 | the ensemble already carries its memory; closed |

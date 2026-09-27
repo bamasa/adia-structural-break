@@ -3229,3 +3229,34 @@ information about the label at any step (AUC 0.49-0.51; Spearman with
 the online length 0.005, so it is no proxy for the withheld position);
 the series id carries none (AUC 0.500); the local hundred-series test
 sample remains unusable as a yardstick.
+
+---
+
+## #39 in the cloud: 0.6056 — the fold's +0.0046 became +0.0008
+
+Selected. Against #37's 0.6048 the two members added since (the
+frequency member of #38, the gated frequency+novelty union of #39) are
+worth +0.0008 on the platform, where fold 2 had promised +0.0027 and
++0.0019. The fold-to-cloud gap widens from 0.016 to 0.0195. #38 was not
+run, so the split between the two is unknown, and it will stay unknown:
+a diagnostic run costs two and a half hours of a budget with room for
+two or three more runs before the deadline.
+
+| submission | fold 2 | cloud | fold Δ | cloud Δ |
+|---|---|---|---|---|
+| #30 | 0.6169 | 0.6007 | | |
+| #36 | 0.6205 | 0.6046 | +0.0036 | +0.0039 |
+| #37 | 0.6205 | 0.6048 | 0 | +0.0002 |
+| #39 | 0.6251 | 0.6056 | +0.0046 | +0.0008 |
+
+The mass member transferred one-for-one; the two weaker members
+transferred at a sixth. The difference is not the fold's honesty — every
+member was scored on series it never trained on — but what a weak member
+is: a learner reading a faint signal fits the faint signal's shape *in
+this sample*, and a plateau of twenty settings chosen on the same fold
+adds its own optimism. The bar moves accordingly: a member ships only
+when it is strong alone (0.57 or better, as the mass member and the
+dependence member are) and its fold-2 gain clears 0.003. #40 — the
+dependence member gated at 300, +0.0014 — is already on the platform and
+is the last of the old bar; its cloud number, if run, reads that bar's
+worth one more time.
