@@ -1,0 +1,20 @@
+#39 with the whitened stream as a member: every test on innovations the history made i.i.d.
+---
+The ensemble of #39 (cloud 0.6056) with one member added at a 0.30 share
+at every step. The history fits an AR(p <= 12) by BIC, a conditional
+scale whose memory is chosen by Gaussian quasi-likelihood, and the
+empirical CDF of the standardised innovations; the online stream is mapped
+through that fit to normal scores that are i.i.d. N(0,1) under the null
+for a far wider family of histories -- real-world series included -- than
+the AR(1) whitening every other channel used. On that stream: CUSUMs and
+exponential averages for mean, scale, dependence and volatility
+clustering, shape and tail frequencies against the history's own,
+generalised likelihood ratios over dyadic windows 8-1024 for mean, scale
+and lag-1 dependence, and KS / Cramer-von Mises / Anderson-Darling tests
+against N(0,1) over windows 32-512 and the prefix; mean and dependence
+extras on the scale-adaptive stream; the conditional scale process
+against its history level; and the step. Ninety channels under a slow
+learner: 0.6088 alone on fold 2 -- nearly the whole ensemble's worth --
+and 0.6358 in the blend against 0.6251, gaining on every range of steps.
+Streamed by the library's white module, verified against the training
+matrix.

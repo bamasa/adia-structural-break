@@ -3307,3 +3307,94 @@ of optimism.
 
 Our whole channel stack whitens with AR(1) and reads the raw and asinh
 views. That is the gap the survey points at, and 145 is built on it.
+
+---
+
+## Generator forensics, 27 September — what the series are, and what a break is
+
+A second survey, of the data itself: ten thousand histories and their
+breaks, taken apart to learn how they were made (the full report with
+every number is in the research notes; the scripts are under
+`scripts/experiments/forensics/`).
+
+**The series.** Every history is standardised on itself. No unit roots,
+no trends, no seasonality; stationary ARMA-type processes — AR(p ≥ 3)
+3413, white noise 2424, MA(1) 1295, ARMA(1,1) 1250, AR(1) 866, AR(2)
+752 — three quarters with constant volatility and a quarter GARCH-like
+(α + β above 0.96 in half of them). Innovations Gaussian in 5663,
+Student-t in 4200 (degrees of freedom continuous), a few percent
+asymmetric. Model *classes* look like a menu; every coefficient is
+continuous, with one exception: AR(1) has a cluster at φ ≈ 0.5.
+
+**The breaks.** Against length-matched controls, only two kinds of change
+carry excess signal: a change of the *innovation variance* — almost
+entirely increases, magnitudes continuous with no minimum (clear cases:
+sd ratio 0.34 / 1.59 / 4.8 at the 5/50/95th percentiles) — and a change
+of the *AR coefficients* in AR-type histories (effect sd 0.06-0.07 on
+φ, symmetric, independent of the variance change). Mean shifts, shape,
+tails, spectral slope, volatility clustering: no excess over controls.
+The forty percent our anatomy called invisible are the small-magnitude
+tail of the same two kinds: with the same rule applied to controls, the
+only signature that separates them is scale, seen only in aggregate;
+about thirty percent of all breaks show no measurable change in any of
+forty-nine statistics, and they are not invisible because tau is late
+(their post-break segments are longer than the visible ones').
+
+**A synthetic generator** built from the estimated distributions
+reproduces the autocorrelations, the AR orders and the break statistics
+of real series, and fails on the spike tails, skewed innovations and the
+strength of volatility clustering; it is not yet a training source.
+
+**Consequences.** Score a one-sided, whitened, robust innovation-variance
+increase; test dependence on whitened residuals for AR-type histories;
+rank by an accumulated posterior probability of a change at some tau ≤ t
+with continuous effect priors — Shiryaev-Roberts, in other words. 145
+was already built on the first two; 147 builds the third.
+
+---
+
+## 145 — the whitened stream as a member: +0.0118
+
+Built on the two surveys. The history fits an AR(p ≤ 12) by BIC, a
+conditional scale (an exponentially weighted variance, memory chosen by
+Gaussian quasi-likelihood among 0.90-1.0) and the empirical CDF of the
+standardised innovations; the online stream is mapped through that fit
+to normal scores. Two streams: the *unconditional* one (history
+innovation variance), where a scale break stays visible, carries the
+full battery — CUSUMs and exponential averages for mean, scale,
+dependence at lags 1, 2, 3, 5, 10 with a portmanteau, volatility
+clustering, shape and tail frequencies against the history's own;
+generalised likelihood ratios over dyadic windows 8-1024 for mean, scale
+and lag-1 dependence, per scale and maximised; KS, Cramer-von Mises and
+Anderson-Darling against N(0,1) over windows 32-512 and the prefix at the
+geometric cadence. The *conditional* stream — sharper for mean and
+dependence under a heteroskedastic history, blind to scale because the
+scale estimate adapts (the first draft put everything on it and could
+not see a variance break at all) — adds mean and dependence extras; the
+conditional scale process is read against its history level; and the
+step index rides along. Ninety channels, twelve seconds to build for all
+series once vectorised, 0.93 ms per step streamed.
+
+Readings under the slow learner, on fold 2: **0.6150 alone** — six
+thousandths short of the whole ensemble of #39 — at Spearman 0.74 with
+it. In the blend: 0.6361 / **0.6369** / 0.6374 at shares 0.25 / 0.30 /
+0.35 against 0.6251, gaining on every range of steps (+0.011 on 0-30,
++0.010 on 100-300, +0.013 on 300-700). A lean blend of core, mass and
+this member alone reads 0.6334; the frequency and novelty members still
+add 0.003 on the fold, and the dependence member of #40 adds nothing on
+top. A first build clipped the step index at 60 with the other channels;
+unclipped, the member gained 0.006 alone — the trees want the step to
+read the CUSUMs' growth. **Shipped as #41**: #39 exactly, then the
+whitened member at 0.30 at every step, both classifiers in the artifact,
+the stream reproduced by the library's `white` module to 2e-6 against
+the matrix. The largest fold-2 step since the augmentation of #28, and
+the first member strong enough alone (0.615) to expect a full transfer.
+
+## 146 — the mass battery on the recent tail of the history
+
+The FAQ admits irregularities in the reference window, and a public
+repository claimed +0.025 at the 0.55 level from "recent tail vs whole
+history" descriptors. The mass battery referenced to the last 512
+history points: 0.5665 alone against 0.5830 for the whole-history one,
+Spearman 0.87 between them, +0.0004 in the blend at a tenth, negative
+beyond. The whole history is the better null here. Closed.

@@ -22,7 +22,7 @@ ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "src" / "structural_break"
 
 #: Dependency order matters: later modules use earlier names.
-MODULES = ["features.py", "detectors.py", "retrospective.py", "retro2.py", "multiscale.py", "bocpd.py", "mass.py", "freqdep.py", "novelty.py", "depcusum.py"]
+MODULES = ["features.py", "detectors.py", "retrospective.py", "retro2.py", "multiscale.py", "bocpd.py", "mass.py", "freqdep.py", "novelty.py", "depcusum.py", "white.py"]
 
 HEADER = '''"""{title}
 
@@ -42,7 +42,7 @@ from typing import Iterable, List, Optional, Tuple
 import joblib
 import json
 import numpy as np
-from scipy.special import gammaln
+from scipy.special import gammaln, ndtr, ndtri
 
 #: One worker per pair of cores. Left unset, the platform runs a single worker
 #: on a sixteen-core machine, and quota is billed in wall-clock hours.
@@ -131,6 +131,8 @@ def verify_channels(assembled: str, target: Path) -> None:
         check("union", getattr(model["union_classifier"], "booster_", model["union_classifier"]).num_feature(), 120)
     if model.get("dep_classifier") is not None and re.search(r"^DEP_OFFSET = ", assembled, re.M):
         check("dep", getattr(model["dep_classifier"], "booster_", model["dep_classifier"]).num_feature(), 23)
+    if model.get("white_classifier") is not None and re.search(r"^WHITE_OFFSET = ", assembled, re.M):
+        check("white", getattr(model["white_classifier"], "booster_", model["white_classifier"]).num_feature(), 90)
     if model.get("booster") is not None:
         check("clf", getattr(model["booster"], "booster_", model["booster"]).num_feature(), width["clf"])
     for i, c in enumerate(model.get("classifiers", [])):
