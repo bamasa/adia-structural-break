@@ -3458,3 +3458,21 @@ module (verified to 3e-6 against the matrices), 6.4 ms per step. The
 ranker took fifty-two minutes to train on all series. Expected on the
 platform, if #41's one-for-one transfer holds: about +0.0035 over
 0.6186.
+
+---
+
+## 149 — per-series null calibration of the whitened battery
+
+The second pillar of the forum recipe: every channel read against the
+series' own null. Built the cheap way — the history's own normal scores
+run through the same battery as a pseudo-online stream (the last 1000
+points, or half, against the earlier part), a mean and sd per channel
+per series, the online channels reported as z-scores against them.
+
+It loses. Z-scores alone 0.6102, raw and z-scores together 0.6127,
+against 0.6186 for the raw battery (Spearman 0.94-0.96 between them).
+The whitening already makes the null common to every series; a null
+estimated from at most a thousand in-sample pseudo-steps adds estimation
+noise to every channel and takes away nothing that was wrong. The
+forum's version simulates the null from the fitted model, which this
+laptop cannot afford per series at inference. Closed.
