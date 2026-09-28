@@ -3436,3 +3436,25 @@ of 27 September holds in both directions.
 | #41 | 0.6369 | 0.6186 | +0.0118 | +0.0130 |
 
 The gap fold-to-cloud is back at 0.018. Selected moves to #41.
+
+---
+
+## 148 — the whitened member's learners: a per-step ranker
+
+The member of #41 was one slow classifier. Two more learners on the
+ninety channels plus the twenty-one odds of 147: a slower, heavier
+regularised classifier (3000 trees, learning rate 0.0075, minimum leaf
+500, L2 10) reads **0.6186** alone against 0.6150; a per-step lambdarank
+ranker (600 trees, truncation 2000, every cross-section a group — the
+recipe of the core's ranker) reads **0.6216** alone, at Spearman 0.61
+with the classifier: the same channels, a different objective, a
+genuinely different member. Blended 0.7 ranker / 0.3 classifier the
+member reads 0.6221, and on top of #39 at a 0.40 share the blend reads
+**0.6405** (0.6398 at 0.30) against 0.6369 for #41 and 0.6251 for #39.
+
+**Shipped as #42**: #39 exactly, then the rebuilt member at 0.40; both
+learners in the artifact; the odds streamed inside the library's white
+module (verified to 3e-6 against the matrices), 6.4 ms per step. The
+ranker took fifty-two minutes to train on all series. Expected on the
+platform, if #41's one-for-one transfer holds: about +0.0035 over
+0.6186.

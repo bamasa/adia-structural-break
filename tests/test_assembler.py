@@ -75,6 +75,12 @@ class ChannelCheck(unittest.TestCase):
         art = _artifact(206, [200], [200], 200)
         art.update(mass_classifier=_Booster(90), freqdep_classifier=_Booster(100), union_classifier=_Booster(120))
         self._run(text, art)
+        art["white2_classifier"], art["white2_ranker"] = _Booster(111), _Booster(111)
+        self._run(text + "WHITE_OFFSET = 416\nWHITE2_WIDTH = 111\n", art)
+        art["white2_ranker"] = _Booster(90)       # a ranker built without the odds
+        with self.assertRaises(SystemExit):
+            self._run(text + "WHITE_OFFSET = 416\nWHITE2_WIDTH = 111\n", art)
+        del art["white2_classifier"], art["white2_ranker"]
         art["white_classifier"] = _Booster(90)
         self._run(text + "WHITE_OFFSET = 416\n", art)
         art["white_classifier"] = _Booster(76)    # the full battery without the extras

@@ -133,6 +133,11 @@ def verify_channels(assembled: str, target: Path) -> None:
         check("dep", getattr(model["dep_classifier"], "booster_", model["dep_classifier"]).num_feature(), 23)
     if model.get("white_classifier") is not None and re.search(r"^WHITE_OFFSET = ", assembled, re.M):
         check("white", getattr(model["white_classifier"], "booster_", model["white_classifier"]).num_feature(), 90)
+    mw = re.search(r"^WHITE2_WIDTH = (\d+)", assembled, re.M)
+    if mw:
+        for key in ("white2_classifier", "white2_ranker"):
+            if model.get(key) is not None:
+                check(key, getattr(model[key], "booster_", model[key]).num_feature(), int(mw.group(1)))
     if model.get("booster") is not None:
         check("clf", getattr(model["booster"], "booster_", model["booster"]).num_feature(), width["clf"])
     for i, c in enumerate(model.get("classifiers", [])):

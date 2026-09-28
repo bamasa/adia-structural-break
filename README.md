@@ -51,8 +51,9 @@ with a ninety-channel battery on the normal scores. +0.0118 on fold 2,
 +0.0130 on the platform. Before it, the two weaker members of #39 had
 transferred at a sixth of their fold gain; the rule since then is that a
 member ships only when it is strong on its own (0.57+, this one 0.615)
-with a fold-2 gain above 0.003. Next in line: the same member with a
-per-step ranker and Shiryaev-Roberts odds (fold 2 0.6405).
+with a fold-2 gain above 0.003. **#42**, the same member with a
+per-step ranker and Shiryaev-Roberts odds (fold 2 0.6405), waits for its
+cloud number.
 
 Everything else measured on the untouched fold since #28 — more or other
 data, capacity, schedule, loss, input, verifiers, stacking in the winners'
@@ -235,6 +236,7 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | 145 | the whitened stream (AR(p) by BIC + conditional scale + innovation ECDF) with a 90-channel battery as a member | **0.6150 alone; blend 0.6369 vs 0.6251** (+0.0118), gaining on every step range | **shipped as #41: cloud 0.6186, rank 222** |
 | 146 | the mass battery referenced to the last 512 history points | 0.5665 alone, +0.0004 | the whole history is the better null; closed |
 | 147 | Shiryaev-Roberts odds on the whitened stream (variance up/down, mean, dependence grids + mixtures; 21 channels) | member 0.6172 vs 0.6150; blend +0.0010 | kept for the next build of the member |
+| 148 | the whitened member's learners: a slower classifier (0.6186 alone) and a per-step ranker (0.6216 alone, Spearman 0.61 between them) on 90 + 21 channels | member 0.6221; blend **0.6405** at a 0.40 share vs 0.6369 | **shipped as #42** |
 | — | #25: broken upload, do not run | — | a `channels[:186]` slice survived the spectral upgrade; the push followed the check with `;` instead of `&&` |
 | — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |
 | — | 015: forecaster horizons 1+5 and signed error | 0.5751 vs 0.5779 | **killed by pre-stated condition**: the extensions dilute the compact four channels |

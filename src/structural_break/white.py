@@ -23,7 +23,10 @@ mean and dependence extras, and the conditional scale process itself is
 read against its history level. Plus the step index: ninety channels
 (experiment 145: 0.6088 alone, +0.0107 to the blend on fold 2).
 
-Reproduces the batch builder to 1e-4 on the float32 matrix.
+With ``odds=True`` the Shiryaev-Roberts odds of 147 ride along: twenty-one
+more channels, one hundred and eleven in all.
+
+Reproduces the batch builders to 1e-4 on the float32 matrices.
 """
 
 from __future__ import annotations
@@ -41,6 +44,48 @@ WHITE_TESTW = (32, 64, 128, 256, 512)
 WHITE_FULL = 8 + len(WHITE_LAGS) * 2 + 1 + 2 + 7 + 3 * len(WHITE_DYADIC) + 3 + 3 * (len(WHITE_TESTW) + 1) + 3
 WHITE_CHANNELS = WHITE_FULL + 10 + 3 + 1
 _RING = max(WHITE_DYADIC) + 1
+
+#: Shiryaev-Roberts odds on the unconditional stream (147): the accumulated
+#: posterior odds of a change at some tau <= t under a uniform prior on tau,
+#: for a grid of alternatives per break family, plus an equal-weight mixture
+#: per family. R_t = (1 + R_{t-1}) * likelihood ratio of the point: one
+#: recursion per alternative per step.
+SR_VAR_UP = (1.25, 1.5, 2.0, 3.0, 5.0)
+SR_VAR_DOWN = (0.7, 0.5)
+SR_MEANS = (0.3, 0.6, 1.0)
+SR_PHIS = (0.2, 0.4)
+SR_CHANNELS = len(SR_VAR_UP) + len(SR_VAR_DOWN) + 2 * len(SR_MEANS) + 2 * len(SR_PHIS) + 4
+WHITE_ODDS_CHANNELS = WHITE_CHANNELS + SR_CHANNELS
+
+
+class _ShiryaevRoberts:
+    """Log odds per alternative, streamed; the families' mixtures appended."""
+
+    def __init__(self, prev: float) -> None:
+        self.prev = prev
+        n_alt = len(SR_VAR_UP) + len(SR_VAR_DOWN) + 2 * len(SR_MEANS) + 2 * len(SR_PHIS)
+        self.logR = np.full(n_alt, -np.inf)
+        self.fam = ((0, len(SR_VAR_UP)), (len(SR_VAR_UP), len(SR_VAR_UP) + len(SR_VAR_DOWN)),
+                    (len(SR_VAR_UP) + len(SR_VAR_DOWN), len(SR_VAR_UP) + len(SR_VAR_DOWN) + 2 * len(SR_MEANS)),
+                    (n_alt - 2 * len(SR_PHIS), n_alt))
+
+    def update(self, n: float) -> list[float]:
+        ell = []
+        for v in SR_VAR_UP + SR_VAR_DOWN:
+            ell.append(-0.5 * np.log(v) - 0.5 * n * n * (1.0 / v - 1.0))
+        for d in SR_MEANS:
+            for sign in (1.0, -1.0):
+                ell.append(sign * d * n - 0.5 * d * d)
+        for phi in SR_PHIS:
+            for sign in (1.0, -1.0):
+                p = sign * phi
+                ell.append(-0.5 * np.log(1 - p * p) - 0.5 * ((n - p * self.prev) ** 2 / (1 - p * p) - n * n))
+        self.logR = np.logaddexp(0.0, self.logR) + np.asarray(ell)
+        self.prev = n
+        out = self.logR.tolist()
+        for a, b in self.fam:
+            out.append(float(np.logaddexp.reduce(self.logR[a:b]) - np.log(b - a)))
+        return [float(np.clip(np.nan_to_num(v), -50, 200)) for v in out]
 
 
 def _scores(u: np.ndarray, sorted_ref: np.ndarray) -> np.ndarray:
@@ -244,7 +289,7 @@ class _CondExtras:
 class WhiteMonitor:
     """The whitened-stream battery, streamed one online point at a time."""
 
-    def __init__(self, history: np.ndarray) -> None:
+    def __init__(self, history: np.ndarray, odds: bool = False) -> None:
         h = np.asarray(history, dtype="float64")
         self.mu, self.sd = float(h.mean()), float(h.std()) + 1e-12
         zh = (h - self.mu) / self.sd
@@ -287,8 +332,10 @@ class WhiteMonitor:
         self.suc, self.suu = np.sort(uc), np.sort(uu)
         l = np.log(s2 / v0)
         self.lm, self.ls = float(l.mean()), float(l.std()) + 1e-6
-        self.full = _FullBattery(_scores(uu, self.suu))
+        nhu = _scores(uu, self.suu)
+        self.full = _FullBattery(nhu)
         self.cond = _CondExtras(_scores(uc, self.suc))
+        self.odds = _ShiryaevRoberts(float(nhu[-1])) if odds else None
         self.z_tail = list(zh[-P:])
         self.e_lz, self.c_lz = _Ewma(0.02), _Cusum2()
         self._t = 0
@@ -308,4 +355,7 @@ class WhiteMonitor:
         self._t += 1
         out = self.full.update(n_u, t) + self.cond.update(n_c, t)
         out.extend((lz, self.e_lz.update(lz), self.c_lz.update(lz)))
-        return [float(np.clip(np.nan_to_num(v), -60, 60)) for v in out] + [float(t)]
+        res = [float(np.clip(np.nan_to_num(v), -60, 60)) for v in out] + [float(t)]
+        if self.odds is not None:
+            res.extend(self.odds.update(n_u))
+        return res

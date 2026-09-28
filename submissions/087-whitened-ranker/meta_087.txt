@@ -1,0 +1,15 @@
+#41's whitened member rebuilt: Shiryaev-Roberts odds, a per-step ranker, a 0.40 share.
+---
+The ensemble of #39 (cloud 0.6056) with the whitened member of #41 (cloud
+0.6186) rebuilt. The stream is whitened as before -- AR(p <= 12) by BIC,
+a conditional scale, the innovation ECDF, all fitted on the history -- and
+the ninety statistics on the normal scores are joined by twenty-one
+Shiryaev-Roberts odds: the accumulated posterior odds of a change at some
+tau <= t under a uniform prior, for grids of alternatives in innovation
+variance (up and down), mean and lag-1 dependence, with a mixture per
+family. Two learners read the hundred and eleven channels: a per-step
+lambdarank ranker (0.6216 alone on fold 2) and a slow classifier
+(0.6186), Spearman 0.61 between them, blended 0.7 / 0.3 into one member
+that takes 0.40 of the final blend at every step. Fold 2: 0.6405 against
+0.6369 for #41 and 0.6251 for #39. Streamed by the library's white
+module with the odds enabled, verified against the training matrices.
