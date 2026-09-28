@@ -41,19 +41,18 @@ platform moved four times, each time for a different reason:
 | 0.6046 | #36 | a mass battery of plain statistics trained as its own member |
 | 0.6048 | #37 | the same, with the network pool doubled — +0.0002, the pool priced at nothing |
 | 0.6056 | #39 | a frequency member and a gated frequency+novelty union — +0.0046 on the fold, +0.0008 in the cloud |
+| **0.6186** | **#41** | the whitened stream as a member: AR(p) by BIC, a conditional scale and the innovation ECDF fitted on the history, ninety statistics on the normal scores — +0.0118 on the fold, +0.0130 in the cloud; rank 222 |
 
-#39 is Selected at 0.6056. Its two members beyond #37 — a frequency
-member under a slow learner, and a window-novelty view joined to it from
-step 100 — were worth +0.0046 on fold 2 and +0.0008 on the platform: the
-mass member transferred one-for-one, the weaker members at a sixth, and
-the fold-to-cloud gap widened from 0.016 to 0.0195. The bar for shipping
-is now a member strong on its own (0.57+) with a fold-2 gain above 0.003.
-#40, the sequential test for dependence joining from step 300 (fold 2
-0.6265), waits for its cloud number — and so does **#41**, the first
-member built from the two surveys of 27 September: the stream whitened
-by an AR(p) fit, a conditional scale and the innovation ECDF of the
-history, with a ninety-channel battery on it. Fold 2 reads 0.6369, the
-largest step since #28's augmentation.
+**#41 is Selected at 0.6186, rank 222.** It came from the two surveys of
+27 September — what the leaders build, and what the generator actually
+makes — and from one member built on both: the stream whitened by an
+AR(p) fit, a conditional scale and the innovation ECDF of the history,
+with a ninety-channel battery on the normal scores. +0.0118 on fold 2,
++0.0130 on the platform. Before it, the two weaker members of #39 had
+transferred at a sixth of their fold gain; the rule since then is that a
+member ships only when it is strong on its own (0.57+, this one 0.615)
+with a fold-2 gain above 0.003. Next in line: the same member with a
+per-step ranker and Shiryaev-Roberts odds (fold 2 0.6405).
 
 Everything else measured on the untouched fold since #28 — more or other
 data, capacity, schedule, loss, input, verifiers, stacking in the winners'
@@ -233,7 +232,7 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | 144 | the sequential test for dependence — Page's CUSUM on lagged products of history-AR residuals (23 channels) as a member | 0.5755 alone (strongest member), Spearman 0.75 with #39; gated at step 300: **0.6265** vs 0.6251 | +0.0014 on a broad plateau; **shipped as #40** |
 | survey | public research: leaders, data, protocol, 2025 winners | the board's top is 0.68, rank 50 is 0.642; the strongest public real-time recipe is proper whitening (AR(p) by BIC + conditional scale + innovation ECDF) with every test on that stream | our stack whitens with AR(1) only — the lever for 145 |
 | forensics | the generator taken apart: families, break menu, the invisible 40% | ARMA ± GARCH, Gaussian/t innovations; only variance increases and AR-coefficient shifts carry signal; ~30% of breaks unidentifiable | the whitened stream and Shiryaev-Roberts are the matched tools |
-| 145 | the whitened stream (AR(p) by BIC + conditional scale + innovation ECDF) with a 90-channel battery as a member | **0.6150 alone; blend 0.6369 vs 0.6251** (+0.0118), gaining on every step range | **shipped as #41** at a 0.30 share |
+| 145 | the whitened stream (AR(p) by BIC + conditional scale + innovation ECDF) with a 90-channel battery as a member | **0.6150 alone; blend 0.6369 vs 0.6251** (+0.0118), gaining on every step range | **shipped as #41: cloud 0.6186, rank 222** |
 | 146 | the mass battery referenced to the last 512 history points | 0.5665 alone, +0.0004 | the whole history is the better null; closed |
 | 147 | Shiryaev-Roberts odds on the whitened stream (variance up/down, mean, dependence grids + mixtures; 21 channels) | member 0.6172 vs 0.6150; blend +0.0010 | kept for the next build of the member |
 | — | #25: broken upload, do not run | — | a `channels[:186]` slice survived the spectral upgrade; the push followed the check with `;` instead of `&&` |

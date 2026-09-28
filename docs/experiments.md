@@ -3418,3 +3418,21 @@ in the blend +0.0010 at every share (0.6379 / 0.6384 / 0.6386 at 0.30 /
 0.35 / 0.40 against 0.6369 / 0.6374 / 0.6376), the gain on steps 100+
 and a hair lost before 30. Small, cheap, and principled: kept for the
 next build of the member rather than shipped on its own.
+
+---
+
+## #41 in the cloud: 0.6186 — the whitened member transferred in full
+
+From 0.6056 (#39) to **0.6186**: +0.0130 on the platform against +0.0118
+on fold 2. Rank 222 of about 1,700, up from about 300. The first member
+strong enough on its own (0.6150 on the fold) carried over one-for-one,
+as the mass member did and the weak members did not — the transfer rule
+of 27 September holds in both directions.
+
+| submission | fold 2 | cloud | fold Δ | cloud Δ |
+|---|---|---|---|---|
+| #36 | 0.6205 | 0.6046 | +0.0036 | +0.0039 |
+| #39 | 0.6251 | 0.6056 | +0.0046 | +0.0008 |
+| #41 | 0.6369 | 0.6186 | +0.0118 | +0.0130 |
+
+The gap fold-to-cloud is back at 0.018. Selected moves to #41.
