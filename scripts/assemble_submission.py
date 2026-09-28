@@ -138,6 +138,20 @@ def verify_channels(assembled: str, target: Path) -> None:
         for key in ("white2_classifier", "white2_ranker"):
             if model.get(key) is not None:
                 check(key, getattr(model[key], "booster_", model[key]).num_feature(), int(mw.group(1)))
+    # The whitened member's readers, each against the width the interface declares for it.
+    for const, keys in (("WHITE_RANK_WIDTH", ("white2_ranker",)), ("WHITE_CLF_WIDTH", ("white3_classifier", "white3_ranker_ctx"))):
+        mc = re.search(rf"^{const} = (\d+)", assembled, re.M)
+        if mc:
+            for key in keys:
+                if model.get(key) is not None:
+                    check(key, getattr(model[key], "booster_", model[key]).num_feature(), int(mc.group(1)))
+    mn = re.search(r"^WHITE_NET_WIDTH = (\d+)", assembled, re.M)
+    if mn:
+        for i, state in enumerate(model.get("white_nets", [])):
+            check(f"white_net[{i}]", state["inp.weight"].shape[1], int(mn.group(1)))
+        for key in ("white_net_mu", "white_net_sd"):
+            if key in model:
+                check(key, len(model[key]), int(mn.group(1)))
     if model.get("booster") is not None:
         check("clf", getattr(model["booster"], "booster_", model["booster"]).num_feature(), width["clf"])
     for i, c in enumerate(model.get("classifiers", [])):

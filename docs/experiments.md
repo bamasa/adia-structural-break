@@ -3503,7 +3503,7 @@ whitened against their own extended history: 11.2 million rows of the
 ninety channels and the twenty-one odds, two minutes across eight
 shards. The input the networks of 152 train on.
 
-## 152 — trajectory networks over the whitened channels (in progress)
+## 152 — trajectory networks over the whitened channels
 
 The 082b recipe unchanged — ChanTCN, ranking loss with a BCE term, ten
 epochs, last epoch, no holdout, triple augmentation — over the 111
@@ -3513,8 +3513,14 @@ channels, at Spearman 0.53 with the whitened ranker and 0.70 with the
 whitened member: the trajectories of the whitened statistics are a
 different reading of them. On top of #42's recipe a single member adds
 +0.0017 at a tenth (0.6434 against 0.6417), the gain on steps 300+ and a
-small cost before 30. Two more members of this kind train, then three
-that read the 200 and the 111 together.
+small cost before 30. Three members in all — 0.6096, 0.6011, 0.6034
+alone, Spearman 0.90 between them, the pool 0.6099 — add **+0.0018** at
+a 0.15 share on top of the tree member with context (0.6439 against
+0.6421; two members read 0.6442, so the third is variance, not signal).
+A gate does not matter. The pool that would read the 200 core channels
+and the 111 together was cancelled: with the triple augmentation it
+needs twenty gigabytes in memory, and the machine was already in swap
+(load average 116 at the worst point).
 
 ## 153 — the history's family as static context
 
@@ -3529,3 +3535,37 @@ alone reads the same (0.6188 against 0.6186) but ranks differently
 The ranker with the same context is being measured. Streamed by the
 library's white module with ``context=True``, verified against the
 matrix to 1e-7.
+
+---
+
+## 153b, 154 — the ranker with context, and a third ranker
+
+The per-step ranker with the eight context channels reads 0.6211 alone
+against 0.6216 without — no gain by itself, at Spearman only 0.70 with
+its context-free twin: rankers are noisy readers of the same channels.
+Bagged, the two read **0.6274** alone, and the tree member (0.7 bag,
+0.3 classifier with context) lifts the blend from 0.6417 to **0.6421**.
+A third ranker with a different column subsample and seed (154) was
+started for the bag and killed: it was the job that tipped the machine
+into swap. It can be trained once the machine is free.
+
+## #44 — the whitened member, third build: context, a ranker bag, three networks
+
+Shipped. #39 exactly, then the whitened member at 0.40 — a bag of two
+per-step rankers (one reading the context) and the slow classifier with
+context — and a 0.15 share for the pool of three trajectory networks
+over the whitened channels. Fold 2 **0.6439** against 0.6405 for #42
+and 0.6369 for #41. 7.8 ms per step. The library's white module streams
+the 119 channels with ``odds=True, context=True``, verified to 3e-6;
+the networks are the 082b recipe over the new input, checked by the
+assembler against their declared width.
+
+Two copies reached the platform: the first shipping attempt was killed
+while its verifier swapped the machine (the full float64 stack of the
+matrices is 21 GB), but it had already finished and pushed as **#43**
+before the kill landed; the verifier was rewritten to memory-map the
+matrices and the rerun pushed the identical files as #44. #43 is #44;
+one of them is to be run, not both.
+
+If #42 transfers like #41 did (about 0.622), #44 should read about
+0.625: rank 150 or so on the board of 27 September.

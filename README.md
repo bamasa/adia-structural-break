@@ -52,8 +52,10 @@ with a ninety-channel battery on the normal scores. +0.0118 on fold 2,
 transferred at a sixth of their fold gain; the rule since then is that a
 member ships only when it is strong on its own (0.57+, this one 0.615)
 with a fold-2 gain above 0.003. **#42**, the same member with a
-per-step ranker and Shiryaev-Roberts odds (fold 2 0.6405), waits for its
-cloud number.
+per-step ranker and Shiryaev-Roberts odds (fold 2 0.6405), and **#44** —
+the member with history context, a bag of two rankers and three
+trajectory networks over the whitened channels (fold 2 0.6439; #43 is
+an identical copy) — wait for their cloud numbers.
 
 Everything else measured on the untouched fold since #28 — more or other
 data, capacity, schedule, loss, input, verifiers, stacking in the winners'
@@ -240,8 +242,9 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | 149 | per-series null calibration: the battery on the history's own scores as a pseudo-online null, channels as z-scores | 0.6102 (z only) / 0.6127 (raw + z) vs 0.6186 | the whitening is the calibration; an in-sample null only adds noise; closed |
 | 150 | a second whitening on the asinh view, joined to the raw one | 0.6203 vs 0.6186 alone; +0.0008 in the blend | in reserve; not worth its cost alone |
 | 151 | the whitened channels and odds for the 26,887 augmented pseudo-series (regenerated from seed, verified) | 11.2M rows | the networks' training input |
-| 152 | trajectory networks over the 111 whitened channels, 082b recipe | first member 0.6096 alone (200-channel nets: 0.606); +0.0017 on #42 at a tenth | in progress: two more members, then three on 200 + 111 |
-| 153 | the history's family as eight static context channels for the whitened member | classifier alone unchanged, blend 0.6405 → **0.6417** | kept; the ranker with context is being measured |
+| 152 | trajectory networks over the 111 whitened channels, 082b recipe | three members 0.6096 / 0.6011 / 0.6034 alone (200-channel nets: 0.606); the pool +0.0018 at 0.15 | **shipped in #44**; the 200 + 111 pool cancelled for memory |
+| 153 | the history's family as eight static context channels for the whitened member | classifier alone unchanged, blend 0.6405 → **0.6417** | kept; the ranker with context adds nothing alone but bags to 0.6274 (153b) — **shipped in #44** |
+| 154 | a third ranker for the bag | killed — it tipped the machine into swap | to train when the machine is free |
 | — | #25: broken upload, do not run | — | a `channels[:186]` slice survived the spectral upgrade; the push followed the check with `;` instead of `&&` |
 | — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |
 | — | 015: forecaster horizons 1+5 and signed error | 0.5751 vs 0.5779 | **killed by pre-stated condition**: the extensions dilute the compact four channels |

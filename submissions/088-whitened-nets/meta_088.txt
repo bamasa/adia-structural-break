@@ -1,0 +1,14 @@
+#42's whitened member with context, a ranker bag, and trajectory networks over the whitened channels.
+---
+The ensemble of #39 with the whitened member of #41/#42 rebuilt a third
+time. The stream is whitened as before; the ninety statistics and the
+twenty-one Shiryaev-Roberts odds are joined by eight constants of the
+history's own family -- AR order and first coefficient, the conditional
+scale's memory, innovation variance, kurtosis and skew, history length,
+largest spike -- so the trees condition every threshold on what kind of
+history they read. The tree member is a bag of two per-step rankers
+(0.6274 alone on fold 2) and a slow classifier with context, at 0.40 of
+the blend. On top, a tenth for a pool of trajectory networks that read
+the whitened channels' motion -- the 082b recipe over the new input, 0.61
+alone each, Spearman 0.53 with the ranker. Fold 2: 0.6442 against 0.6405
+for #42 and 0.6251 for #39.
