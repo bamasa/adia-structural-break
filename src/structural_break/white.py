@@ -56,6 +56,10 @@ SR_MEANS = (0.3, 0.6, 1.0)
 SR_PHIS = (0.2, 0.4)
 SR_CHANNELS = len(SR_VAR_UP) + len(SR_VAR_DOWN) + 2 * len(SR_MEANS) + 2 * len(SR_PHIS) + 4
 WHITE_ODDS_CHANNELS = WHITE_CHANNELS + SR_CHANNELS
+#: The history's family as static context (153): AR order, first coefficient,
+#: conditional-scale memory, log innovation variance, innovation excess
+#: kurtosis and skew, log history length, largest |z|. Constant per series.
+CONTEXT_CHANNELS = 8
 
 
 class _ShiryaevRoberts:
@@ -289,7 +293,7 @@ class _CondExtras:
 class WhiteMonitor:
     """The whitened-stream battery, streamed one online point at a time."""
 
-    def __init__(self, history: np.ndarray, odds: bool = False) -> None:
+    def __init__(self, history: np.ndarray, odds: bool = False, context: bool = False) -> None:
         h = np.asarray(history, dtype="float64")
         self.mu, self.sd = float(h.mean()), float(h.std()) + 1e-12
         zh = (h - self.mu) / self.sd
@@ -333,9 +337,14 @@ class WhiteMonitor:
         l = np.log(s2 / v0)
         self.lm, self.ls = float(l.mean()), float(l.std()) + 1e-6
         nhu = _scores(uu, self.suu)
+        m2 = float((uu ** 2).mean()) + 1e-12
+        self.context = [float(p), float(self.coef[0]) if p else 0.0, float(self.lam), float(np.log(v0)),
+                        float((uu ** 4).mean()) / m2 ** 2 - 3.0, float((uu ** 3).mean()) / m2 ** 1.5,
+                        float(np.log(n)), float(np.abs(zh).max())]
         self.full = _FullBattery(nhu)
         self.cond = _CondExtras(_scores(uc, self.suc))
         self.odds = _ShiryaevRoberts(float(nhu[-1])) if odds else None
+        self.with_context = context
         self.z_tail = list(zh[-P:])
         self.e_lz, self.c_lz = _Ewma(0.02), _Cusum2()
         self._t = 0
@@ -358,4 +367,6 @@ class WhiteMonitor:
         res = [float(np.clip(np.nan_to_num(v), -60, 60)) for v in out] + [float(t)]
         if self.odds is not None:
             res.extend(self.odds.update(n_u))
+        if self.with_context:
+            res.extend(self.context)
         return res

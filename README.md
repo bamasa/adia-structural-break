@@ -239,6 +239,9 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | 148 | the whitened member's learners: a slower classifier (0.6186 alone) and a per-step ranker (0.6216 alone, Spearman 0.61 between them) on 90 + 21 channels | member 0.6221; blend **0.6405** at a 0.40 share vs 0.6369 | **shipped as #42** |
 | 149 | per-series null calibration: the battery on the history's own scores as a pseudo-online null, channels as z-scores | 0.6102 (z only) / 0.6127 (raw + z) vs 0.6186 | the whitening is the calibration; an in-sample null only adds noise; closed |
 | 150 | a second whitening on the asinh view, joined to the raw one | 0.6203 vs 0.6186 alone; +0.0008 in the blend | in reserve; not worth its cost alone |
+| 151 | the whitened channels and odds for the 26,887 augmented pseudo-series (regenerated from seed, verified) | 11.2M rows | the networks' training input |
+| 152 | trajectory networks over the 111 whitened channels, 082b recipe | first member 0.6096 alone (200-channel nets: 0.606); +0.0017 on #42 at a tenth | in progress: two more members, then three on 200 + 111 |
+| 153 | the history's family as eight static context channels for the whitened member | classifier alone unchanged, blend 0.6405 → **0.6417** | kept; the ranker with context is being measured |
 | — | #25: broken upload, do not run | — | a `channels[:186]` slice survived the spectral upgrade; the push followed the check with `;` instead of `&&` |
 | — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |
 | — | 015: forecaster horizons 1+5 and signed error | 0.5751 vs 0.5779 | **killed by pre-stated condition**: the extensions dilute the compact four channels |

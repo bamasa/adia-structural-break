@@ -3489,3 +3489,43 @@ a separate member on top of the raw one, nothing. The PIT already
 absorbs the marginal tails; the compressed view adds a little where the
 fit itself is spike-bent. Kept in reserve — it doubles the whitening
 cost per step for less than a thousandth — not shipped.
+
+---
+
+## 151 — the whitened channels for the augmented pseudo-series
+
+The trajectory networks and the augmented ranker learn from the triple
+boundary augmentation of 065 (26,887 pseudo-series: the boundary moved
+right by three random cuts per series, so that breaks sit early in the
+online part). Regenerated from the same seed and verified against the
+stored augmentation — every group id, length and label identical — and
+whitened against their own extended history: 11.2 million rows of the
+ninety channels and the twenty-one odds, two minutes across eight
+shards. The input the networks of 152 train on.
+
+## 152 — trajectory networks over the whitened channels (in progress)
+
+The 082b recipe unchanged — ChanTCN, ranking loss with a BCE term, ten
+epochs, last epoch, no holdout, triple augmentation — over the 111
+whitened channels instead of the 200. The first member reads **0.6096**
+alone on fold 2 against 0.6057-0.6065 for the same recipe on the 200
+channels, at Spearman 0.53 with the whitened ranker and 0.70 with the
+whitened member: the trajectories of the whitened statistics are a
+different reading of them. On top of #42's recipe a single member adds
++0.0017 at a tenth (0.6434 against 0.6417), the gain on steps 300+ and a
+small cost before 30. Two more members of this kind train, then three
+that read the 200 and the 111 together.
+
+## 153 — the history's family as static context
+
+The survey's sixth idea. Eight constants per series — AR order and first
+coefficient, the conditional scale's memory, log innovation variance,
+innovation excess kurtosis and skew, log history length, largest |z| —
+appended to the whitened member's input, so the trees can condition
+every threshold on what kind of history they are reading. The classifier
+alone reads the same (0.6188 against 0.6186) but ranks differently
+(Spearman 0.92 with the context-free one), and inside the member —
+0.7 ranker, 0.3 classifier — the blend rises from 0.6405 to **0.6417**.
+The ranker with the same context is being measured. Streamed by the
+library's white module with ``context=True``, verified against the
+matrix to 1e-7.
