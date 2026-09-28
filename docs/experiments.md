@@ -3476,3 +3476,16 @@ estimated from at most a thousand in-sample pseudo-steps adds estimation
 noise to every channel and takes away nothing that was wrong. The
 forum's version simulates the null from the fitted model, which this
 laptop cannot afford per series at inference. Closed.
+
+---
+
+## 150 — a second whitening, on the asinh view
+
+The forensics found 637 histories with isolated spikes (median largest
+|z| of 13.8) where a least-squares AR fit is pulled by the spikes. The
+same whitening and battery on asinh(x), joined to the raw one: 0.6203
+alone against 0.6186 (Spearman 0.98), +0.0008 in the blend at 0.40; as
+a separate member on top of the raw one, nothing. The PIT already
+absorbs the marginal tails; the compressed view adds a little where the
+fit itself is spike-bent. Kept in reserve — it doubles the whitening
+cost per step for less than a thousandth — not shipped.
