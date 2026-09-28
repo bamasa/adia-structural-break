@@ -75,6 +75,15 @@ class ChannelCheck(unittest.TestCase):
         art = _artifact(206, [200], [200], 200)
         art.update(mass_classifier=_Booster(90), freqdep_classifier=_Booster(100), union_classifier=_Booster(120))
         self._run(text, art)
+        art["white3_classifier"], art["white2_ranker"], art["white3_ranker_ctx"] = _Booster(119), _Booster(111), _Booster(119)
+        art["white_nets"] = [{"inp.weight": np.zeros((64, 111, 1))}]; art["white_net_mu"] = np.zeros(111); art["white_net_sd"] = np.ones(111)
+        decl = text + "WHITE_OFFSET = 416\nWHITE_RANK_WIDTH = 111\nWHITE_CLF_WIDTH = 119\nWHITE_NET_WIDTH = 111\n"
+        self._run(decl, art)
+        art["white_nets"] = [{"inp.weight": np.zeros((64, 119, 1))}]   # a net built on the context too
+        with self.assertRaises(SystemExit):
+            self._run(decl, art)
+        for key in ("white3_classifier", "white2_ranker", "white3_ranker_ctx", "white_nets", "white_net_mu", "white_net_sd"):
+            del art[key]
         art["white2_classifier"], art["white2_ranker"] = _Booster(111), _Booster(111)
         self._run(text + "WHITE_OFFSET = 416\nWHITE2_WIDTH = 111\n", art)
         art["white2_ranker"] = _Booster(90)       # a ranker built without the odds

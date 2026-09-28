@@ -29,8 +29,8 @@ Two properties of that metric shape every design decision here:
 
 ## Where it stands
 
-Five weeks, a hundred logged experiments, thirty-three submissions. The
-platform moved four times, each time for a different reason:
+Five weeks, a hundred and fifty-four logged experiments, forty-four
+submissions. The platform moved eight times, each time for a different reason:
 
 | Cloud | Submission | What moved it |
 |---|---|---|
@@ -101,8 +101,7 @@ Full history with hypotheses and kill conditions: [`docs/experiments.md`](docs/e
 | 005 | LightGBM over 40 channels: + multi-scale receptive fields (6 EWMA windows, 5–200 obs) + retrospective confirm/cancel verdicts | 0.5648 | 0.5146 | cloud |
 | 006 | + a learned dilated-convolution channel (721 parameters, dilations 1/4/16, inline weights, numpy forward) | **0.5682** | 0.5146 | cloud (resubmitted once: json.loads without import json, hidden locally by a stale __pycache__) |
 
-Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
-40-channel models were scored). Field tail ≈ 0.62, top ≈ 0.652.
+Current standing: rank 222 of about 1,700 with #41 (0.6186); the board's top is 0.680, rank 50 is 0.642 (27 September). See "Where it stands" above.
 
 | — | 007: window classifier on 313k augmented cuts | 0.5627 vs 0.5682 | **killed by pre-stated condition**: window AUC nearly doubled (0.5315 → 0.5687), yet as channels it dilutes the combiner — better in isolation, redundant in ensemble |
 | 008 | + nine reverting channels: each detector's current statistic beside its peak, so a false alarm can be recanted | **0.5719** vs 0.5662, better on all 5 folds | cloud |
@@ -123,7 +122,7 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | 020 | + battery v2: forty more two-sample statistics (CvM, Anderson–Darling, Levene, increments, windows 10/25/100, tail exceedance, signs, slope t-stats); hold sped to 0.99 | **0.5821** (0.5817 raw) vs 0.5814, ahead on 3 of 5 | cloud |
 | 021 | hyperparameter resweep at full width: 63 leaves, colsample 0.5 — each tree sees a different half of the channels | **0.5841** vs 0.5821, ahead on 4 of 5 | cloud |
 | — | 024: gain-importance pruning (top-150/120/90) | 0.5825/0.5813/0.5805 | **killed**: monotone degradation — colsample already mines the weak channels |
-| 022 | the ranking objective: lambdarank, groups = per-step cross-sections, truncation 2000 | **0.5881** raw, ahead on all 5; fold 0 crosses 0.60 | shipping |
+| 022 | the ranking objective: lambdarank, groups = per-step cross-sections, truncation 2000 | **0.5881** raw, ahead on all 5; fold 0 crosses 0.60 | shipped |
 | — | 023: TCN v2 — ranking loss, boundary augmentation, 75k params, 24 epochs | fold-0 0.538; ensemble with the stack flat (+0.0002 at 10%) | concept survives, needs scale: ensemble value starts at ~0.55+ |
 | — | 025: ranker truncation 500/8000, resweep params for the ranker | fold-0 0.5919/0.5986; 0.6006 unchanged | 2000 stays; the ranking loss regularises itself |
 | 022b | shipped blend: 0.6·sigmoid(ranker) + 0.4·classifier, no hold — the ranker carries the memory | fold-0 **0.6035** (ranker 0.6006, classifier 0.5952) | cloud |
@@ -246,13 +245,7 @@ Current standing: ~330 of ~1500 on the public leaderboard (with 004, before the
 | 153 | the history's family as eight static context channels for the whitened member | classifier alone unchanged, blend 0.6405 → **0.6417** | kept; the ranker with context adds nothing alone but bags to 0.6274 (153b) — **shipped in #44** |
 | 154 | a third ranker for the bag | killed — it tipped the machine into swap | to train when the machine is free |
 | — | #25: broken upload, do not run | — | a `channels[:186]` slice survived the spectral upgrade; the push followed the check with `;` instead of `&&` |
-| — | 014: the 50-channel pipeline on the deviation view | 0.5762 vs 0.5779 | **killed by pre-stated condition**: the forecaster already extracts this representation |
-| — | 015: forecaster horizons 1+5 and signed error | 0.5751 vs 0.5779 | **killed by pre-stated condition**: the extensions dilute the compact four channels |
-| 016 | peak-hold on the output: the score rides its running maximum, draining 0.1%/step | **0.5799** vs 0.5779, ahead on 4 of 5 | cloud |
 
-The augmentation pipeline (`augment.py`) survives its first product; the next
-target, per the inspection notebook, is cross-sectional discrimination — clean
-series carrying high scores — not another within-series channel.
 
 ## Reproducing
 

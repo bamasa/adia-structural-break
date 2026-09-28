@@ -3569,3 +3569,29 @@ one of them is to be run, not both.
 
 If #42 transfers like #41 did (about 0.622), #44 should read about
 0.625: rank 150 or so on the board of 27 September.
+
+---
+
+## Notes on the record (29 September)
+
+**The step index.** 010 and 052 killed the step index as a feature of the
+core trees, and 145 keeps it as a channel of the whitened member (+0.006
+alone when unclipped). Both readings stand. For the core's per-step
+snapshot channels the step carried nothing the channels did not, and the
+trees spent splits on it; the whitened battery is built of CUSUM peaks,
+prefix statistics and odds whose null distribution grows with t, and
+there the step is the scale the trees need to read them. The rule is not
+"never the step" but "the step where a channel's null depends on it".
+
+**The survey's hygiene items (idea 4).** Checked and recorded here: the
+label is 1 from tau on in our targets (`step >= tau`), as the platform
+defines it; our `ts_auc` is the platform scorer line for line (per-step
+AUC weighted by positives times negatives); shipped scores lie in
+0.07-0.57, so the runner's float32 cast creates no ties; pair-weighted
+training of the trees was not adopted (083 tried the weighting for the
+networks; the trees use inverse step counts).
+
+**Cloud numbers missing from the transfer table.** #34 was never run;
+#35 read 0.6009 (19 September, a variant of #30's recipe); #38 and #40
+were never run. The transfer rule of 27 September therefore rests on
+#36, #39 and #41 — three readings, all in the same direction.
