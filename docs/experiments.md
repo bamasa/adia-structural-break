@@ -3660,3 +3660,30 @@ one-sided CUSUM, a per-step MLP, AR order by AIC or fixed at 12, a
 Student-t PIT, a Huber-fitted AR, short-window statistics for the early
 steps) are being screened in parallel with adversarial verification of
 any that clear 0.0012.
+
+---
+
+## 157 — the screen of 30 September, first three verdicts
+
+Six ideas screened in parallel by agents, each on a like-for-like cheap
+recipe (half the training series, 1,500 trees) with the baseline
+retrained in the same script, then the survivors on the full recipe.
+
+- **AR order** (157a): fixed at 12, alone −0.0004 and the blend ±0.0000;
+  by AIC, alone −0.0048 and the blend −0.0004. BIC picks a median order
+  of 1 (36% choose 0); AIC picks 5 and adds estimation noise to the
+  innovations. Fixed 12 loses −0.008 before step 100 (short histories)
+  and gains +0.002/+0.005 after 300; nets to zero. Closed.
+- **Huber-fitted AR and a MAD innovation scale** (157b), for the 1,497
+  histories with spikes above 8σ: alone 0.6166 against 0.6188 on the
+  full recipe, the blend 0.6436/0.6438 against 0.6439, and no gain on
+  the spike histories themselves. The PIT already absorbs what the spikes
+  do to the marginal; bending the fit back costs more on the ordinary
+  histories than it returns on the spiked ones. Closed.
+- **A per-step MLP** as a second learner on the 119 channels (157c):
+  0.5948 alone as a bag of three seeds, Spearman 0.75 with the
+  classifier, +0.0003 in the member. Closed.
+
+Three more (odds on the conditional stream with lag-2/3 dependence and a
+one-sided scale CUSUM; a Student-t PIT; short-window statistics for the
+early steps) are being re-run after their agents failed on an API error.

@@ -247,6 +247,7 @@ Current standing: #44 at 0.6277 in the cloud (about rank 150); the board's top i
 | 154 | a third ranker for the bag | killed — it tipped the machine into swap | to train when the machine is free |
 | 155 | the whitened learners with the boundary augmentation (3.4M augmented rows) | classifier 0.6204 vs 0.6186, ranker 0.6217 vs 0.6216; blend flat | the battery is not data-bound; closed |
 | 156 | one per-step ranker over the core's 206 and the whitened 111 channels, augmented | **0.6304 alone** (strongest single model); +0.0003 on #44 | redundant in company; closed |
+| 157a-c | the screen of 30 September: AR order by AIC / fixed 12; Huber-fitted AR + MAD scale; a per-step MLP learner | all within ±0.0005 of 0.6439 in the blend | closed; three more ideas re-running |
 | — | #25: broken upload, do not run | — | a `channels[:186]` slice survived the spectral upgrade; the push followed the check with `;` instead of `&&` |
 
 
