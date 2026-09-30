@@ -3631,3 +3631,32 @@ have. Closed.
 Three more members with the same recipe: 0.6019, 0.5997, 0.6068 alone
 (the six: 0.5997-0.6096, Spearman about 0.9 between them). The pool of
 six reads 0.6107 against 0.6099 for three.
+
+---
+
+## 156 — one ranker over the core's 206 channels and the whitened 111
+
+The trees of the core read the 206, the whitened member's trees read the
+111; a single per-step ranker over both, with the boundary augmentation
+(7.4 million rows, 317 columns, 63 leaves), reads **0.6304 alone** — the
+strongest single model in the project, at Spearman 0.68 with the core
+and 0.65 with the whitened ranker. And it adds nothing: +0.0003 on top
+of #44 at a tenth, negative beyond; blended into the core in place of a
+share of it, 0.6437 at most; in the ranker bag, 0.6440. The information
+the two families carry jointly is already in the blend of their separate
+readers; a model that sees both at once is stronger alone and redundant
+in company. Closed, with the lesson that "strongest alone" and "adds to
+the blend" are different questions and the second is the one that ships.
+
+Also read on the caches: the six-net pool in place of three, 0.6437
+against 0.6439; blending the members in per-step rank space 0.6401,
+in per-step z-scores 0.6430, in probabilities 0.6439 — the
+probabilities stay.
+
+The blend of 30 September is at a plateau with its current ingredients:
+every placement of every new reader lands within 0.0005 of 0.6439. Six
+cheap whitening and learner variants (conditional-stream odds and
+one-sided CUSUM, a per-step MLP, AR order by AIC or fixed at 12, a
+Student-t PIT, a Huber-fitted AR, short-window statistics for the early
+steps) are being screened in parallel with adversarial verification of
+any that clear 0.0012.

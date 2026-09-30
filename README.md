@@ -246,6 +246,7 @@ Current standing: #44 at 0.6277 in the cloud (about rank 150); the board's top i
 | 153 | the history's family as eight static context channels for the whitened member | classifier alone unchanged, blend 0.6405 → **0.6417** | kept; the ranker with context adds nothing alone but bags to 0.6274 (153b) — **shipped in #44** |
 | 154 | a third ranker for the bag | killed — it tipped the machine into swap | to train when the machine is free |
 | 155 | the whitened learners with the boundary augmentation (3.4M augmented rows) | classifier 0.6204 vs 0.6186, ranker 0.6217 vs 0.6216; blend flat | the battery is not data-bound; closed |
+| 156 | one per-step ranker over the core's 206 and the whitened 111 channels, augmented | **0.6304 alone** (strongest single model); +0.0003 on #44 | redundant in company; closed |
 | — | #25: broken upload, do not run | — | a `channels[:186]` slice survived the spectral upgrade; the push followed the check with `;` instead of `&&` |
 
 
