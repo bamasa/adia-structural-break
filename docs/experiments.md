@@ -3711,3 +3711,11 @@ early steps) are being re-run after their agents failed on an API error.
 The plateau stands at 0.6439 ± 0.0005 for every reader and every share
 tried on 30 September. What the blend lacks is not another reading of
 the whitened channels but information the channels do not hold.
+
+- **A Student-t probability integral transform** (157g): degrees of
+  freedom by maximum likelihood on a grid, the scale re-estimated per
+  df, normal scores through the fitted t instead of the empirical CDF.
+  Alone 0.6184 against 0.6188 (better before step 100 by +0.005, worse
+  after), the blend 0.6440. The empirical CDF was already the right
+  null; a parametric one is a different smoothing of the same tails.
+  Closed.

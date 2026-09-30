@@ -249,6 +249,7 @@ Current standing: #44 at 0.6277 in the cloud (about rank 150); the board's top i
 | 156 | one per-step ranker over the core's 206 and the whitened 111 channels, augmented | **0.6304 alone** (strongest single model); +0.0003 on #44 | redundant in company; closed |
 | 157a-c | the screen of 30 September: AR order by AIC / fixed 12; Huber-fitted AR + MAD scale; a per-step MLP learner | all within ±0.0005 of 0.6439 in the blend | closed |
 | 157d-f | short-window early statistics; odds on the conditional stream + one-sided CUSUM; a bag of six whitened readers and three rankers | −0.0015 / +0.0024 alone; blend within ±0.0005 in every case | the plateau of 30 September is firm; closed |
+| 157g | a Student-t PIT (df by likelihood) instead of the empirical CDF | 0.6184 vs 0.6188 alone; blend 0.6440 | closed |
 | — | #25: broken upload, do not run | — | a `channels[:186]` slice survived the spectral upgrade; the push followed the check with `;` instead of `&&` |
 
 
