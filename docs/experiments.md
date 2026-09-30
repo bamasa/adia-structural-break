@@ -3595,3 +3595,39 @@ networks; the trees use inverse step counts).
 #35 read 0.6009 (19 September, a variant of #30's recipe); #38 and #40
 were never run. The transfer rule of 27 September therefore rests on
 #36, #39 and #41 — three readings, all in the same direction.
+
+---
+
+## #44 in the cloud: 0.6277
+
+From 0.6186 (#41) to **0.6277**: +0.0091 on the platform against +0.0070
+on fold 2 (0.6439 vs 0.6369). The third build of the whitened member —
+history context, a bag of two rankers, three trajectory networks over the
+whitened channels — transferred in full again. Rank about 150 on the
+board of 27 September. Selected should move to #44.
+
+| submission | fold 2 | cloud | fold Δ | cloud Δ |
+|---|---|---|---|---|
+| #39 | 0.6251 | 0.6056 | | |
+| #41 | 0.6369 | 0.6186 | +0.0118 | +0.0130 |
+| #44 | 0.6439 | 0.6277 | +0.0070 | +0.0091 |
+
+## 155 — the whitened learners with the boundary augmentation
+
+The lever behind #28 (+0.011 for the networks), applied to the whitened
+member's trees: one cut of the three per parent series, 3.4 million
+augmented rows on top of the 4.0 million originals, fold-2 parents
+excluded. The classifier reads 0.6204 alone against 0.6186; the ranker
+0.6217 against 0.6216 (lambdarank's 10,000-row query cap forced random
+sub-queries within a step). In the member — the bag of three rankers, or
+the augmented classifier — the blend stays at 0.6439 or falls to 0.6433,
+flat or negative on every step range. The whitened battery is not
+data-bound the way the networks were: its statistics carry their own
+null, and moving breaks earlier teaches the trees nothing they did not
+have. Closed.
+
+## 152, continued — six networks
+
+Three more members with the same recipe: 0.6019, 0.5997, 0.6068 alone
+(the six: 0.5997-0.6096, Spearman about 0.9 between them). The pool of
+six reads 0.6107 against 0.6099 for three.

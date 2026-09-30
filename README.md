@@ -42,8 +42,9 @@ submissions. The platform moved eight times, each time for a different reason:
 | 0.6048 | #37 | the same, with the network pool doubled — +0.0002, the pool priced at nothing |
 | 0.6056 | #39 | a frequency member and a gated frequency+novelty union — +0.0046 on the fold, +0.0008 in the cloud |
 | **0.6186** | **#41** | the whitened stream as a member: AR(p) by BIC, a conditional scale and the innovation ECDF fitted on the history, ninety statistics on the normal scores — +0.0118 on the fold, +0.0130 in the cloud; rank 222 |
+| **0.6277** | **#44** | the member rebuilt: history context, a bag of two per-step rankers, three trajectory networks over the whitened channels — +0.0070 on the fold, +0.0091 in the cloud |
 
-**#41 is Selected at 0.6186, rank 222.** It came from the two surveys of
+**#44 reads 0.6277 in the cloud** (#41: 0.6186, rank 222). It came from the two surveys of
 27 September — what the leaders build, and what the generator actually
 makes — and from one member built on both: the stream whitened by an
 AR(p) fit, a conditional scale and the innovation ECDF of the history,
@@ -101,7 +102,7 @@ Full history with hypotheses and kill conditions: [`docs/experiments.md`](docs/e
 | 005 | LightGBM over 40 channels: + multi-scale receptive fields (6 EWMA windows, 5–200 obs) + retrospective confirm/cancel verdicts | 0.5648 | 0.5146 | cloud |
 | 006 | + a learned dilated-convolution channel (721 parameters, dilations 1/4/16, inline weights, numpy forward) | **0.5682** | 0.5146 | cloud (resubmitted once: json.loads without import json, hidden locally by a stale __pycache__) |
 
-Current standing: rank 222 of about 1,700 with #41 (0.6186); the board's top is 0.680, rank 50 is 0.642 (27 September). See "Where it stands" above.
+Current standing: #44 at 0.6277 in the cloud (about rank 150); the board's top is 0.680, rank 50 is 0.642 (27 September). See "Where it stands" above.
 
 | — | 007: window classifier on 313k augmented cuts | 0.5627 vs 0.5682 | **killed by pre-stated condition**: window AUC nearly doubled (0.5315 → 0.5687), yet as channels it dilutes the combiner — better in isolation, redundant in ensemble |
 | 008 | + nine reverting channels: each detector's current statistic beside its peak, so a false alarm can be recanted | **0.5719** vs 0.5662, better on all 5 folds | cloud |
@@ -241,9 +242,10 @@ Current standing: rank 222 of about 1,700 with #41 (0.6186); the board's top is 
 | 149 | per-series null calibration: the battery on the history's own scores as a pseudo-online null, channels as z-scores | 0.6102 (z only) / 0.6127 (raw + z) vs 0.6186 | the whitening is the calibration; an in-sample null only adds noise; closed |
 | 150 | a second whitening on the asinh view, joined to the raw one | 0.6203 vs 0.6186 alone; +0.0008 in the blend | in reserve; not worth its cost alone |
 | 151 | the whitened channels and odds for the 26,887 augmented pseudo-series (regenerated from seed, verified) | 11.2M rows | the networks' training input |
-| 152 | trajectory networks over the 111 whitened channels, 082b recipe | three members 0.6096 / 0.6011 / 0.6034 alone (200-channel nets: 0.606); the pool +0.0018 at 0.15 | **shipped in #44**; the 200 + 111 pool cancelled for memory |
+| 152 | trajectory networks over the 111 whitened channels, 082b recipe | three members 0.6096 / 0.6011 / 0.6034 alone (200-channel nets: 0.606); the pool +0.0018 at 0.15 | **shipped in #44: cloud 0.6277**; six members read 0.6107 as a pool |
 | 153 | the history's family as eight static context channels for the whitened member | classifier alone unchanged, blend 0.6405 → **0.6417** | kept; the ranker with context adds nothing alone but bags to 0.6274 (153b) — **shipped in #44** |
 | 154 | a third ranker for the bag | killed — it tipped the machine into swap | to train when the machine is free |
+| 155 | the whitened learners with the boundary augmentation (3.4M augmented rows) | classifier 0.6204 vs 0.6186, ranker 0.6217 vs 0.6216; blend flat | the battery is not data-bound; closed |
 | — | #25: broken upload, do not run | — | a `channels[:186]` slice survived the spectral upgrade; the push followed the check with `;` instead of `&&` |
 
 
