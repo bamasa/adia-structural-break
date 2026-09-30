@@ -3687,3 +3687,27 @@ retrained in the same script, then the survivors on the full recipe.
 Three more (odds on the conditional stream with lag-2/3 dependence and a
 one-sided scale CUSUM; a Student-t PIT; short-window statistics for the
 early steps) are being re-run after their agents failed on an API error.
+
+## 157d-f — the rest of the screen, and a bag of every reader
+
+- **Short-window statistics for the early steps** (157d): GLR over
+  windows 4 and 6, fast EWMAs, Anderson-Darling on 16-24 points and a
+  dense prefix test below step 64 — thirteen channels. Alone −0.0015,
+  blend ±0.0001, and the target range (steps 30-300) gets worse, not
+  better: twelve of the thirteen rank last of 132 by gain. Windows that
+  short have no power; the 8-window GLR and the EWMA 0.02 already read
+  what there is. Closed.
+- **Odds on the conditional stream, lag-2/3 dependence, a one-sided
+  scale CUSUM** (157e, half-recipe screen with the baseline retrained
+  alike): alone +0.0024, in the blend +0.0004 at Spearman 0.98 with the
+  baseline reader. Below the bar. Closed.
+- **A bag of every whitened reader** (157f, on the caches): the six
+  classifiers of this week (ECDF/BIC with context, augmented, without
+  context, asinh joined, Huber-fitted, short-window) average to 0.6254
+  alone — and the blend reads 0.6438. The three rankers bagged, with the
+  317-channel ranker at a quarter: 0.6440. Every reader of the whitened
+  stream, however trained, tells the blend the same thing.
+
+The plateau stands at 0.6439 ± 0.0005 for every reader and every share
+tried on 30 September. What the blend lacks is not another reading of
+the whitened channels but information the channels do not hold.
