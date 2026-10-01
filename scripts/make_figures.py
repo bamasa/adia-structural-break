@@ -24,11 +24,11 @@ ax.step(x, best, where="post", color=SOFT, lw=6, alpha=.9, zorder=1, label="best
 ax.plot(x, y, "o-", color=ACCENT, lw=1.6, ms=5.5, zorder=3, label="platform score (TS-AUC)")
 for sub, text in levers.items():
     yy = dict(cloud)[sub]
-    dx, dy = {23: (0, -40), 45: (-30, 30), 44: (0, 26)}.get(sub, (0, 26))
+    dx, dy = {23: (0, -40), 45: (18, -46), 44: (-6, 26)}.get(sub, (0, 26))
     ax.annotate(text, (sub, yy), xytext=(dx, dy), textcoords="offset points", ha="center", fontsize=8, color=INK,
                 arrowprops=dict(arrowstyle="-", color=MUTED, lw=.8))
 ax.axhline(.680, color=MUTED, lw=.8, ls="--"); ax.text(46.3, .6815, "leader 0.680", fontsize=8, color=MUTED, va="bottom", ha="right")
-ax.axhline(.642, color=MUTED, lw=.8, ls=":"); ax.text(46.3, .6435, "rank 50: 0.642", fontsize=8, color=MUTED, va="bottom", ha="right")
+ax.axhline(.642, color=MUTED, lw=.8, ls=":"); ax.text(17.0, .6435, "rank 50: 0.642", fontsize=8, color=MUTED, va="bottom", ha="left")
 ax.set_xlabel("platform submission number", color=INK); ax.set_ylabel("TS-AUC on the platform", color=INK)
 ax.set_ylim(.58, .69); ax.set_xlim(16.5, 46.5)
 ax.set_title("Five weeks on the platform: 0.5877 → 0.6299 (about rank 160 of 1,716)", color=INK, fontsize=11, loc="left")
