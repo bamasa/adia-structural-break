@@ -1,0 +1,9 @@
+#44 with a pool of trajectory networks that read the core's channels and the whitened ones together.
+---
+The ensemble of #44 (cloud 0.6277) with one addition: trajectory networks
+over the core's 200 channels and the whitened member's 111 together, the
+082b recipe with a memory-lean loader. Alone the strongest networks of the
+project (0.6210 as a pool on fold 2, against 0.606 for the core's and
+0.610 for the whitened ones), Spearman 0.75 with the whitened pool and
+0.46 with the whitened ranker. A tenth on top of the blend, next to the
+whitened networks' tenth: fold 2 0.6453 against 0.6439.

@@ -152,6 +152,13 @@ def verify_channels(assembled: str, target: Path) -> None:
         for key in ("white_net_mu", "white_net_sd"):
             if key in model:
                 check(key, len(model[key]), int(mn.group(1)))
+    mj = re.search(r"^JOINT_WIDTH = (\d+)", assembled, re.M)
+    if mj:
+        for i, state in enumerate(model.get("joint_nets", [])):
+            check(f"joint_net[{i}]", state["inp.weight"].shape[1], int(mj.group(1)))
+        for key in ("joint_net_mu", "joint_net_sd"):
+            if key in model:
+                check(key, len(model[key]), int(mj.group(1)))
     if model.get("booster") is not None:
         check("clf", getattr(model["booster"], "booster_", model["booster"]).num_feature(), width["clf"])
     for i, c in enumerate(model.get("classifiers", [])):

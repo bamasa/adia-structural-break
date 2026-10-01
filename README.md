@@ -52,11 +52,10 @@ with a ninety-channel battery on the normal scores. +0.0118 on fold 2,
 +0.0130 on the platform. Before it, the two weaker members of #39 had
 transferred at a sixth of their fold gain; the rule since then is that a
 member ships only when it is strong on its own (0.57+, this one 0.615)
-with a fold-2 gain above 0.003. **#42**, the same member with a
-per-step ranker and Shiryaev-Roberts odds (fold 2 0.6405), and **#44** —
-the member with history context, a bag of two rankers and three
-trajectory networks over the whitened channels (fold 2 0.6439; #43 is
-an identical copy) — wait for their cloud numbers.
+with a fold-2 gain above 0.003. **#44 is Selected** (fold 2 0.6439; #43 is an identical copy; #42 was
+never run). **#45**, #44 with a pool of three networks that read the
+core's channels and the whitened ones together (fold 2 0.6452), was
+pushed on the morning of the deadline for the last cloud run.
 
 Everything else measured on the untouched fold since #28 — more or other
 data, capacity, schedule, loss, input, verifiers, stacking in the winners'
@@ -250,6 +249,8 @@ Current standing: #44 at 0.6277 in the cloud (about rank 150); the board's top i
 | 157a-c | the screen of 30 September: AR order by AIC / fixed 12; Huber-fitted AR + MAD scale; a per-step MLP learner | all within ±0.0005 of 0.6439 in the blend | closed |
 | 157d-f | short-window early statistics; odds on the conditional stream + one-sided CUSUM; a bag of six whitened readers and three rankers | −0.0015 / +0.0024 alone; blend within ±0.0005 in every case | the plateau of 30 September is firm; closed |
 | 157g | a Student-t PIT (df by likelihood) instead of the empirical CDF | 0.6184 vs 0.6188 alone; blend 0.6440 | closed |
+| 152a | trajectory networks over the core's 200 and the whitened 111 together, lean loader | **0.6227 as a pool** (strongest networks); blend 0.6452 vs 0.6439 | **shipped as #45** at a tenth |
+| 158 | networks over the whitened innovation stream itself (5 channels) | 0.5932 as a pool, Spearman 0.05 with the other pools; +0.0005 | not shipped; recorded for the next edition |
 | — | #25: broken upload, do not run | — | a `channels[:186]` slice survived the spectral upgrade; the push followed the check with `;` instead of `&&` |
 
 

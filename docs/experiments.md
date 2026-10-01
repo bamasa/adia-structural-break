@@ -3719,3 +3719,40 @@ the whitened channels but information the channels do not hold.
   after), the blend 0.6440. The empirical CDF was already the right
   null; a parametric one is a different smoothing of the same tails.
   Closed.
+
+---
+
+## 152a — trajectory networks over the core's 200 and the whitened 111 together: shipped as #45
+
+The pool cancelled for memory on 28 September, rebuilt with a lean
+loader: rows gathered from memory-mapped matrices per batch, the
+pseudo-series never materialised (7 GB resident instead of 20). Three
+members, the 082b recipe over 311 inputs: **0.6127, 0.6164, 0.6129
+alone, 0.6227 as a pool** — the strongest networks of the project
+(the core's 200-channel pool 0.606, the whitened pool 0.610), at
+Spearman 0.75 with the whitened pool, 0.74 with the core and 0.46 with
+the whitened ranker. On fold 2, a tenth on top of #44 next to the
+whitened networks' tenth: **0.6452** against 0.6439 (+0.0013), the gain
+on steps 0-100 (+0.006) and 700+ (+0.002), a small loss on 100-700.
+
+The lean scripts' fold-2 export took the last point of every series
+(a tuple index that had meant the channel array before the refactor);
+the logits were recomputed from the saved weights with
+`export_logits.py` before any reading was taken.
+
+**Shipped as #45** on the morning of the deadline: #44 exactly, the
+whitened networks at 0.10 instead of 0.15, and the joint pool at 0.10.
+The quota and the clock allow one run; if it reads above #44 in the
+cloud it is the final selection, otherwise #44 stays.
+
+## 158 — networks over the whitened innovation stream itself
+
+Five channels per step — the unconditional and conditional normal
+scores, the square minus one, the lag-1 product, the log scale process
+— and the same recipe, so the network reads the whitened stream rather
+than statistics of it. Three members: 0.5905-0.5932 alone, the pool
+0.5932, Spearman 0.05-0.07 with the other network pools and 0.42 with
+the whitened ranker: a different reading, and a weak one. +0.0005 at a
+twentieth on top of #45's recipe. Not shipped — it would need the
+library to expose the stream itself, and the gain does not buy that
+change on the last morning. Recorded for the next edition.
