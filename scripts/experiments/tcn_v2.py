@@ -28,7 +28,7 @@ for sid, hist, online, labels in iter_series(x, y):
     raw.append((int(sid), np.asarray(hist, dtype="float64"),
                 np.asarray(online, dtype="float64"), labels.astype("float32"),
                 sid_fold[int(sid)]))
-print(f"загрузка {time.time()-t0:.0f}s", flush=True)
+print(f"loading {time.time()-t0:.0f}s", flush=True)
 
 def standardise(hist, online):
     norm = Normalisation.fit(hist)
@@ -39,7 +39,7 @@ def standardise(hist, online):
                      dtype="float32")
     return z_h, z_o
 
-# Валидация фиксирована; обучающая выборка аугментируется каждый вызов.
+# Validation is fixed; the training set is augmented on every call.
 val_fixed = []
 train_raw = []
 for sid, hist, online, lab, fold in raw:
@@ -48,10 +48,10 @@ for sid, hist, online, lab, fold in raw:
         val_fixed.append((z_h[-HIST_CAP:], z_o, lab))
     else:
         train_raw.append((hist, online, lab))
-print(f"подготовка валидации {time.time()-t0:.0f}s", flush=True)
+print(f"validation preparation {time.time()-t0:.0f}s", flush=True)
 
 def augment(hist, online, lab, rng):
-    """Обрезка истории, усечение онлайна, у чистых — сдвиг границы."""
+    """Trim the history, truncate the online part, shift the boundary for clean series."""
     h, o, l = hist, online, lab
     if l.max() == 0 and len(o) > 60 and rng.random() < 0.5:
         move = rng.integers(10, min(len(o) // 2, 200))
@@ -90,7 +90,7 @@ class TCN(nn.Module):
         return self.head(h).squeeze(1)
 
 model = TCN().to(DEVICE)
-print("параметров:", sum(p.numel() for p in model.parameters()), flush=True)
+print("parameters:", sum(p.numel() for p in model.parameters()), flush=True)
 EPOCHS = 24
 opt = torch.optim.Adam(model.parameters(), lr=1.2e-3, weight_decay=1e-4)
 sched = torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=EPOCHS)
@@ -111,8 +111,8 @@ def batch_tensors(rows):
     return X.to(DEVICE), onmask.to(DEVICE), Y.to(DEVICE)
 
 def rank_loss(logits, onmask, Y, rng):
-    """Попарный ранговый лосс на совпадающих шагах внутри батча: на каждом
-    выбранном шаге сломанные (метка 1) должны стоять выше чистых (метка 0)."""
+    """Pairwise ranking loss at matching steps within a batch: at every
+    selected step the broken series (label 1) must rank above the clean ones (label 0)."""
     B, L = logits.shape
     total, count = logits.new_zeros(()), 0
     steps = rng.choice(L, size=min(48, L), replace=False)
@@ -170,5 +170,5 @@ for epoch in range(EPOCHS):
     sched.step()
     auc = validate()
     torch.save(model.state_dict(), "tcn_v2.pt")
-    print(f"эпоха {epoch}: loss {total/len(batches):.4f}, TS-AUC фолд-0 {auc:.4f}  [{time.time()-t0:.0f}s]", flush=True)
-print("готово", flush=True)
+    print(f"epoch {epoch}: loss {total/len(batches):.4f}, TS-AUC fold 0 {auc:.4f}  [{time.time()-t0:.0f}s]", flush=True)
+print("done", flush=True)

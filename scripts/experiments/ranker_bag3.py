@@ -12,7 +12,7 @@ str_ = s[tr]; order = np.argsort(str_, kind="stable"); _, sizes = np.unique(str_
 rk = lgb.LGBMRanker(objective="lambdarank", n_estimators=600, learning_rate=0.03, num_leaves=47, min_child_samples=300, subsample=0.7, subsample_freq=1, colsample_bytree=0.35, reg_lambda=10.0, lambdarank_truncation_level=2000, label_gain=[0, 1], random_state=7, verbose=-1, n_jobs=4)
 rk.fit(Dtr[order], y[tr][order], group=sizes); r2 = 1.0 / (1.0 + np.exp(-rk.predict(Dte))); np.save("fold2_rank_white_v3.npy", r2)
 sp = lambda a, b: pd.Series(a).corr(pd.Series(b), method="spearman")
-print(f"третий ранкер (47 листьев, colsample 0.35, seed 7): соло {ts_auc(r2, yf, sf):.4f} | Spearman с r0 {sp(r2, r0):.3f}, с r1 {sp(r2, r1):.3f} [{time.time()-t0:.0f}s]")
-for name, rb in (("бэг r0+r1", 0.5 * (r0 + r1)), ("бэг r0+r1+r2", (r0 + r1 + r2) / 3)):
-    m = 0.7 * rb + 0.3 * c1; print(f"  {name}: сам {ts_auc(rb, yf, sf):.4f} | член → #39 + 0.40: {ts_auc(0.6 * s39 + 0.4 * m, yf, sf):.4f} | + 0.45: {ts_auc(0.55 * s39 + 0.45 * m, yf, sf):.4f}")
-print(f"готово [{time.time()-t0:.0f}s]")
+print(f"third ranker (47 leaves, colsample 0.35, seed 7): alone {ts_auc(r2, yf, sf):.4f} | Spearman with r0 {sp(r2, r0):.3f}, with r1 {sp(r2, r1):.3f} [{time.time()-t0:.0f}s]")
+for name, rb in (("bag r0+r1", 0.5 * (r0 + r1)), ("bag r0+r1+r2", (r0 + r1 + r2) / 3)):
+    m = 0.7 * rb + 0.3 * c1; print(f"  {name}: by itself {ts_auc(rb, yf, sf):.4f} | member → #39 + 0.40: {ts_auc(0.6 * s39 + 0.4 * m, yf, sf):.4f} | + 0.45: {ts_auc(0.55 * s39 + 0.45 * m, yf, sf):.4f}")
+print(f"done [{time.time()-t0:.0f}s]")

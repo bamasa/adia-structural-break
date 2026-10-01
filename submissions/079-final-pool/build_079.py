@@ -1,4 +1,4 @@
-"""resources079: resources078 (#33) + 6 сетей на всех данных (#29) + 6 членов пула = 24 сети."""
+"""resources079: resources078 (#33) + 6 nets on all data (#29) + 6 pool members = 24 nets."""
 import os, joblib, numpy as np
 m = joblib.load("resources078/model.joblib")
 def unpack(path):

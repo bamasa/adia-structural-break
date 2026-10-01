@@ -1,4 +1,4 @@
-"""052: спектральные каналы — спектр префикса против спектра истории."""
+"""052: spectral channels — prefix spectrum against the history spectrum."""
 import sys, time
 sys.path.insert(0, "repo/src")
 import numpy as np
@@ -9,18 +9,18 @@ from structural_break.stream import iter_series
 t0 = time.time()
 x = pd.read_parquet("structural-break-real-time-test/data/X_train.parquet")
 y = pd.read_parquet("structural-break-real-time-test/data/y_train.parquet")
-print(f"загрузка {time.time()-t0:.0f}s", flush=True)
+print(f"loading {time.time()-t0:.0f}s", flush=True)
 
-NFFT = 64          # окно спектра
-BANDS = 8          # полос
+NFFT = 64          # spectrum window
+BANDS = 8          # bands
 
 def spectrum(v):
-    """Нормированная мощность по 8 полосам + спектральная энтропия + пик."""
+    """Normalised power over 8 bands + spectral entropy + peak."""
     if len(v) < NFFT:
         v = np.concatenate([np.zeros(NFFT - len(v)), v])
     seg = v[-NFFT:] * np.hanning(NFFT)
     p = np.abs(np.fft.rfft(seg)) ** 2
-    p = p[1:]                                   # без постоянной составляющей
+    p = p[1:]                                   # without the DC component
     tot = p.sum() + 1e-12
     pn = p / tot
     band = np.add.reduceat(pn, np.linspace(0, len(pn), BANDS + 1)[:-1].astype(int))
@@ -29,7 +29,7 @@ def spectrum(v):
     return band, ent, peak, float(np.log(tot))
 
 def hist_profile(z):
-    """Средний спектр истории по скользящим окнам."""
+    """Mean history spectrum over sliding windows."""
     bands, ents, peaks, tots = [], [], [], []
     step = max(NFFT // 2, 1)
     for i in range(NFFT, len(z) + 1, step):
@@ -60,20 +60,20 @@ for sid, hist, online, labels in iter_series(x, y):
         if step_i >= next_scan:
             next_scan = max(next_scan + 1, int(next_scan * 1.12))
             b, e, pk, lt = spectrum(np.asarray(buf))
-            diff = (b - hb) / hb_sd                       # 8 полос в сигмах истории
+            diff = (b - hb) / hb_sd                       # 8 bands in history sigmas
             cur = list(diff) + [
-                (e - he) / he_sd,                          # сдвиг энтропии
-                pk - hp,                                   # сдвиг пиковой частоты
-                lt - ht,                                   # сдвиг полной мощности
-                float(np.abs(diff).max()),                 # худшая полоса
-                float(np.abs(b - hb).sum()),               # суммарное отличие формы
-                float(np.dot(b, hb) / (np.linalg.norm(b) * np.linalg.norm(hb) + 1e-12)),  # косинус
+                (e - he) / he_sd,                          # entropy shift
+                pk - hp,                                   # peak-frequency shift
+                lt - ht,                                   # total-power shift
+                float(np.abs(diff).max()),                 # worst band
+                float(np.abs(b - hb).sum()),               # total shape difference
+                float(np.dot(b, hb) / (np.linalg.norm(b) * np.linalg.norm(hb) + 1e-12)),  # cosine
             ]
         rows.append(list(cur))
     count += 1
     if count % 2000 == 0:
-        print(f"  {count} рядов, {time.time()-t0:.0f}s", flush=True)
+        print(f"  {count} series, {time.time()-t0:.0f}s", flush=True)
 
 S = np.asarray(rows, dtype="float32")
 np.save("SPEC14.npy", S)
-print(f"готово {time.time()-t0:.0f}s: {S.shape}", flush=True)
+print(f"done {time.time()-t0:.0f}s: {S.shape}", flush=True)

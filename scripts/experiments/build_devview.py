@@ -13,7 +13,7 @@ spec.loader.exec_module(sub)
 K = 10
 t0 = time.time()
 x = pd.read_parquet("structural-break-real-time-test/data/X_train.parquet")
-print(f"загрузка {time.time()-t0:.0f}s", flush=True)
+print(f"loading {time.time()-t0:.0f}s", flush=True)
 
 def deviations(v):
     v = np.asarray(v, dtype="float64")
@@ -36,8 +36,8 @@ for sid, part in x.groupby(level="id"):
         rows.append(m.update(float(v)))
     count += 1
     if count % 2000 == 0:
-        print(f"  {count} рядов, {time.time()-t0:.0f}s", flush=True)
+        print(f"  {count} series, {time.time()-t0:.0f}s", flush=True)
 
 a = np.asarray(rows, dtype="float32")
 np.save("X50d.npy", a)
-print(f"готово {time.time()-t0:.0f}s: {a.shape}", flush=True)
+print(f"done {time.time()-t0:.0f}s: {a.shape}", flush=True)

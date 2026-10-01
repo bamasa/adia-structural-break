@@ -1,8 +1,8 @@
-"""096: BOCPD с моделью наблюдений AR(1) (байесовская регрессия x_t на x_{t-1}) + прямой апостериор P(r<=t).
+"""096: BOCPD with an AR(1) observation model (Bayesian regression of x_t on x_{t-1}) + the direct posterior P(r<=t).
 
-Ловит смену структуры зависимостей, которую Normal-Gamma не видит. Семь каналов:
-P(r<5), P(r<20), P(r<60), P(r<200), E[r]/(t+1), surprise, P(r<=t) — «слом уже был в онлайн-части».
-python build_bocpd_ar.py <shard> <n>  |  merge <n>   (env BOCPD_H — хазард, по умолчанию 50)
+Catches a change in the dependence structure that Normal-Gamma does not see. Seven channels:
+P(r<5), P(r<20), P(r<60), P(r<200), E[r]/(t+1), surprise, P(r<=t) — "the break already happened in the online part".
+python build_bocpd_ar.py <shard> <n>  |  merge <n>   (env BOCPD_H — hazard, default 50)
 """
 import sys, time, os, numpy as np
 from scipy.special import gammaln
@@ -14,14 +14,14 @@ def student_logpdf(y, loc, scale2, nu):
     return gammaln((nu + 1) / 2) - gammaln(nu / 2) - 0.5 * np.log(nu * np.pi * scale2) - (nu + 1) / 2 * np.log1p(z2 / nu)
 
 def bocpd_ar(hist, online):
-    # приор из истории: AR(1) по МНК; сила приора k0 = 5 точек
+    # prior from the history: AR(1) by OLS; prior strength k0 = 5 points
     h = np.asarray(hist, float); X0 = np.column_stack([np.ones(len(h) - 1), h[:-1]]); y0 = h[1:]
     beta0, *_ = np.linalg.lstsq(X0, y0, rcond=None); resid = y0 - X0 @ beta0; s2 = resid.var() + 1e-12
     k0, a0 = 5.0, 2.5
-    L0 = k0 * (X0.T @ X0) / len(y0)           # 2x2 точность приора
+    L0 = k0 * (X0.T @ X0) / len(y0)           # 2x2 prior precision
     m0 = beta0.copy(); b0 = a0 * s2
-    # состояние по длинам режима r = 0..RMAX; индекс RMAX — «хвост», в нём с самого начала
-    # живёт гипотеза «режим продолжается из истории» с параметрами, обученными на всей истории.
+    # state over run lengths r = 0..RMAX; index RMAX is the "tail", which from the very start
+    # holds the hypothesis "the regime continues from the history" with parameters fitted on the whole history.
     Lh = L0 + X0.T @ X0; mh = np.linalg.solve(Lh, L0 @ m0 + X0.T @ y0)
     ah = a0 + 0.5 * len(y0); bh = b0 + 0.5 * (y0 @ y0 + m0 @ L0 @ m0 - mh @ Lh @ mh); bh = max(bh, 1e-12)
     m = np.vstack([m0[None, :]] + [m0[None, :]] * (RMAX - 1) + [mh[None, :]])
@@ -29,8 +29,8 @@ def bocpd_ar(hist, online):
     logR = np.full(RMAX + 1, -np.inf); logR[RMAX] = 0.0
     prev = h[-1]; out = np.empty((len(online), 7), dtype="float32")
     for t, x in enumerate(online):
-        phi = np.array([1.0, prev])                                   # регрессор
-        # предиктив: Student-t(nu=2a, loc=m·phi, scale2 = b/a·(1 + phiᵀ Lam⁻¹ phi))
+        phi = np.array([1.0, prev])                                   # regressor
+        # predictive: Student-t(nu=2a, loc=m·phi, scale2 = b/a·(1 + phiᵀ Lam⁻¹ phi))
         det = Lam[:, 0, 0] * Lam[:, 1, 1] - Lam[:, 0, 1] * Lam[:, 1, 0]
         inv = np.empty_like(Lam); inv[:, 0, 0] = Lam[:, 1, 1] / det; inv[:, 1, 1] = Lam[:, 0, 0] / det
         inv[:, 0, 1] = -Lam[:, 0, 1] / det; inv[:, 1, 0] = -Lam[:, 1, 0] / det
@@ -38,7 +38,7 @@ def bocpd_ar(hist, online):
         loc = m @ phi; scale2 = b / a * (1 + q); lp = student_logpdf(x, loc, scale2, 2 * a)
         log_growth = logR + lp + np.log(1 - HAZARD); log_cp = np.logaddexp.reduce(logR + lp) + np.log(HAZARD)
         newR = np.concatenate([[log_cp], log_growth]); evidence = np.logaddexp.reduce(newR); newR -= evidence
-        # обновление параметров (байесовская линейная регрессия, y = x)
+        # parameter update (Bayesian linear regression, y = x)
         Lam_n = Lam + np.einsum("i,j->ij", phi, phi)[None]
         rhs = np.einsum("rij,rj->ri", Lam, m) + phi[None, :] * x
         det_n = Lam_n[:, 0, 0] * Lam_n[:, 1, 1] - Lam_n[:, 0, 1] * Lam_n[:, 1, 0]
@@ -60,14 +60,14 @@ def bocpd_ar(hist, online):
 if __name__ == "__main__":
     if sys.argv[1] == "test":
         rng = np.random.default_rng(0); n = 1500
-        # AR(1) с phi=0.1 -> phi=0.6 на шаге 700 онлайн-части, та же дисперсия
+        # AR(1) with phi=0.1 -> phi=0.6 at step 700 of the online part, same variance
         def ar(phi, n, s): 
             x = np.zeros(n); e = rng.normal(0, s, n)
             for i in range(1, n): x[i] = phi * x[i-1] + e[i]
             return x
         hist = ar(0.1, 2000, 1.0); online = np.concatenate([ar(0.1, 700, 1.0), ar(0.6, 300, 0.8)])
         t0 = time.time(); o = bocpd_ar(hist, online); dt = (time.time()-t0)/len(online)*1000
-        print(f"тест AR: P(r<=t) до слома (шаги 600-700) {o[600:700,6].mean():.3f}, после (720-800) {o[720:800,6].mean():.3f}; P(r<20) до {o[600:700,1].mean():.3f} после {o[705:725,1].mean():.3f}; {dt:.2f} мс/шаг")
+        print(f"AR test: P(r<=t) before the break (steps 600-700) {o[600:700,6].mean():.3f}, after (720-800) {o[720:800,6].mean():.3f}; P(r<20) before {o[600:700,1].mean():.3f} after {o[705:725,1].mean():.3f}; {dt:.2f} ms/step")
         sys.exit(0)
     if sys.argv[1] == "merge":
         n = int(sys.argv[2]); parts = [np.load(f"{PARTS}/part_{i}.npz", allow_pickle=True) for i in range(n)]
@@ -86,7 +86,7 @@ if __name__ == "__main__":
     for i, (sid, part) in enumerate(x.groupby(level="id")):
         hist = part.loc[part.period == 1, "value"].to_numpy("float64"); online = part.loc[part.period == 2, "value"].to_numpy("float64")
         sids.append(int(sid)); arrs.append(bocpd_ar(hist, online))
-        if (i + 1) % 100 == 0: print(f"шард {shard}: {i+1} рядов, {time.time()-t0:.0f}s", flush=True)
+        if (i + 1) % 100 == 0: print(f"shard {shard}: {i+1} series, {time.time()-t0:.0f}s", flush=True)
     os.makedirs(PARTS, exist_ok=True)
     np.savez(f"{PARTS}/part_{shard}.npz", sids=np.array(sids), arrs=np.array(arrs, dtype=object), allow_pickle=True)
-    print(f"шард {shard} готов {time.time()-t0:.0f}s: {len(sids)} рядов", flush=True)
+    print(f"shard {shard} done {time.time()-t0:.0f}s: {len(sids)} series", flush=True)

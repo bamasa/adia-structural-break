@@ -58,7 +58,7 @@ if __name__ == "__main__":
             return x
         hist = ar(0.3, 3000); online = np.concatenate([ar(0.3, 300), ar(0.6, 300) * np.sqrt((1 - 0.6 ** 2) / (1 - 0.3 ** 2))])  # same marginal variance
         t0 = time.time(); o = dep_channels(hist, online); dt = (time.time() - t0) * 1000
-        print(f"каналов {o.shape[1]}, {dt:.0f} мс на ряд; слом зависимости при равной дисперсии: CUSUM лаг1 {o[250:300,0].mean():.2f} -> {o[450:600,0].mean():.2f}, EWMA лаг1 {o[250:300,1].mean():+.2f} -> {o[450:600,1].mean():+.2f}, портманто {o[250:300,15].mean():.1f} -> {o[450:600,15].mean():.1f}")
+        print(f"{o.shape[1]} channels, {dt:.0f} ms per series; dependence break at equal variance: CUSUM lag1 {o[250:300,0].mean():.2f} -> {o[450:600,0].mean():.2f}, EWMA lag1 {o[250:300,1].mean():+.2f} -> {o[450:600,1].mean():+.2f}, portmanteau {o[250:300,15].mean():.1f} -> {o[450:600,15].mean():.1f}")
         sys.exit(0)
     t0 = time.time(); x = pd.read_parquet("structural-break-real-time-test/data/X_train.parquet")
     g = np.load("G40.npy"); s = np.load("S40.npy"); out = np.empty((len(g), NCH), dtype="float32")
@@ -66,5 +66,5 @@ if __name__ == "__main__":
     for i, (sid, part) in enumerate(x.groupby(level="id")):
         hist = part.loc[part.period == 1, "value"].to_numpy("float64"); online = part.loc[part.period == 2, "value"].to_numpy("float64")
         a, b = pos[int(sid)]; out[a:b] = dep_channels(hist, online)[s[a:b]]
-        if (i + 1) % 2000 == 0: print(f"{i+1} рядов, {time.time()-t0:.0f}s", flush=True)
+        if (i + 1) % 2000 == 0: print(f"{i+1} series, {time.time()-t0:.0f}s", flush=True)
     np.save("DEP23.npy", out); print(f"DEP23: {out.shape}, nan {np.isnan(out).sum()} [{time.time()-t0:.0f}s]", flush=True)

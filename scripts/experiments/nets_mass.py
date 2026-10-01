@@ -1,35 +1,35 @@
-"""121: сети по каналам МАССОВОЙ БАТАРЕИ (90 входов) — второй независимый член.
+"""121: nets on the MASS BATTERY channels (90 inputs) — the second independent member.
 
-#36 показал в облаке: независимо построенный член платит (+0.0039). Массовый член —
-деревья на 90 каналах в одном шаге. Здесь та же сеть, что и в ансамбле (ChanTCN,
-ранговый лосс, последняя эпоха, тройная аугментация), но читает 90 каналов батареи
-как траектории. Другое семейство на независимых признаках: должна расходиться и с
-деревьями ансамбля, и с массовым классификатором. Три члена, сиды 082b.
+#36 showed in the cloud: an independently built member pays off (+0.0039). The mass member is
+trees on 90 channels at a single step. Here the same net as in the ensemble (ChanTCN,
+rank loss, last epoch, triple augmentation), but it reads the 90 battery channels
+as trajectories. A different family on independent features: it should diverge both from
+the ensemble trees and from the mass classifier. Three members, 082b seeds.
 
-082 (15 эпох) дал 0.5936 на сиде 51000 против 0.6036 у 10 эпох: длинное
-расписание уходит в запоминание. Здесь десять эпох, шесть сидов #28,
-фолд-2 на последней эпохе; сравнение ансамбля с #28 (0.6163).
+082 (15 epochs) gave 0.5936 on seed 51000 against 0.6036 for 10 epochs: the long
+schedule drifts into memorization. Here ten epochs, the six seeds of #28,
+fold 2 at the last epoch; the ensemble is compared with #28 (0.6163).
 
-081d: фолд-2 растёт монотонно до последних эпох, холдаут — шум в противофазе.
-Здесь шесть членов с сидами #28, без холдаута (+8% данных), косинус на 15
-эпох; фолд-2 оценивается на эпохах 9 и 14, обе сохраняются. Отвечает: (а)
-последняя эпоха@10 против дырявого выбора #28, (б) 15 эпох против 10.
+081d: fold 2 grows monotonically up to the last epochs, the holdout is noise in antiphase.
+Here six members with the #28 seeds, no holdout (+8% data), cosine over 15
+epochs; fold 2 is evaluated at epochs 9 and 14, both are saved. Answers: (a)
+last epoch@10 against the leaky selection of #28, (b) 15 epochs against 10.
 
-081 с чистым холдаутом дал 0.5623 на фолде-2 против 0.6048 у того же
-сида с дырявым. Здесь один член, сид 51000, и по эпохам: чистый холдаут,
-дырявый холдаут (те же ряды, но их псевдоряды в обучении — как в #28) и
-фолд-2. Ответ на вопрос, какой критерий выбора эпохи переносится.
+081 with a clean holdout gave 0.5623 on fold 2 against 0.6048 for the same
+seed with a leaky one. Here one member, seed 51000, and per epoch: clean holdout,
+leaky holdout (same series, but their pseudo-series are in training — as in #28) and
+fold 2. Answers the question of which epoch-selection criterion transfers.
 
-Во всех пулах лучшая эпоха выбиралась по холдауту, чьи псевдоряды лежали
-в обучении (080b: холдаут 0.7255 при фолде-2 0.5678). Выбор эпохи был
-смещён к запоминанию. Здесь холдаут честный. Рецепт #28 в остальном.
-Kill: соло на фолде-2 не выше 0.605.
-Исходный 076: сети на ТРОЙНОЙ аугментации — втрое больше псевдорядов.
+In all pools the best epoch was chosen by a holdout whose pseudo-series were
+in the training set (080b: holdout 0.7255 with fold 2 at 0.5678). Epoch selection was
+biased toward memorization. Here the holdout is honest. Otherwise the #28 recipe.
+Kill: alone on fold 2 not above 0.605.
+Original 076: nets on TRIPLE augmentation — three times more pseudo-series.
 
-Сети data-bound: одинарная аугментация дала рекорды обоим архитектурам.
-Тройную (AUG3, три случайных среза на ряд) видели только ранкеры.
-AUG3_X 8.3 ГБ — читаем через mmap по-рядно. Половина членов plain (200
-входов), половина diff (600). Kill: холдауты не выше пулов на одинарной."""
+The nets are data-bound: single augmentation gave records to both architectures.
+Triple (AUG3, three random cuts per series) was only seen by the rankers.
+AUG3_X is 8.3 GB — read via mmap series by series. Half of the members plain (200
+inputs), half diff (600). Kill: holdouts not above the single-augmentation pools."""
 import sys, time, os
 sys.path.insert(0, "repo/src")
 import numpy as np
@@ -48,14 +48,14 @@ bounds = np.append(starts, len(g))
 mu = X.mean(0); sd = X.std(0) + 1e-6
 np.save("mu90.npy", mu); np.save("sd90.npy", sd)
 
-# Оригинальные ряды (фолд-2 держим в стороне — он линейка).
+# Original series (fold 2 is kept aside — it is the yardstick).
 orig, orig_fold = [], []
 for a, b in zip(starts, bounds[1:]):
     orig.append((((X[a:b] - mu) / sd), y[a:b].astype("float32")))
     orig_fold.append(int(assignment[a]))
 del X
 
-# Тройная аугментация: 8.3 ГБ, читаем mmap по-рядно.
+# Triple augmentation: 8.3 GB, read via mmap series by series.
 AX = np.load("AUG3_MASS90.npy", mmap_mode="r")
 AY = np.load("AUG3_Y.npy"); AG = np.load("AUG3_G.npy")
 a_starts = np.flatnonzero(np.concatenate([[True], AG[1:] != AG[:-1]]))
@@ -64,12 +64,12 @@ fold_by_sid = {int(g[a]): int(assignment[a]) for a in starts}
 aug = []
 for a, b in zip(a_starts, a_bounds[1:]):
     sid = (int(AG[a]) - 100000) // 10
-    # псевдоряд наследует фолд родителя; фолд-2 исключаем
+    # a pseudo-series inherits the parent's fold; fold 2 is excluded
     if fold_by_sid.get(sid, 0) != 2:
         aug.append((((np.asarray(AX[a:b]) - mu) / sd).astype("float32"),
                     AY[a:b].astype("float32"), sid))
 del AX, AY
-print(f"оригинал {len(orig)}, аугментация {len(aug)} [{time.time()-t0:.0f}s]", flush=True)
+print(f"original {len(orig)}, augmentation {len(aug)} [{time.time()-t0:.0f}s]", flush=True)
 
 class Block(nn.Module):
     def __init__(self, ch, dil):
@@ -147,21 +147,21 @@ os.makedirs("nets_mass", exist_ok=True)
 fold2_rows = [orig[i] for i in range(len(orig)) if orig_fold[i] == 2]
 pool_orig = [orig[i] for i in range(len(orig)) if orig_fold[i] != 2]
 pool_sid = [int(g[starts[i]]) for i in range(len(orig)) if orig_fold[i] != 2]
-# После пробы d0 (холдаут 0.6543 -> фолд-2 0.5875) diff-члены из очереди
-# убраны: они не переносятся, а стоят по 4.4 часа каждый.
+# After the d0 probe (holdout 0.6543 -> fold 2 0.5875) the diff members were removed
+# from the queue: they do not transfer, and cost 4.4 hours each.
 JOBS = [("q", i, False) for i in range(3)]
 for tag, member, use_diffs in JOBS:
     path = f"nets_mass/member_{tag}{member}.pt"
     if os.path.exists(path):
         continue
-    seed = 51000 + member  # те же сиды, что p0–p2: парное сравнение
+    seed = 51000 + member  # same seeds as p0–p2: paired comparison
     rng = np.random.default_rng(seed)
     torch.manual_seed(seed)
     idx = rng.permutation(len(pool_orig))
     hold_n = int(0.08 * len(pool_orig))
-    train_set = list(pool_orig) + [(f, lab) for f, lab, sid in aug]  # 082: без холдаута
+    train_set = list(pool_orig) + [(f, lab) for f, lab, sid in aug]  # 082: no holdout
     rng.shuffle(train_set)
-    print(f"  член {tag}{member}: обучение {len(train_set)} рядов, холдаута нет", flush=True)
+    print(f"  member {tag}{member}: training {len(train_set)} series, no holdout", flush=True)
     rng.shuffle(train_set)
     model = ChanTCN(600 if use_diffs else 90).to(DEVICE)
     opt = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
@@ -182,10 +182,10 @@ for tag, member, use_diffs in JOBS:
         sched.step()
         if epoch == 9:
             f2 = holdout_auc(model, fold2_rows, use_diffs)
-            print(f"    член {tag}{member} эпоха {epoch}: фолд-2 {f2:.4f}  [{time.time()-t0:.0f}s]", flush=True)
+            print(f"    member {tag}{member} epoch {epoch}: fold 2 {f2:.4f}  [{time.time()-t0:.0f}s]", flush=True)
             torch.save({k: v.cpu().clone() for k, v in model.state_dict().items()},
                        f"nets_mass/member_{tag}{member}_epoch{epoch}.pt")
             best = (f2, {k: v.cpu().clone() for k, v in model.state_dict().items()})
     torch.save(best[1], path)
-    print(f"mass-сеть {tag}{member}: фолд-2 на последней эпохе {best[0]:.4f}  [{time.time()-t0:.0f}s]", flush=True)
+    print(f"mass net {tag}{member}: fold 2 at the last epoch {best[0]:.4f}  [{time.time()-t0:.0f}s]", flush=True)
 print("done", flush=True)

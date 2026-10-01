@@ -18,8 +18,8 @@ for fold in range(5):
     m = Boosted.fit(X186[tr], y[tr], names, step_weights(s[tr]))
     oof[va] = m.predict(X186[va])
     scores.append(ts_auc(oof[va], y[va], s[va]))
-    print(f"  фолд {fold}: {scores[-1]:.4f}  [{time.time()-t0:.0f}s]", flush=True)
-print(f"186 (146 + батарея v2): {np.mean(scores):.4f}  " + " ".join(f"{v:.4f}" for v in scores), flush=True)
+    print(f"  fold {fold}: {scores[-1]:.4f}  [{time.time()-t0:.0f}s]", flush=True)
+print(f"186 (146 + battery v2): {np.mean(scores):.4f}  " + " ".join(f"{v:.4f}" for v in scores), flush=True)
 np.save("oof186.npy", oof)
 
 starts = np.flatnonzero(np.concatenate([[True], g[1:] != g[:-1]]))
@@ -36,5 +36,5 @@ def peak_hold(p, alpha):
     return out
 for alpha in (0.99, 0.995, 0.999):
     sc = fold_scores(peak_hold(oof, alpha))
-    print(f"186 + пик-холд α={alpha}: {np.mean(sc):.4f}  " + " ".join(f"{v:.4f}" for v in sc), flush=True)
-print(f"всего {time.time()-t0:.0f}s", flush=True)
+    print(f"186 + peak-hold α={alpha}: {np.mean(sc):.4f}  " + " ".join(f"{v:.4f}" for v in sc), flush=True)
+print(f"total {time.time()-t0:.0f}s", flush=True)

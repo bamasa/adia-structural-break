@@ -37,4 +37,4 @@ if __name__ == "__main__":
         sids.append(int(sid)); arrs.append(whitez_channels(hist, online))
     os.makedirs(PARTS, exist_ok=True)
     np.savez(f"{PARTS}/part_{shard}.npz", sids=np.array(sids), arrs=np.array(arrs, dtype=object), allow_pickle=True)
-    print(f"шард {shard} готов {time.time()-t0:.0f}s: {len(sids)} рядов", flush=True)
+    print(f"shard {shard} done {time.time()-t0:.0f}s: {len(sids)} series", flush=True)

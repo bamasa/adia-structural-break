@@ -1,9 +1,9 @@
-"""109: где ансамбль слеп — разбор по типам слома.
+"""109: where the ensemble is blind — breakdown by break type.
 
-Для каждого ряда фолда-2 со сломом считаем, что именно изменилось (окна 300 до/после tau):
-сдвиг среднего, отношение дисперсий, изменение AR(1), изменение формы (асимметрия/эксцесс).
-Затем меряем per-series AUC ансамбля #30 внутри каждого типа: ряд со сломом против всех
-рядов без слома на тех же шагах. Показывает, какой тип изменений мы не видим.
+For every fold-2 series with a break, compute what exactly changed (windows of 300 before/after tau):
+mean shift, variance ratio, AR(1) change, shape change (skewness/kurtosis).
+Then measure the per-series AUC of ensemble #30 within each type: the series with a break against all
+series without a break at the same steps. Shows which kind of change we do not see.
 """
 import sys, numpy as np, pandas as pd
 sys.path.insert(0, "repo/src")
@@ -32,11 +32,11 @@ df = pd.DataFrame(rows)
 brk = df[df.tau >= 0].dropna(subset=["dmean"]).copy()
 def kind(r):
     k = []
-    if r.dmean > 0.3: k.append("среднее")
-    if r.vratio < 0.85 or r.vratio > 1.18: k.append("дисперсия")
-    if r.dar1 > 0.12: k.append("зависимости")
-    if r.dshape > 1.5: k.append("форма")
-    return "+".join(k) if k else "нет явного"
+    if r.dmean > 0.3: k.append("mean")
+    if r.vratio < 0.85 or r.vratio > 1.18: k.append("variance")
+    if r.dar1 > 0.12: k.append("dependence")
+    if r.dshape > 1.5: k.append("shape")
+    return "+".join(k) if k else "none evident"
 brk["kind"] = brk.apply(kind, axis=1)
 brk[["a", "b", "sid", "tau", "n", "dmean", "vratio", "dar1", "dshape", "kind"]].to_csv("fold2_break_kinds.csv", index=False)
 print(brk.kind.value_counts().to_string())

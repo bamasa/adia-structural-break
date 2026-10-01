@@ -1,9 +1,9 @@
-"""030 (фолд-0): ошибка Chronos-2 как одиночный канал — соло-скрининг.
+"""030 (fold 0): the Chronos-2 error as a single channel — alone screening.
 
-Планка: наш дообучаемый прогнозист соло 0.5586 (пик ошибки, полная выборка);
-здесь скрин на рядах фолда-0. На каденс-точках просим Chronos спрогнозировать
-следующие 8 шагов от префикса, меряем нормированный промах факта; уровень
-нормировки — такие же прогнозы внутри истории (там слома нет по условию).
+The bar: our fine-tunable forecaster alone 0.5586 (error peak, full sample);
+here a screen on the fold-0 series. At the cadence points we ask Chronos to forecast
+the next 8 steps from the prefix and measure the normalized miss of the actual value; the
+normalization level is the same forecasts inside the history (no break there by construction).
 """
 import sys, time
 sys.path.insert(0, "repo/src")
@@ -18,7 +18,7 @@ from structural_break.combiners import split_by_series, ts_auc
 t0 = time.time()
 pipe = BaseChronosPipeline.from_pretrained("amazon/chronos-2", device_map="mps",
                                            torch_dtype=torch.float32)
-print(f"модель загружена [{time.time()-t0:.0f}s]", flush=True)
+print(f"model loaded [{time.time()-t0:.0f}s]", flush=True)
 
 x = pd.read_parquet("structural-break-real-time-test/data/X_train.parquet")
 y = pd.read_parquet("structural-break-real-time-test/data/y_train.parquet")
@@ -27,8 +27,8 @@ assignment = split_by_series(g, folds=5, seed=0)
 starts = np.flatnonzero(np.concatenate([[True], g[1:] != g[:-1]]))
 sid_fold = {int(g[st]): int(assignment[st]) for st in starts}
 
-H = 8          # горизонт прогноза
-CTX = 256      # максимум контекста
+H = 8          # forecast horizon
+CTX = 256      # maximum context
 
 def cadence(n):
     pts, nxt = [], 10
@@ -46,14 +46,14 @@ for sid, hist, online, labels in iter_series(x, y):
     z_o = np.asarray([norm.clip(norm.standardise(float(v), i)) for i, v in enumerate(online)],
                      dtype="float32")
     series_data.append((z_h, z_o, labels))
-print(f"рядов: {len(series_data)}, подготовка {time.time()-t0:.0f}s", flush=True)
+print(f"series: {len(series_data)}, preparation {time.time()-t0:.0f}s", flush=True)
 
-# Собираем все запросы одной пачкой: (контекст, факт h шагов).
-requests, owners = [], []   # owner: (series_idx, "hist"/"online", позиция каденса)
+# Collect all requests in a single batch: (context, actual h steps).
+requests, owners = [], []   # owner: (series_idx, "hist"/"online", cadence position)
 for si, (z_h, z_o, labels) in enumerate(series_data):
     full = np.concatenate([z_h, z_o])
     n_h = len(z_h)
-    # опорные прогнозы внутри истории — уровень нормальной ошибки
+    # reference forecasts inside the history — the normal error level
     for p in cadence(n_h)[-6:]:
         if p + H <= n_h:
             requests.append(full[max(0, p - CTX):p]); owners.append((si, "hist", p))
@@ -61,7 +61,7 @@ for si, (z_h, z_o, labels) in enumerate(series_data):
         gp = n_h + p
         if gp + H <= len(full):
             requests.append(full[max(0, gp - CTX):gp]); owners.append((si, "online", p))
-print(f"запросов: {len(requests)}", flush=True)
+print(f"requests: {len(requests)}", flush=True)
 
 errors = np.zeros(len(requests))
 widths = np.zeros(len(requests))
@@ -85,7 +85,7 @@ with torch.no_grad():
         if (k // B) % 100 == 0:
             print(f"  {k}/{len(requests)} [{time.time()-t0:.0f}s]", flush=True)
 
-# Канал на ряд: ошибка онлайн-точки, делённая на медианную ошибку истории ряда.
+# Channel per series: the online-point error divided by the median error of the series' history.
 scores_rows, labels_rows, steps_rows = [], [], []
 for si, (z_h, z_o, labels) in enumerate(series_data):
     hist_errs = [errors[i] for i, (s2, kind, _) in enumerate(owners) if s2 == si and kind == "hist"]
@@ -109,7 +109,7 @@ for si, (z_h, z_o, labels) in enumerate(series_data):
     steps_rows.append(np.arange(len(z_o)))
 S = np.vstack(scores_rows); L = np.concatenate(labels_rows); T = np.concatenate(steps_rows)
 np.save("C3.npy", S.astype("float32"))
-print(f"соло сырая ошибка:    {ts_auc(S[:,0], L, T):.4f}", flush=True)
-print(f"соло ширина интервала: {ts_auc(S[:,1], L, T):.4f}", flush=True)
-print(f"соло пик ошибки:      {ts_auc(S[:,2], L, T):.4f}", flush=True)
-print(f"всего {time.time()-t0:.0f}s", flush=True)
+print(f"alone raw error:       {ts_auc(S[:,0], L, T):.4f}", flush=True)
+print(f"alone interval width:  {ts_auc(S[:,1], L, T):.4f}", flush=True)
+print(f"alone error peak:      {ts_auc(S[:,2], L, T):.4f}", flush=True)
+print(f"total {time.time()-t0:.0f}s", flush=True)

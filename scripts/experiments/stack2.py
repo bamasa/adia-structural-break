@@ -1,4 +1,4 @@
-"""040 (фолд-0): стекинг v2 — мета-ранкер поверх чистых предсказаний членов."""
+"""040 (fold 0): stacking v2 — a meta-ranker over the members' clean predictions."""
 import sys, time
 sys.path.insert(0, "repo/src")
 import numpy as np
@@ -12,8 +12,8 @@ P = np.load("member_rank_preds.npy").astype("float64")  # drop1..drop4
 clf = np.load("oof_cfg5.npy").astype("float64")
 rnk = np.load("oof_rank.npy").astype("float64")
 
-# Чистый бэггинг-скор на каждой строке: для строки фолда d — предсказание
-# члена drop-d; для фолда 0 — среднее всех четырёх (никто его не видел).
+# Clean bagging score on every row: for a row of fold d — the prediction
+# of the drop-d member; for fold 0 — the mean of all four (none of them saw it).
 sig = 1.0 / (1.0 + np.exp(-P))
 bag_clean = np.zeros(len(y))
 for d in (1, 2, 3, 4):
@@ -22,8 +22,8 @@ for d in (1, 2, 3, 4):
 m0 = assignment == 0
 bag_clean[m0] = sig[m0].mean(axis=1)
 
-# Мета-признаки: чистый бэггинг, классификатор-OOF, одиночный ранкер-OOF,
-# разброс мнений членов (несогласие — само по себе сигнал).
+# Meta-features: clean bagging, classifier OOF, single-ranker OOF,
+# spread of the members' opinions (disagreement is a signal in itself).
 spread = sig.std(axis=1)
 F = np.column_stack([bag_clean, clf, 1.0/(1.0+np.exp(-rnk)), spread]).astype("float32")
 
@@ -43,7 +43,7 @@ meta.fit(Ftr, ytr, group=sizes)
 mp = meta.predict(F[va])
 net_ens = np.load("tcn_foldens_fold0.npy").astype("float64")
 msig = 1.0/(1.0+np.exp(-mp))
-print(f"мета-ранкер (деревянная нога): {ts_auc(mp, yf, sf):.4f}", flush=True)
+print(f"meta-ranker (tree leg): {ts_auc(mp, yf, sf):.4f}", flush=True)
 for w in (0.4, 0.5, 0.6):
-    print(f"мета + {w:.0%} сетей: {ts_auc((1-w)*msig + w*net_ens, yf, sf):.4f} (эталон 0.6099)", flush=True)
-print(f"всего {time.time()-t0:.0f}s", flush=True)
+    print(f"meta + {w:.0%} nets: {ts_auc((1-w)*msig + w*net_ens, yf, sf):.4f} (reference 0.6099)", flush=True)
+print(f"total {time.time()-t0:.0f}s", flush=True)

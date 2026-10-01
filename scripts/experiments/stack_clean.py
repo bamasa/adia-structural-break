@@ -1,4 +1,4 @@
-"""040b: стекинг честно — чистые члены (без фолда 0 и без фолда d), сохраняем."""
+"""040b: stacking done properly — clean members (without fold 0 and without fold d), saved."""
 import sys, time
 sys.path.insert(0, "repo/src")
 import numpy as np, joblib, os
@@ -13,7 +13,7 @@ y = np.load("Y40.npy"); g = np.load("G40.npy"); s = np.load("S40.npy")
 assignment = split_by_series(g, folds=5, seed=0)
 os.makedirs("resources040", exist_ok=True)
 
-# Чистые предсказания: P[i, d-1] валидны на фолдах 0 и d.
+# Clean predictions: P[i, d-1] are valid on folds 0 and d.
 P = np.full((len(y), 4), np.nan, dtype="float32")
 for j, d in enumerate((1, 2, 3, 4)):
     path = f"resources040/clean_drop{d}.joblib"
@@ -35,22 +35,22 @@ for j, d in enumerate((1, 2, 3, 4)):
         joblib.dump(r, path)
     m = (assignment == 0) | (assignment == d)
     P[m, j] = r.booster_.predict(X[m], num_threads=8)
-    print(f"чистый член drop{d} готов [{time.time()-t0:.0f}s]", flush=True)
+    print(f"clean member drop{d} done [{time.time()-t0:.0f}s]", flush=True)
 
 sig = 1.0 / (1.0 + np.exp(-P))
 clf = np.load("oof_cfg5.npy").astype("float64")
 rnk_sig = 1.0 / (1.0 + np.exp(-np.load("oof_rank.npy").astype("float64")))
 
-# Строки фолда d: чистый член drop-d; фолд 0: среднее и разброс всех четырёх.
+# Rows of fold d: the clean drop-d member; fold 0: mean and spread of all four.
 bag = np.zeros(len(y)); spread = np.zeros(len(y))
 for d in (1, 2, 3, 4):
     m = assignment == d
     bag[m] = sig[m, d - 1]
-    spread[m] = 0.0  # у train-строк один чистый член — разброса нет
+    spread[m] = 0.0  # train rows have a single clean member — no spread
 m0 = assignment == 0
 bag[m0] = np.nanmean(sig[m0], axis=1)
 spread[m0] = np.nanstd(sig[m0], axis=1)
-# Разброс несопоставим между train и val -> в мета-признаки НЕ берём.
+# The spread is not comparable between train and val -> NOT used as a meta-feature.
 F = np.column_stack([bag, clf, rnk_sig]).astype("float32")
 
 tr, va = assignment != 0, assignment == 0
@@ -67,7 +67,7 @@ meta = lgb.LGBMRanker(
 meta.fit(Ftr, ytr, group=sizes)
 msig = 1.0 / (1.0 + np.exp(-meta.predict(F[va])))
 net_ens = np.load("tcn_foldens_fold0.npy").astype("float64")
-print(f"мета (чисто), деревянная нога: {ts_auc(msig, yf, sf):.4f}", flush=True)
+print(f"meta (clean), tree leg: {ts_auc(msig, yf, sf):.4f}", flush=True)
 for w in (0.5,):
-    print(f"мета + {w:.0%} сетей: {ts_auc((1-w)*msig + w*net_ens, yf, sf):.4f} (эталон девятки 0.6099)", flush=True)
-print(f"всего {time.time()-t0:.0f}s", flush=True)
+    print(f"meta + {w:.0%} nets: {ts_auc((1-w)*msig + w*net_ens, yf, sf):.4f} (nine-member reference 0.6099)", flush=True)
+print(f"total {time.time()-t0:.0f}s", flush=True)

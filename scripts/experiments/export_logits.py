@@ -36,4 +36,4 @@ for m in members:
             for j, x in enumerate(segs): Xb[j, :, L - len(x):] = torch.from_numpy(x.T)
             out = model(Xb.to(DEVICE)).cpu().numpy()
             for row, i, x in zip(out, chunk, segs): sc[i] = row[-len(x):]
-    arr = np.concatenate(sc); np.save(f"{outdir}/fold2_logits_{kind}{m}.npy", arr); print(f"{kind}{m}: {len(arr)} логитов", flush=True)
+    arr = np.concatenate(sc); np.save(f"{outdir}/fold2_logits_{kind}{m}.npy", arr); print(f"{kind}{m}: {len(arr)} logits", flush=True)

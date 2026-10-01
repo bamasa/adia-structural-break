@@ -61,15 +61,15 @@ yf, sf = y[mask], s[mask]
 n0 = np.load("tcn_chan_aligned.npy").astype("float64")
 n1 = aligned("tcn_chan_s1.pt").astype("float64")
 n2 = aligned("tcn_chan_s2.pt").astype("float64")
-for name, v in (("сид0", n0), ("сид1", n1), ("сид2", n2)):
-    print(f"{name} соло: {ts_auc(v, yf, sf):.4f}", flush=True)
+for name, v in (("seed0", n0), ("seed1", n1), ("seed2", n2)):
+    print(f"{name} alone: {ts_auc(v, yf, sf):.4f}", flush=True)
 sig = (1/(1+np.exp(-n0)) + 1/(1+np.exp(-n1)) + 1/(1+np.exp(-n2))) / 3
-print(f"сид-ансамбль соло: {ts_auc(sig, yf, sf):.4f}", flush=True)
+print(f"seed ensemble alone: {ts_auc(sig, yf, sf):.4f}", flush=True)
 np.save("tcn_seedens_fold0.npy", sig)
 clf = np.load("oof_cfg5.npy")[mask].astype("float64")
 rnk = np.load("oof_rank.npy")[mask].astype("float64")
 sig_r = 1.0/(1.0+np.exp(-rnk))
 blend = 0.6*sig_r + 0.4*clf
 for w in (0.3, 0.4, 0.5):
-    print(f"тройка с {w:.0%} сид-ансамбля: {ts_auc((1-w)*blend + w*sig, yf, sf):.4f} (эталон #18: 0.6068)", flush=True)
+    print(f"triple with {w:.0%} seed ensemble: {ts_auc((1-w)*blend + w*sig, yf, sf):.4f} (reference #18: 0.6068)", flush=True)
 PY

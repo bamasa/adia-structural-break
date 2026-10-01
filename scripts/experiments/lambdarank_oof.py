@@ -31,11 +31,11 @@ for fold in range(5):
     tr, va = assignment != fold, assignment == fold
     r = fit(tr)
     oof[va] = r.predict(X[va])
-    print(f"  фолд {fold}: {ts_auc(oof[va], y[va], s[va]):.4f}  [{time.time()-t0:.0f}s]", flush=True)
+    print(f"  fold {fold}: {ts_auc(oof[va], y[va], s[va]):.4f}  [{time.time()-t0:.0f}s]", flush=True)
 np.save("oof_rank.npy", oof)
 final = fit(np.ones(len(y), dtype=bool))
 art = joblib.load("resources013/model.joblib")
 os.makedirs("resources022", exist_ok=True)
 joblib.dump({"booster": final, "forecaster": art["forecaster"], "ranker": True},
             "resources022/model.joblib")
-print(f"готово {time.time()-t0:.0f}s", flush=True)
+print(f"done {time.time()-t0:.0f}s", flush=True)

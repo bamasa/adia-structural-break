@@ -1,4 +1,4 @@
-"""025 (фолд-0): глубина ранжирования lambdarank — 500 / 2000 (эталон) / 8000."""
+"""025 (fold 0): lambdarank truncation depth — 500 / 2000 (reference) / 8000."""
 import sys, time
 sys.path.insert(0, "repo/src")
 import numpy as np
@@ -24,6 +24,6 @@ for trunc in (500, 8000):
         random_state=0, n_jobs=8, deterministic=True, force_row_wise=True,
         verbose=-1, lambdarank_truncation_level=trunc, label_gain=[0, 1])
     r.fit(Xtr, ytr, group=sizes)
-    print(f"truncation {trunc}: фолд-0 {ts_auc(r.predict(X[va]), y[va], s[va]):.4f}  "
-          f"(эталон 2000: 0.6006)  [{time.time()-t0:.0f}s]", flush=True)
-print(f"всего {time.time()-t0:.0f}s", flush=True)
+    print(f"truncation {trunc}: fold 0 {ts_auc(r.predict(X[va]), y[va], s[va]):.4f}  "
+          f"(reference 2000: 0.6006)  [{time.time()-t0:.0f}s]", flush=True)
+print(f"total {time.time()-t0:.0f}s", flush=True)

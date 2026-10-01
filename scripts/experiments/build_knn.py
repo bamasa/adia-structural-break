@@ -1,12 +1,12 @@
-"""140: новизна окна против ЭМПИРИЧЕСКОГО распределения окон истории — другая точка отсчёта.
+"""140: window novelty against the EMPIRICAL distribution of history windows — a different reference point.
 
-Все члены сравнивают окно со средним/дисперсией истории. Если история сама неоднородна
-(режимы, гетероскедастичность), среднее — плохой ноль: обычное для истории окно выглядит
-аномальным, а слом в «спокойный» режим — нет. Здесь окно описывается вектором сводок
-(mean, sd, skew, kurt, ac1, q05, q95) и сравнивается со ВСЕМИ окнами истории такой же длины:
-расстояние до ближайшего, медианное расстояние, и ранг текущего расстояния среди расстояний
-«история против истории» (эмпирическое p-значение). 4 окна x 3 = 12 каналов + 4 канала
-p-значений по отдельным сводкам (sd и ac1) = 20. O(окон истории x 7) на шаг.
+All members compare the window with the history mean/variance. If the history itself is heterogeneous
+(regimes, heteroskedasticity), the mean is a poor zero: a window typical for the history looks
+anomalous, while a break into a "calm" regime does not. Here the window is described by a vector of summaries
+(mean, sd, skew, kurt, ac1, q05, q95) and compared with ALL history windows of the same length:
+distance to the nearest one, median distance, and the rank of the current distance among the
+"history vs history" distances (empirical p-value). 4 windows x 3 = 12 channels + 4 channels of
+p-values on individual summaries (sd and ac1) = 20. O(history windows x 7) per step.
 python build_knn.py <shard> <n> | merge <n> | test
 """
 import sys, time, os, numpy as np
@@ -23,9 +23,9 @@ def knn_channels(hist, online):
     full = np.concatenate([zh[-max(WINS):], zo]); off = len(zh[-max(WINS):])
     for i, W in enumerate(WINS):
         step = max(W // 2, 1)
-        H = np.array([summ(zh[j:j + W]) for j in range(0, len(zh) - W + 1, step)])            # окна истории
+        H = np.array([summ(zh[j:j + W]) for j in range(0, len(zh) - W + 1, step)])            # history windows
         scale = H.std(0) + 1e-6; Hn = H / scale
-        # расстояния «история против истории» (без самого себя) для эталона
+        # "history vs history" distances (excluding self) as the reference
         D = np.sqrt(((Hn[:, None, :] - Hn[None, :, :]) ** 2).sum(-1)); np.fill_diagonal(D, np.inf)
         d_nn_h = D.min(1); d_med_h = np.median(np.where(np.isinf(D), np.nan, D), 1)
         nn_ref = np.sort(d_nn_h); med_ref = np.sort(np.nan_to_num(d_med_h, nan=np.nanmedian(d_med_h)))
@@ -44,7 +44,7 @@ def knn_channels(hist, online):
 if __name__ == "__main__":
     if sys.argv[1] == "test":
         rng = np.random.default_rng(0)
-        # неоднородная история: чередование режимов σ=0.6 и σ=1.4; слом — в третий режим σ=1.0 с AR 0.5
+        # heterogeneous history: alternating regimes σ=0.6 and σ=1.4; the break goes into a third regime σ=1.0 with AR 0.5
         hist = np.concatenate([rng.normal(0, 0.6 if (k // 200) % 2 == 0 else 1.4, 200) for k in range(0, 2000, 200)])
         def ar(phi, n): 
             x = np.zeros(n); e = rng.normal(0, 1, n)
@@ -52,7 +52,7 @@ if __name__ == "__main__":
             return x
         online = np.concatenate([rng.normal(0, 0.6, 200), ar(0.5, 200)])
         t0 = time.time(); o = knn_channels(hist, online); dt = (time.time() - t0) / len(online) * 1000
-        print(f"каналов {o.shape[1]}, {dt:.3f} мс/шаг; неоднородная история, слом в новый режим: p_nn/окно100 {o[150:200,11].mean():+.2f} -> {o[300:400,11].mean():+.2f}, p_ac {o[150:200,14].mean():+.2f} -> {o[300:400,14].mean():+.2f}")
+        print(f"channels {o.shape[1]}, {dt:.3f} ms/step; heterogeneous history, break into a new regime: p_nn/window100 {o[150:200,11].mean():+.2f} -> {o[300:400,11].mean():+.2f}, p_ac {o[150:200,14].mean():+.2f} -> {o[300:400,14].mean():+.2f}")
         sys.exit(0)
     if sys.argv[1] == "merge":
         n = int(sys.argv[2]); parts = [np.load(f"{PARTS}/part_{i}.npz", allow_pickle=True) for i in range(n)]
@@ -70,7 +70,7 @@ if __name__ == "__main__":
     for i, (sid, part) in enumerate(x.groupby(level="id")):
         hist = part.loc[part.period == 1, "value"].to_numpy("float64"); online = part.loc[part.period == 2, "value"].to_numpy("float64")
         sids.append(int(sid)); arrs.append(knn_channels(hist, online))
-        if (i + 1) % 200 == 0: print(f"шард {shard}: {i+1} рядов, {time.time()-t0:.0f}s", flush=True)
+        if (i + 1) % 200 == 0: print(f"shard {shard}: {i+1} series, {time.time()-t0:.0f}s", flush=True)
     os.makedirs(PARTS, exist_ok=True)
     np.savez(f"{PARTS}/part_{shard}.npz", sids=np.array(sids), arrs=np.array(arrs, dtype=object), allow_pickle=True)
-    print(f"шард {shard} готов {time.time()-t0:.0f}s: {len(sids)} рядов", flush=True)
+    print(f"shard {shard} done {time.time()-t0:.0f}s: {len(sids)} series", flush=True)

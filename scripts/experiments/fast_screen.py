@@ -1,4 +1,4 @@
-"""Быстрый скрининг: полряда, 150 деревьев, max_bin 63. Калибровка на известном."""
+"""Fast screening: half the series, 150 trees, max_bin 63. Calibration against known results."""
 import sys, time
 sys.path.insert(0, "repo/src")
 import numpy as np
@@ -16,7 +16,7 @@ rng = np.random.default_rng(7)
 train_sids = np.unique(g[tr_full])
 half = rng.choice(train_sids, size=len(train_sids) // 2, replace=False)
 tr = tr_full & np.isin(g, half)
-print(f"обучающих строк: {tr.sum()} (было {tr_full.sum()})", flush=True)
+print(f"training rows: {tr.sum()} (was {tr_full.sum()})", flush=True)
 Xtr, ytr, str_ = X[tr], y[tr], s[tr]
 order = np.argsort(str_, kind="stable")
 Xtr, ytr, str_ = Xtr[order], ytr[order], str_[order]
@@ -43,7 +43,7 @@ def screen_clf():
     m.fit(X[tr], y[tr], sample_weight=step_weights(s[tr]))
     return ts_auc(m.predict_proba(X[va])[:, 1], yf, sf)
 
-print(f"скрин ранкер t2000:  {screen_rank(2000):.4f}  (полный: 0.6006)  [{time.time()-t0:.0f}s]", flush=True)
-print(f"скрин классификатор: {screen_clf():.4f}  (полный: 0.5952)  [{time.time()-t0:.0f}s]", flush=True)
-print(f"скрин ранкер t500:   {screen_rank(500):.4f}  (полный: 0.5919)  [{time.time()-t0:.0f}s]", flush=True)
-print(f"всего {time.time()-t0:.0f}s", flush=True)
+print(f"screen ranker t2000:  {screen_rank(2000):.4f}  (full: 0.6006)  [{time.time()-t0:.0f}s]", flush=True)
+print(f"screen classifier:    {screen_clf():.4f}  (full: 0.5952)  [{time.time()-t0:.0f}s]", flush=True)
+print(f"screen ranker t500:   {screen_rank(500):.4f}  (full: 0.5919)  [{time.time()-t0:.0f}s]", flush=True)
+print(f"total {time.time()-t0:.0f}s", flush=True)

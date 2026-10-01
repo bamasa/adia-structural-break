@@ -1,15 +1,15 @@
-"""081: чистый холдаут — псевдоряды холдаутных рядов исключены из обучения.
+"""081: clean holdout — pseudo-series of the holdout series are excluded from training.
 
-Во всех пулах лучшая эпоха выбиралась по холдауту, чьи псевдоряды лежали
-в обучении (080b: холдаут 0.7255 при фолде-2 0.5678). Выбор эпохи был
-смещён к запоминанию. Здесь холдаут честный. Рецепт #28 в остальном.
-Kill: соло на фолде-2 не выше 0.605.
-Исходный 076: сети на ТРОЙНОЙ аугментации — втрое больше псевдорядов.
+In all pools the best epoch was chosen by a holdout whose pseudo-series were
+in the training set (080b: holdout 0.7255 with fold 2 at 0.5678). Epoch selection was
+biased toward memorization. Here the holdout is honest. Otherwise the #28 recipe.
+Kill: alone on fold 2 not above 0.605.
+Original 076: nets on TRIPLE augmentation — three times more pseudo-series.
 
-Сети data-bound: одинарная аугментация дала рекорды обоим архитектурам.
-Тройную (AUG3, три случайных среза на ряд) видели только ранкеры.
-AUG3_X 8.3 ГБ — читаем через mmap по-рядно. Половина членов plain (200
-входов), половина diff (600). Kill: холдауты не выше пулов на одинарной."""
+The nets are data-bound: single augmentation gave records to both architectures.
+Triple (AUG3, three random cuts per series) was only seen by the rankers.
+AUG3_X is 8.3 GB — read via mmap series by series. Half of the members plain (200
+inputs), half diff (600). Kill: holdouts not above the single-augmentation pools."""
 import sys, time, os
 sys.path.insert(0, "repo/src")
 import numpy as np
@@ -30,14 +30,14 @@ starts = np.flatnonzero(np.concatenate([[True], g[1:] != g[:-1]]))
 bounds = np.append(starts, len(g))
 mu = np.load("mu200.npy"); sd = np.load("sd200.npy")
 
-# Оригинальные ряды (фолд-2 держим в стороне — он линейка).
+# Original series (fold 2 is kept aside — it is the yardstick).
 orig, orig_fold = [], []
 for a, b in zip(starts, bounds[1:]):
     orig.append((((X[a:b] - mu) / sd), y[a:b].astype("float32")))
     orig_fold.append(int(assignment[a]))
 del X
 
-# Тройная аугментация: 8.3 ГБ, читаем mmap по-рядно.
+# Triple augmentation: 8.3 GB, read via mmap series by series.
 AX = np.load("AUG3_X.npy", mmap_mode="r")
 AY = np.load("AUG3_Y.npy"); AG = np.load("AUG3_G.npy")
 a_starts = np.flatnonzero(np.concatenate([[True], AG[1:] != AG[:-1]]))
@@ -46,12 +46,12 @@ fold_by_sid = {int(g[a]): int(assignment[a]) for a in starts}
 aug = []
 for a, b in zip(a_starts, a_bounds[1:]):
     sid = (int(AG[a]) - 100000) // 10
-    # псевдоряд наследует фолд родителя; фолд-2 исключаем
+    # a pseudo-series inherits the parent's fold; fold 2 is excluded
     if fold_by_sid.get(sid, 0) != 2:
         aug.append((((np.asarray(AX[a:b]) - mu) / sd).astype("float32"),
                     AY[a:b].astype("float32"), sid))
 del AX, AY
-print(f"оригинал {len(orig)}, аугментация {len(aug)} [{time.time()-t0:.0f}s]", flush=True)
+print(f"original {len(orig)}, augmentation {len(aug)} [{time.time()-t0:.0f}s]", flush=True)
 
 class Block(nn.Module):
     def __init__(self, ch, dil):
@@ -128,23 +128,23 @@ def holdout_auc(model, rows, use_diffs):
 os.makedirs("nets_aug3_clean", exist_ok=True)
 pool_orig = [orig[i] for i in range(len(orig)) if orig_fold[i] != 2]
 pool_sid = [int(g[starts[i]]) for i in range(len(orig)) if orig_fold[i] != 2]
-# После пробы d0 (холдаут 0.6543 -> фолд-2 0.5875) diff-члены из очереди
-# убраны: они не переносятся, а стоят по 4.4 часа каждый.
+# After the d0 probe (holdout 0.6543 -> fold 2 0.5875) the diff members were removed
+# from the queue: they do not transfer, and cost 4.4 hours each.
 JOBS = [("c", i, False) for i in range(3)]
 for tag, member, use_diffs in JOBS:
     path = f"nets_aug3_clean/member_{tag}{member}.pt"
     if os.path.exists(path):
         continue
-    seed = 51000 + member  # те же сиды, что p0–p2: парное сравнение
+    seed = 51000 + member  # same seeds as p0–p2: paired comparison
     rng = np.random.default_rng(seed)
     torch.manual_seed(seed)
     idx = rng.permutation(len(pool_orig))
     hold_n = int(0.08 * len(pool_orig))
     hold = [pool_orig[i] for i in idx[:hold_n]]
     hold_sids = {pool_sid[i] for i in idx[:hold_n]}
-    # 081: псевдоряды холдаутных рядов в обучение не попадают
+    # 081: pseudo-series of the holdout series do not enter training
     train_set = [pool_orig[i] for i in idx[hold_n:]] + [(f, lab) for f, lab, sid in aug if sid not in hold_sids]
-    print(f"  член {tag}{member}: обучение {len(train_set)} рядов, холдаут {len(hold)} (чистый)", flush=True)
+    print(f"  member {tag}{member}: training {len(train_set)} series, holdout {len(hold)} (clean)", flush=True)
     rng.shuffle(train_set)
     model = ChanTCN(600 if use_diffs else 200).to(DEVICE)
     opt = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
@@ -167,5 +167,5 @@ for tag, member, use_diffs in JOBS:
         if a > best[0]:
             best = (a, {k: v.cpu().clone() for k, v in model.state_dict().items()})
     torch.save(best[1], path)
-    print(f"clean-сеть {tag}{member}: холдаут {best[0]:.4f}  [{time.time()-t0:.0f}s]", flush=True)
+    print(f"clean net {tag}{member}: holdout {best[0]:.4f}  [{time.time()-t0:.0f}s]", flush=True)
 print("done", flush=True)

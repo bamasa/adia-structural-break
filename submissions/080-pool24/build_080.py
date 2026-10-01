@@ -1,8 +1,8 @@
-"""resources080: артефакт #30 (resources075) с пулом сетей, расширенным с 12 до 24.
+"""resources080: the #30 artifact (resources075) with the net pool extended from 12 to 24.
 
-Те же двенадцать добавочных членов, что в #34 (шесть на всех рядах из #29, шесть из пула 095),
-но без самонормировки и без второго классификатора — оба не подтвердились в облаке.
-Единственное отличие от #30 — число сетей.
+The same twelve additional members as in #34 (six on all series from #29, six from the 095 pool),
+but without self-normalization and without the second classifier — neither was confirmed in the cloud.
+The only difference from #30 is the number of nets.
 """
 import os, joblib, numpy as np
 m = joblib.load("resources075/model.joblib")

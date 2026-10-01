@@ -18,13 +18,13 @@ sid = (AG - 100000) // 10; cut = AG % 10
 keep = np.flatnonzero((cut == 0) & np.array([fold_by_sid.get(int(x), 0) != 2 for x in sid]))
 AW = np.load("AUG3_WHITE111.npy", mmap_mode="r"); Atr = np.asarray(AW[keep]); del AW
 Xtr = np.vstack([Dtr, Atr]); ytr = np.concatenate([y[tr], AY[keep]]); str_ = np.concatenate([s[tr], AS[keep]]); del Dtr, Atr
-print(f"обучение: {tr.sum()} оригинальных строк + {len(keep)} аугментированных = {len(ytr)} [{time.time()-t0:.0f}s]", flush=True)
+print(f"training: {tr.sum()} original rows + {len(keep)} augmented = {len(ytr)} [{time.time()-t0:.0f}s]", flush=True)
 slow = dict(n_estimators=3000, learning_rate=0.0075, num_leaves=31, colsample_bytree=0.5, subsample=0.8, subsample_freq=1, min_child_samples=500, reg_lambda=10.0, verbose=-1, n_jobs=8)
 import os
 if os.path.exists("fold2_clf_white_aug.npy"): c_aug = np.load("fold2_clf_white_aug.npy")
 else: c_aug = lgb.LGBMClassifier(**slow).fit(Xtr, ytr).predict_proba(Dte)[:, 1]; np.save("fold2_clf_white_aug.npy", c_aug)
 c0 = np.load("fold2_clf_white_sr_slower.npy")
-print(f"клф с аугментацией: соло {ts_auc(c_aug, yf, sf):.4f} (без {ts_auc(c0, yf, sf):.4f}) [{time.time()-t0:.0f}s]", flush=True)
+print(f"clf with augmentation: alone {ts_auc(c_aug, yf, sf):.4f} (without {ts_auc(c0, yf, sf):.4f}) [{time.time()-t0:.0f}s]", flush=True)
 # lambdarank caps a query at 10,000 rows; with the augmentation a step's cross-section exceeds it,
 # so every step is split into random chunks of at most 9,000 rows, each its own query.
 rng = np.random.default_rng(0); key = str_.astype("int64") * 8
@@ -34,13 +34,13 @@ for t_ in np.unique(str_):
 order = np.argsort(key, kind="stable"); _, sizes = np.unique(key[order], return_counts=True)
 rk = lgb.LGBMRanker(objective="lambdarank", n_estimators=600, learning_rate=0.03, num_leaves=31, min_child_samples=500, subsample=0.8, subsample_freq=1, colsample_bytree=0.5, reg_lambda=10.0, lambdarank_truncation_level=2000, label_gain=[0, 1], verbose=-1, n_jobs=8)
 rk.fit(Xtr[order], ytr[order], group=sizes); r_aug = sig(rk.predict(Dte)); np.save("fold2_rank_white_aug.npy", r_aug)
-print(f"ранкер с аугментацией: соло {ts_auc(r_aug, yf, sf):.4f} (без {ts_auc(r0, yf, sf):.4f}) [{time.time()-t0:.0f}s]", flush=True)
-print(f"#44-рецепт: {ts_auc(s44, yf, sf):.4f}")
-for name, rb, cc in (("бэг r0+r1 / c1 (#44)", 0.5 * (r0 + r1), c1), ("бэг r0+r1+r_aug / c1", (r0 + r1 + r_aug) / 3, c1), ("бэг r0+r1+r_aug / c_aug", (r0 + r1 + r_aug) / 3, c_aug), ("r_aug / c_aug", r_aug, c_aug)):
+print(f"ranker with augmentation: alone {ts_auc(r_aug, yf, sf):.4f} (without {ts_auc(r0, yf, sf):.4f}) [{time.time()-t0:.0f}s]", flush=True)
+print(f"#44 recipe: {ts_auc(s44, yf, sf):.4f}")
+for name, rb, cc in (("bag r0+r1 / c1 (#44)", 0.5 * (r0 + r1), c1), ("bag r0+r1+r_aug / c1", (r0 + r1 + r_aug) / 3, c1), ("bag r0+r1+r_aug / c_aug", (r0 + r1 + r_aug) / 3, c_aug), ("r_aug / c_aug", r_aug, c_aug)):
     m = 0.7 * rb + 0.3 * cc; b = 0.85 * (0.6 * s39 + 0.4 * m) + 0.15 * pool
-    print(f"  {name}: член {ts_auc(m, yf, sf):.4f} | смесь {ts_auc(b, yf, sf):.4f}")
-print("--- по диапазонам: #44 -> бэг с аугментацией ---")
+    print(f"  {name}: member {ts_auc(m, yf, sf):.4f} | blend {ts_auc(b, yf, sf):.4f}")
+print("--- by step range: #44 -> bag with augmentation ---")
 m = 0.7 * (r0 + r1 + r_aug) / 3 + 0.3 * c_aug; b = 0.85 * (0.6 * s39 + 0.4 * m) + 0.15 * pool
 for a, bb in ((0, 30), (30, 100), (100, 300), (300, 700), (700, 3000)):
-    mm = (sf >= a) & (sf < bb); print(f"  шаги {a}-{bb}: {ts_auc(s44[mm], yf[mm], sf[mm]):.4f} -> {ts_auc(b[mm], yf[mm], sf[mm]):.4f}")
-print(f"готово [{time.time()-t0:.0f}s]")
+    mm = (sf >= a) & (sf < bb); print(f"  steps {a}-{bb}: {ts_auc(s44[mm], yf[mm], sf[mm]):.4f} -> {ts_auc(b[mm], yf[mm], sf[mm]):.4f}")
+print(f"done [{time.time()-t0:.0f}s]")

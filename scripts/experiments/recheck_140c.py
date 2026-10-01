@@ -1,4 +1,4 @@
-"""140c повтор: точные доли смеси после гейта и проверка каналов p_med в KNN20."""
+"""140c rerun: exact blend weights after the gate and a check of the p_med channels in KNN20."""
 import sys, glob, numpy as np
 sys.path.insert(0, "repo/src")
 from structural_break.combiners import split_by_series, ts_auc
@@ -16,5 +16,5 @@ for M, U in ((0.25, 0.20), (0.25, 0.25), (0.20, 0.25)):
     late = 0.55 * base + M * mass + U * un
     print(f"core 0.55 mass {M:.2f} union {U:.2f}: flat {ts_auc(late, yf, sf):.4f} | gate<100 {ts_auc(np.where(sf < 100, ref, late), yf, sf):.4f}")
 K = np.load("KNN20.npy")
-print("p_med (каналы 2,7,12,17) уникальных значений:", [len(np.unique(K[:, 2 + 5 * i])) for i in range(4)], "min/max:", float(K[:, 2::5].min()), float(K[:, 2::5].max()))
-print("p_nn уникальных:", [len(np.unique(K[:, 1 + 5 * i])) for i in range(4)])
+print("p_med (channels 2,7,12,17) unique values:", [len(np.unique(K[:, 2 + 5 * i])) for i in range(4)], "min/max:", float(K[:, 2::5].min()), float(K[:, 2::5].max()))
+print("p_nn unique values:", [len(np.unique(K[:, 1 + 5 * i])) for i in range(4)])

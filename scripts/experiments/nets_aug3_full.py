@@ -1,14 +1,14 @@
-"""078: рецепт #28 на ПОЛНЫХ данных — фолд-2 больше не вычёркивается.
+"""078: recipe of #28 on the FULL data — fold 2 is no longer held out.
 
-Отправленные сети учились без фолда-2 (20% рядов + их псевдоряды). Для
-финальной модели данные-ограниченной сети это потеря; деревья давно учатся
-на всём. Локально не проверяется (фолд-2 в обучении) — судья облако.
-Исходный 076: сети на ТРОЙНОЙ аугментации — втрое больше псевдорядов.
+The shipped nets were trained without fold 2 (20% of series + their pseudo-series). For
+the final model of a data-limited net this is a loss; the trees have long been trained
+on everything. Not verifiable locally (fold 2 is in training) — the cloud is the judge.
+Original 076: nets on TRIPLE augmentation — three times more pseudo-series.
 
-Сети data-bound: одинарная аугментация дала рекорды обоим архитектурам.
-Тройную (AUG3, три случайных среза на ряд) видели только ранкеры.
-AUG3_X 8.3 ГБ — читаем через mmap по-рядно. Половина членов plain (200
-входов), половина diff (600). Kill: холдауты не выше пулов на одинарной."""
+The nets are data-bound: single augmentation gave records to both architectures.
+Only the rankers have seen the triple one (AUG3, three random cuts per series).
+AUG3_X is 8.3 GB — read via mmap series by series. Half of the members are plain (200
+inputs), half diff (600). Kill: holdouts not above the pools on single augmentation."""
 import sys, time, os
 sys.path.insert(0, "repo/src")
 import numpy as np
@@ -29,14 +29,14 @@ starts = np.flatnonzero(np.concatenate([[True], g[1:] != g[:-1]]))
 bounds = np.append(starts, len(g))
 mu = np.load("mu200.npy"); sd = np.load("sd200.npy")
 
-# Оригинальные ряды (фолд-2 держим в стороне — он линейка).
+# Original series (fold 2 is kept aside — it is the yardstick).
 orig, orig_fold = [], []
 for a, b in zip(starts, bounds[1:]):
     orig.append((((X[a:b] - mu) / sd), y[a:b].astype("float32")))
     orig_fold.append(int(assignment[a]))
 del X
 
-# Тройная аугментация: 8.3 ГБ, читаем mmap по-рядно.
+# Triple augmentation: 8.3 GB, read via mmap series by series.
 AX = np.load("AUG3_X.npy", mmap_mode="r")
 AY = np.load("AUG3_Y.npy"); AG = np.load("AUG3_G.npy")
 a_starts = np.flatnonzero(np.concatenate([[True], AG[1:] != AG[:-1]]))
@@ -45,12 +45,12 @@ fold_by_sid = {int(g[a]): int(assignment[a]) for a in starts}
 aug = []
 for a, b in zip(a_starts, a_bounds[1:]):
     sid = (int(AG[a]) - 100000) // 10
-    # псевдоряд наследует фолд родителя; фолд-2 исключаем
-    if True:  # 078: псевдоряды всех фолдов
+    # a pseudo-series inherits the parent's fold; fold 2 is excluded
+    if True:  # 078: pseudo-series of all folds
         aug.append((((np.asarray(AX[a:b]) - mu) / sd).astype("float32"),
                     AY[a:b].astype("float32")))
 del AX, AY
-print(f"оригинал {len(orig)}, аугментация {len(aug)} [{time.time()-t0:.0f}s]", flush=True)
+print(f"original {len(orig)}, augmentation {len(aug)} [{time.time()-t0:.0f}s]", flush=True)
 
 class Block(nn.Module):
     def __init__(self, ch, dil):
@@ -125,15 +125,15 @@ def holdout_auc(model, rows, use_diffs):
     return ts_auc(np.concatenate(sc_), np.concatenate(lb_), np.concatenate(st_))
 
 os.makedirs("nets_aug3_full", exist_ok=True)
-pool_orig = list(orig)  # 078: все десять тысяч рядов
-# После пробы d0 (холдаут 0.6543 -> фолд-2 0.5875) diff-члены из очереди
-# убраны: они не переносятся, а стоят по 4.4 часа каждый.
+pool_orig = list(orig)  # 078: all ten thousand series
+# After the d0 trial (holdout 0.6543 -> fold 2 0.5875) the diff members were
+# removed from the queue: they do not transfer and cost 4.4 hours each.
 JOBS = [("f", i, False) for i in range(6)]
 for tag, member, use_diffs in JOBS:
     path = f"nets_aug3_full/member_{tag}{member}.pt"
     if os.path.exists(path):
         continue
-    seed = 51000 + member  # те же сиды, что у p0–p5
+    seed = 51000 + member  # the same seeds as p0–p5
     rng = np.random.default_rng(seed)
     torch.manual_seed(seed)
     idx = rng.permutation(len(pool_orig))
@@ -162,5 +162,5 @@ for tag, member, use_diffs in JOBS:
         if a > best[0]:
             best = (a, {k: v.cpu().clone() for k, v in model.state_dict().items()})
     torch.save(best[1], path)
-    print(f"full-сеть {tag}{member}: холдаут {best[0]:.4f}  [{time.time()-t0:.0f}s]", flush=True)
+    print(f"full net {tag}{member}: holdout {best[0]:.4f}  [{time.time()-t0:.0f}s]", flush=True)
 print("done", flush=True)

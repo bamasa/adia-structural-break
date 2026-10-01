@@ -1,12 +1,12 @@
-"""resources082: массовый член (#36) плюс полный пул из 24 сетей (#35).
+"""resources082: the mass member (#36) plus the full pool of 24 nets (#35).
 
-Два независимо обоснованных изменения к #30 в одном артефакте: массовая батарея
-как отдельный член (114, +0.004 на фолде-2) и пул сетей, удвоенный с 12 до 24
-(проверялся отдельно как #35). Фолд-2 не различает 12 и 24 сети, поэтому от
-объединения ожидается прирост массы; пул — ставка на снижение дисперсии в облаке.
+Two independently justified changes to #30 in one artifact: the mass battery
+as a separate member (114, +0.004 on fold 2) and the net pool doubled from 12 to 24
+(tested separately as #35). Fold 2 does not distinguish 12 from 24 nets, so the
+combination is expected to gain from the mass member; the pool is a bet on lower variance in the cloud.
 """
 import os, joblib, numpy as np
-m = joblib.load("resources081/model.joblib")          # #36: 12 сетей + массовый член
+m = joblib.load("resources081/model.joblib")          # #36: 12 nets + the mass member
 assert "mass_classifier" in m and len(m["nets"]) == 12
 def unpack(path):
     arc = np.load(path); n = 1 + max(int(k.split("|")[0]) for k in arc.files)

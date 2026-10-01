@@ -25,44 +25,44 @@ def cv_boosted(mat, tag, save_oof=False):
           + f"   [{time.time()-t0:.0f}s]", flush=True)
     return np.mean(scores), oof
 
-# 1) соло-качество новых блоков
-print("соло D-вид, максимум по 50:", f"{ts_auc(D50.max(axis=1), y, s):.4f}", flush=True)
-print("соло E8, пик горизонта 5:  ", f"{ts_auc(E8[:, 5], y, s):.4f}", flush=True)
+# 1) solo quality of the new blocks
+print("alone D-view, max over 50:   ", f"{ts_auc(D50.max(axis=1), y, s):.4f}", flush=True)
+print("alone E8, horizon-5 peak:    ", f"{ts_auc(E8[:, 5], y, s):.4f}", flush=True)
 
-# 2) наборы каналов
-best_mean, best_mat, best_tag, best_oof = 0.5779, None, "104 (базовая 013)", None
+# 2) channel sets
+best_mean, best_mat, best_tag, best_oof = 0.5779, None, "104 (baseline 013)", None
 for tag, mat in [
-    ("108 (100 + E8-прогнозист)", np.hstack([X100, E8])),
-    ("154 (104 + D-вид)", np.hstack([X100, E4, D50])),
-    ("162 (100 + E8 + D-вид)", np.hstack([X100, E8, D50])),
+    ("108 (100 + E8 forecaster)", np.hstack([X100, E8])),
+    ("154 (104 + D-view)", np.hstack([X100, E4, D50])),
+    ("162 (100 + E8 + D-view)", np.hstack([X100, E8, D50])),
 ]:
     mean, oof = cv_boosted(mat, tag, save_oof=True)
     if mean > best_mean:
         best_mean, best_mat, best_tag, best_oof = mean, mat, tag, oof
-print(f"лучший набор: {best_tag} ({best_mean:.4f})", flush=True)
+print(f"best set: {best_tag} ({best_mean:.4f})", flush=True)
 
 if best_mat is None:
-    print("новые наборы не побили 104 — постобработку меряем на 104", flush=True)
-    _, best_oof = cv_boosted(np.hstack([X100, E4]), "104 (пересчёт для OOF)", save_oof=True)
+    print("the new sets did not beat 104 — measuring post-processing on 104", flush=True)
+    _, best_oof = cv_boosted(np.hstack([X100, E4]), "104 (recomputed for OOF)", save_oof=True)
     best_mat = np.hstack([X100, E4])
 
-# 3) взвешенная сумма и максимум на лучшем наборе (один фолд для скорости, потом полный если близко)
+# 3) weighted sum and max on the best set (one fold for speed, then full if close)
 names = [f"c{i}" for i in range(best_mat.shape[1])]
 tr, va = assignment != 0, assignment == 0
 w_model = Weighted.fit(best_mat[tr], y[tr], names, step_weights(s[tr]))
-print(f"взвешенная сумма, фолд 0: {ts_auc(w_model.predict(best_mat[va]), y[va], s[va]):.4f}", flush=True)
-print(f"максимум каналов, фолд 0: {ts_auc(best_mat[va].max(axis=1), y[va], s[va]):.4f}", flush=True)
+print(f"weighted sum, fold 0: {ts_auc(w_model.predict(best_mat[va]), y[va], s[va]):.4f}", flush=True)
+print(f"channel max, fold 0: {ts_auc(best_mat[va].max(axis=1), y[va], s[va]):.4f}", flush=True)
 
-# 4) асимметричная постобработка OOF лучшей модели
+# 4) asymmetric post-processing of the best model's OOF
 starts = np.flatnonzero(np.concatenate([[True], g[1:] != g[:-1]]))
 bounds = np.append(starts, len(g))
-fast_pred = E8[:, 0]  # быстрая EWMA ошибки прогноза: ~1 = ряд предсказуем
+fast_pred = E8[:, 0]  # fast EWMA of forecast error: ~1 = series is predictable
 
 def fold_scores(p):
     return [ts_auc(p[assignment == f], y[assignment == f], s[assignment == f]) for f in range(5)]
 
 base_scores = fold_scores(best_oof)
-print(f"постобработка, база: {np.mean(base_scores):.4f}", flush=True)
+print(f"post-processing, baseline: {np.mean(base_scores):.4f}", flush=True)
 
 def peak_hold(p, alpha):
     out = np.empty_like(p)
@@ -85,9 +85,9 @@ def gated(p, a_calm, a_loud, thr):
 
 for alpha in (0.98, 0.995, 0.999):
     sc = fold_scores(peak_hold(best_oof, alpha))
-    print(f"пик-холд α={alpha}: {np.mean(sc):.4f}  " + " ".join(f"{v:.4f}" for v in sc), flush=True)
+    print(f"peak-hold α={alpha}: {np.mean(sc):.4f}  " + " ".join(f"{v:.4f}" for v in sc), flush=True)
 for a_calm, a_loud, thr in [(0.95, 0.999, 1.05), (0.90, 0.999, 1.10), (0.97, 1.0, 1.05)]:
     sc = fold_scores(gated(best_oof, a_calm, a_loud, thr))
-    print(f"гейт прогнозистом ({a_calm}/{a_loud}, порог {thr}): {np.mean(sc):.4f}  "
+    print(f"forecaster gate ({a_calm}/{a_loud}, threshold {thr}): {np.mean(sc):.4f}  "
           + " ".join(f"{v:.4f}" for v in sc), flush=True)
-print(f"всего {time.time()-t0:.0f}s", flush=True)
+print(f"total {time.time()-t0:.0f}s", flush=True)

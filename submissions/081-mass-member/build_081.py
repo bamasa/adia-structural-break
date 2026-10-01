@@ -1,4 +1,4 @@
-"""resources081: артефакт #30 плюс классификатор массовой батареи как отдельный член."""
+"""resources081: the #30 artifact plus the mass-battery classifier as a separate member."""
 import os, joblib
 m = joblib.load("resources075/model.joblib")
 assert len(m["nets"]) == 12 and "mass_classifier" not in m

@@ -40,15 +40,15 @@ SPIKE_CANCEL = _traj(lambda t: 0.06 if t < 4 else (0.55 if t < 7 else max(0.10, 
 
 #: name, break step (None = clean), colour, score trajectory
 SERIES = [
-    ("А — слом на 5, быстрая реакция", 5, "#D85A30",
+    ("A — break at 5, fast reaction", 5, "#D85A30",
      _traj(lambda t: 0.05 if t < 5 else min(0.78, 0.10 + 0.09 * (t - 4)))),
-    ("Д — слом на 5, опоздавшая реакция", 5, "#D4537E",
+    ("E — break at 5, late reaction", 5, "#D4537E",
      _traj(lambda t: 0.05 if t < 11 else min(0.70, 0.10 + 0.09 * (t - 10)))),
-    ("Г — поздний слом на 12", 12, "#BA7517",
+    ("D — late break at 12", 12, "#BA7517",
      _traj(lambda t: 0.06 if t < 12 else min(0.72, 0.12 + 0.10 * (t - 11)))),
-    ("Б — чистый спокойный", None, "#0F6E56",
+    ("B — clean, calm", None, "#0F6E56",
      _traj(lambda t: 0.05 + 0.01 * (t % 2))),
-    ("В — чистый, ложный всплеск на 4", None, "#185FA5", SPIKE_CANCEL),
+    ("C — clean, false spike at 4", None, "#185FA5", SPIKE_CANCEL),
 ]
 
 
@@ -69,7 +69,7 @@ def total_score(series) -> float:
 def variant(cancel: bool):
     out = []
     for name, tau, colour, s in SERIES:
-        if name.startswith("В"):
+        if name.startswith("C"):
             s = SPIKE_CANCEL if cancel else SPIKE_STICKY
         out.append((name, tau, colour, s))
     return out
@@ -90,9 +90,9 @@ def render_gif(path: Path) -> None:
                 ax_l.axvline(tau, color=colour, lw=1, ls="--", alpha=0.5)
         ax_l.axvline(t, color="#444441", lw=1.6)
         ax_l.set_ylim(0, 0.9); ax_l.set_xlim(1, N)
-        ax_l.set_xlabel("шаг"); ax_l.set_ylabel("счёт модели")
-        mode = "модель УМЕЕТ отменять тревогу" if cancel else "отмены НЕТ — всплеск застревает"
-        ax_l.set_title(f"{mode}   |   итог за 20 шагов: {total_score(series):.3f}", fontsize=10)
+        ax_l.set_xlabel("step"); ax_l.set_ylabel("model score")
+        mode = "the model CAN cancel the alarm" if cancel else "NO cancellation — the spike gets stuck"
+        ax_l.set_title(f"{mode}   |   total over 20 steps: {total_score(series):.3f}", fontsize=10)
         ax_l.legend(loc="upper left", fontsize=7)
 
         state = sorted(
@@ -102,14 +102,14 @@ def render_gif(path: Path) -> None:
         colours = ["#F0997B" if broken else "#9FE1CB" for _, broken, _ in state]
         ax_r.barh(range(len(state)), [v for _, _, v in state], color=colours)
         for i, (short, broken, v) in enumerate(state):
-            ax_r.text(0.01, i, f"{short} — {'слом уже был' if broken else 'чистый'}",
+            ax_r.text(0.01, i, f"{short} — {'break already happened' if broken else 'clean'}",
                       va="center", fontsize=8,
                       color="#712B13" if broken else "#085041")
         ax_r.set_yticks([]); ax_r.set_xlim(0, 0.9)
         v = step_score(t, series)
-        ax_r.set_title("сортировка на шаге "
-                       f"{t}: оценка {'—' if v is None else f'{v:.2f}'}", fontsize=10)
-        ax_r.set_xlabel("оранжевые должны быть выше зелёных")
+        ax_r.set_title("ranking at step "
+                       f"{t}: score {'—' if v is None else f'{v:.2f}'}", fontsize=10)
+        ax_r.set_xlabel("orange must rank above green")
         fig.tight_layout()
 
     anim = FuncAnimation(fig, draw, frames=frames, interval=700)
@@ -117,8 +117,8 @@ def render_gif(path: Path) -> None:
     plt.close(fig)
 
 
-HTML_HEAD = """<!DOCTYPE html><html lang="ru"><head><meta charset="utf-8">
-<title>Метрика соревнования на пальцах</title>
+HTML_HEAD = """<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<title>The competition metric, explained simply</title>
 <style>
 body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:760px;margin:2rem auto;padding:0 1rem;color:#202124;}
 h1{font-size:22px;} .muted{color:#5f6368;font-size:14px;line-height:1.6;}
@@ -131,12 +131,12 @@ h1{font-size:22px;} .muted{color:#5f6368;font-size:14px;line-height:1.6;}
 .rowbar .tag{position:absolute;left:8px;top:3px;font-size:12px;}
 input[type=range]{width:100%;}
 </style></head><body>
-<h1>Метрика соревнования на пальцах</h1>
-<p class="muted">Мы сдаём числа, но оценивается фактически <b>сортировка рядов на каждом шаге</b>:
-ряды, где слом уже был (оранжевые), должны стоять выше рядов без слома (зелёные).
-Оценка шага — доля правильных пар «сломанный выше чистого»; итог — среднее по шагам.
-Подвигайте шаг и снимите галочку отмены — увидите, как ложный всплеск без отмены
-застревает наверху и съедает итоговую метрику.</p>
+<h1>The competition metric, explained simply</h1>
+<p class="muted">We submit numbers, but what is actually scored is the <b>ranking of the series at every step</b>:
+series where the break has already happened (orange) must rank above series without a break (green).
+The step score is the share of correct "broken above clean" pairs; the total is the mean over steps.
+Move the step and untick the cancellation box — you will see how a false spike without cancellation
+gets stuck at the top and eats into the final metric.</p>
 """
 
 
@@ -150,16 +150,16 @@ def render_html(path: Path) -> None:
                 for n_, tau, c, s in SERIES],
     )
     body = """
-<label style="font-size:14px"><input type="checkbox" id="cancel" checked> модель умеет отменять тревогу</label>
+<label style="font-size:14px"><input type="checkbox" id="cancel" checked> the model can cancel the alarm</label>
 <div style="display:flex;align-items:center;gap:10px;margin:0.6rem 0;">
-  <span class="muted">Шаг</span><input type="range" min="1" max="20" step="1" value="6" id="st">
+  <span class="muted">Step</span><input type="range" min="1" max="20" step="1" value="6" id="st">
   <b id="stout">6</b></div>
 <svg id="chart" viewBox="0 0 720 260" width="100%"></svg>
 <div id="rows"></div>
 <div class="cards">
- <div class="card"><div class="l">Оценка этого шага</div><div class="v" id="sc">—</div></div>
- <div class="card"><div class="l">Итог за шаги 1–20</div><div class="v" id="tot">—</div></div>
- <div class="card"><div class="l">Итог, если отмены нет</div><div class="v" id="tot0">—</div></div>
+ <div class="card"><div class="l">Score of this step</div><div class="v" id="sc">—</div></div>
+ <div class="card"><div class="l">Total over steps 1–20</div><div class="v" id="tot">—</div></div>
+ <div class="card"><div class="l">Total without cancellation</div><div class="v" id="tot0">—</div></div>
 </div>
 <p class="muted" id="expl"></p>
 <script>
@@ -169,7 +169,7 @@ cb=document.getElementById("cancel"),chart=document.getElementById("chart"),
 rows=document.getElementById("rows"),scEl=document.getElementById("sc"),
 totEl=document.getElementById("tot"),tot0El=document.getElementById("tot0"),
 expl=document.getElementById("expl");
-function seriesSet(cancel){return D.series.map(r=>r.name.startsWith("В")?{...r,s:cancel?D.cancel:D.sticky}:r);}
+function seriesSet(cancel){return D.series.map(r=>r.name.startsWith("C")?{...r,s:cancel?D.cancel:D.sticky}:r);}
 function stepScore(t,ss){const b=[],c=[];
  for(const r of ss){(r.tau!==null&&t>=r.tau?b:c).push(r.s[t-1]);}
  if(!b.length||!c.length)return null;let ok=0,n=0;
@@ -188,7 +188,7 @@ function render(){
   if(r.tau)svg+='<line x1="'+xs(r.tau-1)+'" y1="14" x2="'+xs(r.tau-1)+'" y2="'+B+'" stroke="'+r.color+'" stroke-dasharray="4 3" opacity="0.5"/>';
   svg+='<text x="'+(xs(D.n-1)-8)+'" y="'+(ys(r.s[D.n-1])-5)+'" font-size="11" fill="'+r.color+'">'+r.name[0]+'</text>';}
  svg+='<line x1="'+xs(t-1)+'" y1="10" x2="'+xs(t-1)+'" y2="'+B+'" stroke="#444" stroke-width="1.5"/>'
- +'<text x="'+(xs(t-1)+4)+'" y="24" font-size="11" fill="#444">шаг '+t+'</text>';
+ +'<text x="'+(xs(t-1)+4)+'" y="24" font-size="11" fill="#444">step '+t+'</text>';
  chart.innerHTML=svg;
  const state=ss.map(r=>({short:r.name[0],color:r.color,score:r.s[t-1],broken:r.tau!==null&&t>=r.tau}))
    .sort((a,b)=>b.score-a.score);
@@ -196,16 +196,16 @@ function render(){
   const fill=r.broken?"#F0997B":"#9FE1CB",txt=r.broken?"#712B13":"#085041";
   return '<div class="rowbar"><b style="width:18px;color:'+r.color+'">'+r.short+'</b>'
   +'<div class="track"><div class="fill" style="width:'+Math.round(r.score*100)+'%;background:'+fill+'"></div>'
-  +'<span class="tag" style="color:'+txt+'">'+(r.broken?"слом уже был":"чистый")+'</span></div>'
+  +'<span class="tag" style="color:'+txt+'">'+(r.broken?"break already happened":"clean")+'</span></div>'
   +'<b style="width:44px;text-align:right">'+r.score.toFixed(2)+'</b></div>';}).join("");
  const v=stepScore(t,ss);
- scEl.textContent=v===null?"пар нет":v.toFixed(2);
+ scEl.textContent=v===null?"no pairs":v.toFixed(2);
  totEl.textContent=total(ss).toFixed(3);
  tot0El.textContent=total(seriesSet(false)).toFixed(3);
  const bad=[];const b=state.filter(r=>r.broken),c=state.filter(r=>!r.broken);
- for(const x of b)for(const y of c)if(y.score>x.score)bad.push("«"+y.short+"» выше сломанного «"+x.short+"»");
- expl.textContent=v===null?"Сломов ещё нет — судья пропускает шаг."
-   :(bad.length?"Потерянные пары: "+bad.join("; ")+".":"Все сломанные выше всех чистых — шаг идеальный.");}
+ for(const x of b)for(const y of c)if(y.score>x.score)bad.push("“"+y.short+"” above broken “"+x.short+"”");
+ expl.textContent=v===null?"No breaks yet — the judge skips the step."
+   :(bad.length?"Lost pairs: "+bad.join("; ")+".":"All broken above all clean — a perfect step.");}
 st.addEventListener("input",render);cb.addEventListener("change",render);render();
 </script></body></html>"""
     path.write_text(HTML_HEAD + body.replace("__DATA__", json.dumps(data, ensure_ascii=False)))

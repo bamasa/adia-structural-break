@@ -1,9 +1,9 @@
-"""074: третья порода ранкера — глубокая, на аугментированных данных.
+"""074: a third ranker breed — deep, on augmented data.
 
-Гипотеза: древесная половина держится на двух близких по конфигурации
-ранкерах; порода с другой геометрией (127 листьев, lr 0.02, colsample 0.7,
-truncation 1000, другой сид) добавит разнообразия. Kill: смесь трёх ранкеров
-не лучше смеси двух на фолде-2.
+Hypothesis: the tree half rests on two rankers with similar configurations;
+a breed with a different geometry (127 leaves, lr 0.02, colsample 0.7,
+truncation 1000, a different seed) will add diversity. Kill: the blend of three rankers
+is no better than the blend of two on fold 2.
 """
 import sys, time
 sys.path.insert(0, "repo/src")
@@ -42,7 +42,7 @@ for st in np.unique(str_):
         chunk_id[idx[c::n_chunks]] = int(st) * 10 + c
 order = np.argsort(chunk_id, kind="stable")
 _, sizes = np.unique(chunk_id[order], return_counts=True)
-print(f"строк {len(ytr)}, групп {len(sizes)} [{time.time()-t0:.0f}s]", flush=True)
+print(f"rows {len(ytr)}, groups {len(sizes)} [{time.time()-t0:.0f}s]", flush=True)
 
 r = lgb.LGBMRanker(
     objective="lambdarank", learning_rate=0.02, num_leaves=127,
@@ -53,16 +53,16 @@ r = lgb.LGBMRanker(
 r.fit(Xtr[order], ytr[order], group=sizes)
 rs = r.predict(X[va])
 np.save("fold2_rank_deep.npy", rs)
-print(f"глубокий ранкер соло: {ts_auc(rs, yf, sf):.4f} (rank_aug 0.6034) [{time.time()-t0:.0f}s]", flush=True)
+print(f"deep ranker alone: {ts_auc(rs, yf, sf):.4f} (rank_aug 0.6034) [{time.time()-t0:.0f}s]", flush=True)
 
 import joblib
 joblib.dump(r, "rank_deep.joblib")
 
-# Смесь трёх ранкеров + классификатор + сети (кэш топ-10 из свипа).
+# Blend of three rankers + classifier + nets (cached top 10 from the sweep).
 r1 = 1/(1+np.exp(-np.load("fold2_rank_aug.npy").astype("float64")))
 r2 = 1/(1+np.exp(-np.load("fold2_rank_aug3.npy").astype("float64")))
 r3 = 1/(1+np.exp(-rs.astype("float64")))
-cp = np.load("fold2_clf_эталон.npy").astype("float64")
+cp = np.load("fold2_clf_reference.npy").astype("float64")
 net = np.load("fold2_net_top10.npy")
 best = (0, None)
 for a3 in (0.0, 0.1, 0.15, 0.2, 0.25):
@@ -72,5 +72,5 @@ for a3 in (0.0, 0.1, 0.15, 0.2, 0.25):
         v = ts_auc((1-w)*pair + w*net, yf, sf)
         if v > best[0]:
             best = (v, (a3, w))
-        print(f"доля породы-3 {a3:.2f}, вес сетей {w}: {v:.4f}", flush=True)
-print(f"\nИТОГ: {best[0]:.4f} при {best[1]}  (рекорд без неё 0.6116)", flush=True)
+        print(f"breed-3 share {a3:.2f}, net weight {w}: {v:.4f}", flush=True)
+print(f"\nRESULT: {best[0]:.4f} at {best[1]}  (record without it 0.6116)", flush=True)

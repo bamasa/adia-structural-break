@@ -1,9 +1,9 @@
-"""084: два сырых канала для сетей — z-оценка точки по истории и asinh(z).
+"""084: two raw channels for the nets — the point's z-score against the history and asinh(z).
 
-Каналы-признаки — сводки; сам ряд сети никогда не видели. Для псевдорядов
-AUG3 история продлена на online[:k]; k восстанавливается как
-len(online) - длина псевдоряда. Выход: RAW2.npy (по строкам X40) и
-AUG3_RAW2.npy (по строкам AUG3_X)."""
+The feature channels are summaries; the nets have never seen the series itself. For the AUG3
+pseudo-series the history is extended by online[:k]; k is recovered as
+len(online) - pseudo-series length. Output: RAW2.npy (aligned with X40 rows) and
+AUG3_RAW2.npy (aligned with AUG3_X rows)."""
 import time, numpy as np, pandas as pd
 t0 = time.time()
 x = pd.read_parquet("structural-break-real-time-test/data/X_train.parquet")
@@ -12,7 +12,7 @@ for sid, part in x.groupby(level="id"):
     series[int(sid)] = (part.loc[part.period == 1, "value"].to_numpy("float64"),
                         part.loc[part.period == 2, "value"].to_numpy("float64"))
 del x
-print(f"ряды загружены [{time.time()-t0:.0f}s]", flush=True)
+print(f"series loaded [{time.time()-t0:.0f}s]", flush=True)
 
 def raw2(hist, online, steps):
     mu, sd = hist.mean(), hist.std() + 1e-9
@@ -21,7 +21,7 @@ def raw2(hist, online, steps):
     out[:, 0] = z[steps]; out[:, 1] = np.arcsinh(z[steps])
     return out
 
-# Оригиналы
+# Originals
 g = np.load("G40.npy"); s = np.load("S40.npy")
 starts = np.flatnonzero(np.concatenate([[True], g[1:] != g[:-1]])); bounds = np.append(starts, len(g))
 R = np.empty((len(g), 2), dtype="float32")
@@ -32,7 +32,7 @@ for a, b in zip(starts, bounds[1:]):
 np.save("RAW2.npy", R)
 print(f"RAW2: {R.shape}, |z| max {np.abs(R[:,0]).max():.0f} [{time.time()-t0:.0f}s]", flush=True)
 
-# Псевдоряды AUG3: k = len(online) - длина псевдоряда
+# AUG3 pseudo-series: k = len(online) - pseudo-series length
 AG = np.load("AUG3_G.npy"); AS = np.load("AUG3_S.npy")
 a_starts = np.flatnonzero(np.concatenate([[True], AG[1:] != AG[:-1]])); a_bounds = np.append(a_starts, len(AG))
 AR = np.empty((len(AG), 2), dtype="float32")
@@ -46,4 +46,4 @@ for a, b in zip(a_starts, a_bounds[1:]):
     h2 = np.concatenate([hist, online[:k]]); o2 = online[k:]
     AR[a:b] = raw2(h2, o2, AS[a:b])
 np.save("AUG3_RAW2.npy", AR)
-print(f"AUG3_RAW2: {AR.shape}, k в [{min(ks)}, {max(ks)}], медиана {int(np.median(ks))} [{time.time()-t0:.0f}s]", flush=True)
+print(f"AUG3_RAW2: {AR.shape}, k in [{min(ks)}, {max(ks)}], median {int(np.median(ks))} [{time.time()-t0:.0f}s]", flush=True)

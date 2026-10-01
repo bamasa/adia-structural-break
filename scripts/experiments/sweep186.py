@@ -17,7 +17,7 @@ BASE = dict(objective="binary", learning_rate=0.05, num_leaves=31, min_child_sam
             n_estimators=300, random_state=0, n_jobs=8, deterministic=True,
             force_row_wise=True, verbose=-1)
 GRID = [
-    dict(),                                                   # текущая
+    dict(),                                                   # current
     dict(num_leaves=63),
     dict(num_leaves=63, n_estimators=500, learning_rate=0.04),
     dict(num_leaves=127, n_estimators=500, learning_rate=0.03, min_child_samples=1000),
@@ -41,10 +41,10 @@ results = []
 for i, params in enumerate(GRID):
     sc = run(params, [0, 1, 2])
     results.append((float(np.mean(sc)) - float(np.std(sc)), i, params))
-    print(f"конфиг {i} {params}: {np.mean(sc):.4f} (±{np.std(sc):.4f})  [{time.time()-t0:.0f}s]", flush=True)
+    print(f"config {i} {params}: {np.mean(sc):.4f} (±{np.std(sc):.4f})  [{time.time()-t0:.0f}s]", flush=True)
 results.sort(reverse=True)
 _, best_i, best = results[0]
-print(f"лучший на 3 фолдах: конфиг {best_i} {best}", flush=True)
+print(f"best on 3 folds: config {best_i} {best}", flush=True)
 sc = run(best, [0, 1, 2, 3, 4])
-print(f"подтверждение на 5: {np.mean(sc):.4f}  " + " ".join(f"{v:.4f}" for v in sc), flush=True)
-print(f"всего {time.time()-t0:.0f}s", flush=True)
+print(f"confirmation on 5: {np.mean(sc):.4f}  " + " ".join(f"{v:.4f}" for v in sc), flush=True)
+print(f"total {time.time()-t0:.0f}s", flush=True)

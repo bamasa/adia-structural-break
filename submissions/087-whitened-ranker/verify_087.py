@@ -1,4 +1,4 @@
-"""#087: каналы против матриц (206 + 90 + 100 + 20 + 90 отбелённых + 21 SR), скорость, прогон."""
+"""#087: channels against the matrices (206 + 90 + 100 + 20 + 90 whitened + 21 SR), speed, dry run."""
 import importlib.util, sys, time
 import numpy as np, pandas as pd
 spec = importlib.util.spec_from_file_location("sub", "repo/submissions/087-whitened-ranker/main.py")

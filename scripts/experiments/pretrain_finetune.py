@@ -1,4 +1,4 @@
-"""049: самообучение чан-сети (прогноз следующего вектора каналов) + дообучение."""
+"""049: self-supervised pretraining of the channel net (predicting the next channel vector) + fine-tuning."""
 import sys, time, os
 sys.path.insert(0, "repo/src")
 import numpy as np
@@ -17,7 +17,7 @@ starts = np.flatnonzero(np.concatenate([[True], g[1:] != g[:-1]]))
 bounds = np.append(starts, len(g))
 mu = np.load("net_bag_mac/mu.npy"); sd = np.load("net_bag_mac/sd.npy")
 series = [(((X[a:b] - mu) / sd), y[a:b].astype("float32")) for a, b in zip(starts, bounds[1:])]
-print(f"{len(series)} рядов [{time.time()-t0:.0f}s]", flush=True)
+print(f"{len(series)} series [{time.time()-t0:.0f}s]", flush=True)
 
 class Block(nn.Module):
     def __init__(self, ch, dil):
@@ -55,7 +55,7 @@ def batch_tensors(rows):
         Yb[i, L - n:] = torch.from_numpy(lab)
     return Xb.to(DEVICE), M.to(DEVICE), Yb.to(DEVICE)
 
-# --- Этап 1: самообучение — прогноз следующего вектора каналов ---
+# --- Stage 1: self-supervised pretraining — predicting the next channel vector ---
 if not os.path.exists("pretrained_backbone.pt"):
     backbone = Backbone().to(DEVICE)
     pred_head = nn.Conv1d(64, 186, 1).to(DEVICE)
@@ -73,7 +73,7 @@ if not os.path.exists("pretrained_backbone.pt"):
             opt.zero_grad()
             h = backbone(Xb)
             pred = pred_head(h)
-            # предсказываем канал-вектор следующего шага
+            # predict the channel vector of the next step
             tgt = Xb[:, :, 1:]
             prd = pred[:, :, :-1]
             msk = M[:, 1:].unsqueeze(1)
@@ -82,11 +82,11 @@ if not os.path.exists("pretrained_backbone.pt"):
             opt.step()
             total += float(loss); nb += 1
         sched.step()
-        print(f"предобучение, эпоха {epoch}: huber {total/nb:.4f}  [{time.time()-t0:.0f}s]", flush=True)
+        print(f"pretraining, epoch {epoch}: huber {total/nb:.4f}  [{time.time()-t0:.0f}s]", flush=True)
     torch.save(backbone.state_dict(), "pretrained_backbone.pt")
-    print("хребет сохранён", flush=True)
+    print("backbone saved", flush=True)
 
-# --- Этап 2: дообучение ранговым лоссом, рецепт тяжёлых членов ---
+# --- Stage 2: fine-tuning with the ranking loss, the heavy-member recipe ---
 def rank_loss(logits, onmask, Y, rng):
     L = logits.shape[1]
     total, count = logits.new_zeros(()), 0
@@ -155,7 +155,7 @@ for member in range(3):
         a = holdout_auc(model, hold)
         if a > best[0]:
             best = (a, {k: v.cpu().clone() for k, v in model.state_dict().items()})
-        print(f"  дообучение {member}, эпоха {epoch}: холдаут {a:.4f} (лучший {best[0]:.4f}) [{time.time()-t0:.0f}s]", flush=True)
+        print(f"  fine-tuning {member}, epoch {epoch}: holdout {a:.4f} (best {best[0]:.4f}) [{time.time()-t0:.0f}s]", flush=True)
     torch.save(best[1], path)
-    print(f"дообученный член {member}: {best[0]:.4f}", flush=True)
+    print(f"fine-tuned member {member}: {best[0]:.4f}", flush=True)
 print("done", flush=True)

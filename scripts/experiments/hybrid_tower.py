@@ -1,4 +1,4 @@
-"""048: гибрид — двухбашенная сеть (сырой ряд + траектории каналов)."""
+"""048: hybrid — two-tower net (raw series + channel trajectories)."""
 import sys, time, os
 sys.path.insert(0, "repo/src")
 import numpy as np
@@ -22,11 +22,11 @@ starts = np.flatnonzero(np.concatenate([[True], g[1:] != g[:-1]]))
 bounds = np.append(starts, len(g))
 mu = np.load("net_bag_mac/mu.npy"); sd = np.load("net_bag_mac/sd.npy")
 
-# Сырьевые последовательности: кэш на диске, чтобы считать нормировку один раз.
+# Raw sequences: on-disk cache so the normalisation is computed once.
 if os.path.exists("raw_seq_cache.npz"):
     z_cache = np.load("raw_seq_cache.npz", allow_pickle=True)
     raw_hist = list(z_cache["hist"]); raw_online = list(z_cache["online"])
-    print(f"сырьевой кэш загружен [{time.time()-t0:.0f}s]", flush=True)
+    print(f"raw cache loaded [{time.time()-t0:.0f}s]", flush=True)
 else:
     x = pd.read_parquet("structural-break-real-time-test/data/X_train.parquet")
     yp = pd.read_parquet("structural-break-real-time-test/data/y_train.parquet")
@@ -40,12 +40,12 @@ else:
                                       for i, v in enumerate(online)], dtype="float32"))
     np.savez("raw_seq_cache.npz",
              hist=np.array(raw_hist, dtype=object), online=np.array(raw_online, dtype=object))
-    print(f"сырьевой кэш построен [{time.time()-t0:.0f}s]", flush=True)
+    print(f"raw cache built [{time.time()-t0:.0f}s]", flush=True)
 
 series = []
 for k, (a, b) in enumerate(zip(starts, bounds[1:])):
     series.append((((X[a:b] - mu) / sd), raw_hist[k], raw_online[k], y[a:b].astype("float32")))
-print(f"{len(series)} рядов [{time.time()-t0:.0f}s]", flush=True)
+print(f"{len(series)} series [{time.time()-t0:.0f}s]", flush=True)
 
 class Block(nn.Module):
     def __init__(self, ch, dil):
@@ -61,7 +61,7 @@ class Block(nn.Module):
         return r + self.mix(h)
 
 class Hybrid(nn.Module):
-    """Башня каналов + сырьевая башня (видит историю), слияние по шагам."""
+    """Channel tower + raw tower (sees the history), fused per step."""
     def __init__(self, ch_chan=64, ch_raw=32):
         super().__init__()
         self.chan_inp = nn.Conv1d(186, ch_chan, 1)
@@ -138,7 +138,7 @@ for member in range(4):
     hold = [series[i] for i in idx[:hold_n]]
     train_set = [series[i] for i in idx[hold_n:int(0.96 * len(series))]]
     model = Hybrid().to(DEVICE)
-    print(f"member {member}: параметров {sum(p.numel() for p in model.parameters())}", flush=True)
+    print(f"member {member}: parameters {sum(p.numel() for p in model.parameters())}", flush=True)
     opt = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
     sched = torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=14)
     order = sorted(range(len(train_set)), key=lambda i: len(train_set[i][0]))
@@ -158,7 +158,7 @@ for member in range(4):
         a = holdout_auc(model, hold)
         if a > best[0]:
             best = (a, {k: v.cpu().clone() for k, v in model.state_dict().items()})
-        print(f"  member {member} эпоха {epoch}: холдаут {a:.4f} (лучший {best[0]:.4f}) [{time.time()-t0:.0f}s]", flush=True)
+        print(f"  member {member} epoch {epoch}: holdout {a:.4f} (best {best[0]:.4f}) [{time.time()-t0:.0f}s]", flush=True)
     torch.save(best[1], path)
-    print(f"member {member} готов: {best[0]:.4f}", flush=True)
+    print(f"member {member} done: {best[0]:.4f}", flush=True)
 print("done", flush=True)

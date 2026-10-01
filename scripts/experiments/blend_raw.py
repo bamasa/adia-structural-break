@@ -1,4 +1,4 @@
-"""Вклад сырой сети в ансамбль: корреляция с #30 и смесь. Считает на CPU, чтобы не мешать обучению."""
+"""Contribution of the raw network to the ensemble: correlation with #30 and the blend. Runs on CPU so as not to interfere with training."""
 import sys, numpy as np, pandas as pd, torch
 import torch.nn as nn, torch.nn.functional as F
 sys.path.insert(0, "repo/src")
@@ -37,11 +37,11 @@ sig = lambda a: 1/(1+np.exp(-a.astype("float64")))
 rank = sig(np.load("fold2_rank_bocpd_200.npy")); clf = np.load("fold2_clf_bocpdh50_206.npy").astype("float64")
 net = np.mean([np.load(f"fold2_sig_nets_aug3_member_p{i}.pt.npy") for i in range(6)] + [np.load(f"fold2_sig_nets_aug3_last_member_z{i}.pt.npy") for i in range(6)], 0)
 base = 0.45*(0.7*rank + 0.3*clf) + 0.55*net
-print(f"сырая сеть соло: {ts_auc(raw, yf, sf):.4f} | ансамбль #30: {ts_auc(base, yf, sf):.4f}")
-print(f"корреляция Спирмена с ансамблем: {pd.Series(raw).corr(pd.Series(base), method='spearman'):.3f} | с сетями: {pd.Series(raw).corr(pd.Series(net), method='spearman'):.3f}")
+print(f"raw network alone: {ts_auc(raw, yf, sf):.4f} | ensemble #30: {ts_auc(base, yf, sf):.4f}")
+print(f"Spearman correlation with the ensemble: {pd.Series(raw).corr(pd.Series(base), method='spearman'):.3f} | with the nets: {pd.Series(raw).corr(pd.Series(net), method='spearman'):.3f}")
 best = (0, 0)
 for w in (0.02, 0.05, 0.10, 0.15, 0.25):
     v = ts_auc((1-w)*base + w*raw, yf, sf)
     if v > best[0]: best = (v, w)
-    print(f"  доля сырой сети {w:.2f}: смесь {v:.4f}  ({v - ts_auc(base, yf, sf):+.4f})")
-print(f"ЛУЧШЕЕ: {best[0]:.4f} при доле {best[1]}")
+    print(f"  raw-network weight {w:.2f}: blend {v:.4f}  ({v - ts_auc(base, yf, sf):+.4f})")
+print(f"BEST: {best[0]:.4f} at weight {best[1]}")

@@ -1,4 +1,4 @@
-"""114b: ранкер на MASS90 как независимый член + точный подбор веса."""
+"""114b: ranker on MASS90 as an independent member + fine weight tuning."""
 import sys, time, numpy as np, lightgbm as lgb, pandas as pd
 sys.path.insert(0, "repo/src")
 from structural_break.combiners import split_by_series, ts_auc
@@ -23,15 +23,15 @@ sig = lambda a: 1/(1+np.exp(-np.asarray(a, dtype="float64")))
 rank_mass = sig(rs)
 clf_mass = np.load("fold2_clf_mass_90 .npy") if False else np.load([p for p in __import__("glob").glob("fold2_clf_mass_90*.npy")][0])
 base = np.load("fold2_base30.npy")
-print(f"ранкер на MASS90 соло: {ts_auc(rank_mass, yf, sf):.4f} | классификатор на MASS90: {ts_auc(clf_mass, yf, sf):.4f} [{time.time()-t0:.0f}s]")
-print(f"корреляция с ансамблем: ранкер {pd.Series(rank_mass).corr(pd.Series(base), method='spearman'):.3f}, классификатор {pd.Series(clf_mass).corr(pd.Series(base), method='spearman'):.3f}")
+print(f"ranker on MASS90 alone: {ts_auc(rank_mass, yf, sf):.4f} | classifier on MASS90: {ts_auc(clf_mass, yf, sf):.4f} [{time.time()-t0:.0f}s]")
+print(f"correlation with the ensemble: ranker {pd.Series(rank_mass).corr(pd.Series(base), method='spearman'):.3f}, classifier {pd.Series(clf_mass).corr(pd.Series(base), method='spearman'):.3f}")
 mass_pair = 0.7 * rank_mass + 0.3 * clf_mass
-print(f"пара MASS (0.7 ранкер + 0.3 клф): {ts_auc(mass_pair, yf, sf):.4f}")
-print(f"\nбаза {ts_auc(base, yf, sf):.4f}; подбор доли MASS-члена:")
+print(f"MASS pair (0.7 ranker + 0.3 clf): {ts_auc(mass_pair, yf, sf):.4f}")
+print(f"\nbaseline {ts_auc(base, yf, sf):.4f}; tuning the MASS member share:")
 best = (0, None)
-for name, member in (("классификатор", clf_mass), ("ранкер", rank_mass), ("пара", mass_pair)):
+for name, member in (("classifier", clf_mass), ("ranker", rank_mass), ("pair", mass_pair)):
     for w in (0.10, 0.15, 0.20, 0.25, 0.30, 0.35):
         v = ts_auc((1 - w) * base + w * member, yf, sf)
         if v > best[0]: best = (v, (name, w))
-        print(f"  {name:13s} доля {w:.2f}: {v:.4f}  ({v - ts_auc(base, yf, sf):+.4f})")
-print(f"\nЛУЧШЕЕ: {best[0]:.4f} — {best[1]}")
+        print(f"  {name:13s} share {w:.2f}: {v:.4f}  ({v - ts_auc(base, yf, sf):+.4f})")
+print(f"\nBEST: {best[0]:.4f} — {best[1]}")

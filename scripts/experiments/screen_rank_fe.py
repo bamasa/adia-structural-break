@@ -1,4 +1,4 @@
-"""091r: ранкер (конфиг #28) на оригиналах(≠2)+AUG против того же + первая редакция."""
+"""091r: ranker (#28 config) on originals(≠2)+AUG vs the same + the first edition."""
 import sys, time, numpy as np, lightgbm as lgb
 sys.path.insert(0, "repo/src")
 from structural_break.combiners import split_by_series, ts_auc
@@ -17,13 +17,13 @@ def groups(str_):
         idx = np.flatnonzero(str_ == st); rng.shuffle(idx); n_chunks = int(np.ceil(len(idx) / MAXQ))
         for c in range(n_chunks): chunk_id[idx[c::n_chunks]] = int(st) * 10 + c
     order = np.argsort(chunk_id, kind="stable"); _, sizes = np.unique(chunk_id[order], return_counts=True); return order, sizes
-for name, Xtr, ytr, str_ in (("без FE", np.vstack([X[tr], AX]), np.concatenate([y[tr], AY]), np.concatenate([s[tr], AS])),
-                             ("с FE", np.vstack([X[tr], AX, np.asarray(FX)]), np.concatenate([y[tr], AY, FY]), np.concatenate([s[tr], AS, FS]))):
+for name, Xtr, ytr, str_ in (("without FE", np.vstack([X[tr], AX]), np.concatenate([y[tr], AY]), np.concatenate([s[tr], AS])),
+                             ("with FE", np.vstack([X[tr], AX, np.asarray(FX)]), np.concatenate([y[tr], AY, FY]), np.concatenate([s[tr], AS, FS]))):
     order, sizes = groups(str_)
     r = lgb.LGBMRanker(objective="lambdarank", learning_rate=0.03, num_leaves=63, min_child_samples=300, subsample=0.7, subsample_freq=1,
                        colsample_bytree=0.5, reg_lambda=20.0, n_estimators=600, random_state=7, n_jobs=6, deterministic=True,
                        force_row_wise=True, verbose=-1, lambdarank_truncation_level=2000, label_gain=[0, 1])
     r.fit(Xtr[order], ytr[order], group=sizes); rs = r.predict(X[va])
     np.save(f"fold2_rank_fe_{name.replace(' ', '_')}.npy", rs)
-    print(f"ранкер {name} ({len(ytr)} строк): фолд-2 {ts_auc(rs, yf, sf):.4f} [{time.time()-t0:.0f}s]", flush=True)
+    print(f"ranker {name} ({len(ytr)} rows): fold 2 {ts_auc(rs, yf, sf):.4f} [{time.time()-t0:.0f}s]", flush=True)
     del Xtr

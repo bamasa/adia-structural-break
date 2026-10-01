@@ -1,4 +1,4 @@
-"""#086: каналы против матриц (206 + 90 + 100 + 20 + 90 отбелённых), скорость, прогон."""
+"""#086: channels vs matrices (206 + 90 + 100 + 20 + 90 whitened), speed, dry run."""
 import importlib.util, sys, time
 import numpy as np, pandas as pd
 spec = importlib.util.spec_from_file_location("sub", "repo/submissions/086-whitened-member/main.py")

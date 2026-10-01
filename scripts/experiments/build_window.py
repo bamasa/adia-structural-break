@@ -1,9 +1,9 @@
-"""116: сырое окно как признаки — последние 32 значения и их порядковые статистики.
+"""116: the raw window as features — the last 32 values and their order statistics.
 
-Все наши каналы (и массовая батарея) — сводки. Здесь дерево видит сам кусок ряда:
-32 последних z-значения в порядке поступления + те же 32, отсортированные
-(порядковые статистики окна — инвариант к перестановке, устойчив к шуму).
-64 канала, O(1) на шаг через кольцевой буфер + сортировка 32 элементов.
+All our channels (and the mass battery) are summaries. Here the tree sees the piece of the series itself:
+the last 32 z-values in arrival order + the same 32 sorted
+(the window's order statistics — permutation-invariant, robust to noise).
+64 channels, O(1) per step via a ring buffer + sorting 32 elements.
 python build_window.py <shard> <n> | merge <n> | test
 """
 import sys, time, os, numpy as np
@@ -26,7 +26,7 @@ if __name__ == "__main__":
         rng = np.random.default_rng(0); hist = rng.normal(0, 1, 2000)
         online = np.concatenate([rng.normal(0, 1, 200), rng.normal(0.5, 1, 200)])
         t0 = time.time(); o = window_channels(hist, online); dt = (time.time() - t0) / len(online) * 1000
-        print(f"каналов {o.shape[1]}, {dt:.3f} мс/шаг; медиана окна до слома {np.median(o[150:200, K + K//2]):+.2f}, после {np.median(o[300:400, K + K//2]):+.2f}")
+        print(f"{o.shape[1]} channels, {dt:.3f} ms/step; window median before the break {np.median(o[150:200, K + K//2]):+.2f}, after {np.median(o[300:400, K + K//2]):+.2f}")
         sys.exit(0)
     if sys.argv[1] == "merge":
         n = int(sys.argv[2]); parts = [np.load(f"{PARTS}/part_{i}.npz", allow_pickle=True) for i in range(n)]
@@ -46,4 +46,4 @@ if __name__ == "__main__":
         sids.append(int(sid)); arrs.append(window_channels(hist, online))
     os.makedirs(PARTS, exist_ok=True)
     np.savez(f"{PARTS}/part_{shard}.npz", sids=np.array(sids), arrs=np.array(arrs, dtype=object), allow_pickle=True)
-    print(f"шард {shard} готов {time.time()-t0:.0f}s: {len(sids)} рядов", flush=True)
+    print(f"shard {shard} done {time.time()-t0:.0f}s: {len(sids)} series", flush=True)

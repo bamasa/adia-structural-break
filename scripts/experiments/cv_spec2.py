@@ -1,4 +1,4 @@
-"""054 скрин: 232 канала (186 + спектр v1 + спектр v2), фолд-0."""
+"""054 screen: 232 channels (186 + spectrum v1 + spectrum v2), fold 0."""
 import sys, time
 sys.path.insert(0, "repo/src")
 import numpy as np
@@ -30,10 +30,10 @@ sig = 1.0 / (1.0 + np.exp(-sc))
 clf = np.load("oof_cfg5.npy")[va].astype("float64")
 net = np.load("tcn_foldens_fold0.npy").astype("float64")
 pair = ts_auc(0.6*sig + 0.4*clf, yf, sf)
-print(f"232 канала: ранкер {ts_auc(sc, yf, sf):.4f} (186: 0.6016, +v1: 0.6032), "
-      f"пара {pair:.4f} (0.6045 / 0.6060)  [{time.time()-t0:.0f}s]", flush=True)
+print(f"232 channels: ranker {ts_auc(sc, yf, sf):.4f} (186: 0.6016, +v1: 0.6032), "
+      f"pair {pair:.4f} (0.6045 / 0.6060)  [{time.time()-t0:.0f}s]", flush=True)
 trees = 0.7*sig + 0.3*clf
 for w in (0.4, 0.5):
-    print(f"тройка, вес сетей {w}: {ts_auc((1-w)*trees + w*net, yf, sf):.4f} (эталон 0.6099)", flush=True)
+    print(f"triple, net weight {w}: {ts_auc((1-w)*trees + w*net, yf, sf):.4f} (reference 0.6099)", flush=True)
 np.save("oof_rank_spec2.npy", sc)
-print(f"всего {time.time()-t0:.0f}s", flush=True)
+print(f"total {time.time()-t0:.0f}s", flush=True)

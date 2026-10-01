@@ -1,9 +1,9 @@
-"""099: классический стекинг (по Alphabot): блочные модели первого уровня + мета-модель.
+"""099: classic stacking (after Alphabot): block-wise level-0 models + a meta-model.
 
-Уровень 0: LightGBM-классификаторы, каждый на своём блоке каналов; OOF по четырём
-внутренним фолдам (0,1,3,4); для фолда-2 — модель на всех четырёх.
-Уровень 1: мета-модель на OOF-предсказаниях (и вариант «предсказания + признаки»).
-Замер: фолд-2, TS-AUC; сравнение с полным классификатором и со смесью #30.
+Level 0: LightGBM classifiers, each on its own block of channels; OOF over the four
+inner folds (0,1,3,4); for fold 2 — a model on all four.
+Level 1: a meta-model on the OOF predictions (and a "predictions + features" variant).
+Measurement: fold 2, TS-AUC; comparison with the full classifier and with the #30 blend.
 """
 import sys, time, os, numpy as np, lightgbm as lgb
 sys.path.insert(0, "repo/src")
@@ -27,7 +27,7 @@ for j, (name, cols) in enumerate(BLOCKS.items()):
     cache = f"stack/oof_{name}.npz"
     if os.path.exists(cache):
         z = np.load(cache); P_tr[:, j], P_te[:, j] = z["tr"], z["te"]
-        print(f"[{name}] из кэша", flush=True); continue
+        print(f"[{name}] from cache", flush=True); continue
     oof = np.zeros(tr.sum(), dtype="float32")
     Xtr = Xb[tr]
     for k in inner:
@@ -35,28 +35,28 @@ for j, (name, cols) in enumerate(BLOCKS.items()):
         m = lgb.LGBMClassifier(**params).fit(Xtr[fit], ytr[fit]); oof[hold] = m.predict_proba(Xtr[hold])[:, 1]
     m = lgb.LGBMClassifier(**params).fit(Xtr, ytr); pte = m.predict_proba(Xb[te])[:, 1]
     P_tr[:, j], P_te[:, j] = oof, pte; np.savez(cache, tr=oof, te=pte)
-    print(f"[{name}] {len(cols)} каналов: OOF (фолды 0/1/3/4) {ts_auc(oof, ytr, s[tr]):.4f} | фолд-2 {ts_auc(pte, y[te], s[te]):.4f} [{time.time()-t0:.0f}s]", flush=True)
+    print(f"[{name}] {len(cols)} channels: OOF (folds 0/1/3/4) {ts_auc(oof, ytr, s[tr]):.4f} | fold 2 {ts_auc(pte, y[te], s[te]):.4f} [{time.time()-t0:.0f}s]", flush=True)
 names = list(BLOCKS)
-print("--- уровень 1 ---", flush=True)
+print("--- level 1 ---", flush=True)
 sf, yf = s[te], y[te]
-print(f"среднее блоков (равные веса): фолд-2 {ts_auc(P_te.mean(1), yf, sf):.4f}", flush=True)
+print(f"mean of blocks (equal weights): fold 2 {ts_auc(P_te.mean(1), yf, sf):.4f}", flush=True)
 from sklearn.linear_model import LogisticRegression
 lr = LogisticRegression(C=1.0, max_iter=500).fit(P_tr, ytr); meta_lin = lr.decision_function(P_te)
-print(f"мета линейная (11 предсказаний): фолд-2 {ts_auc(meta_lin, yf, sf):.4f}; веса {dict(zip(names, lr.coef_[0].round(2)))}", flush=True)
+print(f"linear meta (11 predictions): fold 2 {ts_auc(meta_lin, yf, sf):.4f}; weights {dict(zip(names, lr.coef_[0].round(2)))}", flush=True)
 mp = dict(n_estimators=300, learning_rate=0.03, num_leaves=15, min_child_samples=500, subsample=0.8, subsample_freq=1, verbose=-1, n_jobs=8)
 m = lgb.LGBMClassifier(**mp).fit(P_tr, ytr); meta_gb = m.predict_proba(P_te)[:, 1]
-print(f"мета LightGBM (11 предсказаний): фолд-2 {ts_auc(meta_gb, yf, sf):.4f}", flush=True)
+print(f"LightGBM meta (11 predictions): fold 2 {ts_auc(meta_gb, yf, sf):.4f}", flush=True)
 Ftr = np.hstack([P_tr, X[tr]]); Fte = np.hstack([P_te, X[te]])
 m2 = lgb.LGBMClassifier(**dict(mp, num_leaves=31, colsample_bytree=0.5)).fit(Ftr, ytr); meta_gbf = m2.predict_proba(Fte)[:, 1]
-print(f"мета LightGBM (предсказания + 206 признаков): фолд-2 {ts_auc(meta_gbf, yf, sf):.4f}", flush=True)
+print(f"LightGBM meta (predictions + 206 features): fold 2 {ts_auc(meta_gbf, yf, sf):.4f}", flush=True)
 np.savez("stack/meta_fold2.npz", mean=P_te.mean(1), lin=meta_lin, gb=meta_gb, gbf=meta_gbf)
-# в смеси #30: мета вместо классификатора
+# in the #30 blend: meta instead of the classifier
 sig = lambda a: 1/(1+np.exp(-a.astype("float64")))
 rank = sig(np.load("fold2_rank_bocpd_200.npy")); clf = np.load("fold2_clf_bocpdh50_206.npy").astype("float64")
 net = np.mean([np.load(f"fold2_sig_nets_aug3_member_p{i}.pt.npy") for i in range(6)] + [np.load(f"fold2_sig_nets_aug3_last_member_z{i}.pt.npy") for i in range(6)], 0)
-print(f"смесь #30 (0.7·ранкер+0.3·clf, сети 0.55): {ts_auc(0.45*(0.7*rank+0.3*clf)+0.55*net, yf, sf):.4f}", flush=True)
-for nm, meta in (("среднее", P_te.mean(1)), ("линейная", sig(meta_lin)), ("gb", meta_gb), ("gb+признаки", meta_gbf)):
+print(f"#30 blend (0.7·ranker+0.3·clf, nets 0.55): {ts_auc(0.45*(0.7*rank+0.3*clf)+0.55*net, yf, sf):.4f}", flush=True)
+for nm, meta in (("mean", P_te.mean(1)), ("linear", sig(meta_lin)), ("gb", meta_gb), ("gb+features", meta_gbf)):
     for cw in (0.3, 0.5, 0.7):
         trees = (1-cw)*rank + cw*meta
-        print(f"  мета={nm:12s} доля {cw}: деревья {ts_auc(trees, yf, sf):.4f} | смесь с сетями 0.55 {ts_auc(0.45*trees+0.55*net, yf, sf):.4f} | 0.45 {ts_auc(0.55*trees+0.45*net, yf, sf):.4f}", flush=True)
+        print(f"  meta={nm:12s} share {cw}: trees {ts_auc(trees, yf, sf):.4f} | blend with nets 0.55 {ts_auc(0.45*trees+0.55*net, yf, sf):.4f} | 0.45 {ts_auc(0.55*trees+0.45*net, yf, sf):.4f}", flush=True)
 print("done", flush=True)

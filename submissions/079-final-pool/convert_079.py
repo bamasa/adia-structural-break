@@ -1,4 +1,4 @@
-"""torch-only: шесть членов пула (k6-k11) -> npz."""
+"""torch-only: six pool members (k6-k11) -> npz."""
 import glob, numpy as np, torch
 paths = sorted(p for p in glob.glob("nets_pool24/member_k*.pt") if "_epoch" not in p)
 out = {}

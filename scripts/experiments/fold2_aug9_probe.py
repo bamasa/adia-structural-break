@@ -1,4 +1,4 @@
-"""Быстрая проверка готовых членов 076 на фолде-2."""
+"""Quick check of the ready 076 members on fold 2."""
 import sys, os, glob
 sys.path.insert(0, "repo/src")
 import numpy as np, torch
@@ -77,4 +77,4 @@ for p in sorted(glob.glob("nets_aug9/member_*.pt")):
     model.eval()
     sig = 1.0 / (1.0 + np.exp(-fold_scores(model, diffs).astype("float64")))
     np.save(f"fold2_sig_{p.replace('/', '_')}.npy", sig)
-    print(f"{p}: фолд-2 соло {ts_auc(sig, yf, sf):.4f}", flush=True)
+    print(f"{p}: fold 2 alone {ts_auc(sig, yf, sf):.4f}", flush=True)

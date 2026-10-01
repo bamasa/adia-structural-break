@@ -1,4 +1,4 @@
-"""039 (фолд-0): фолд-бэггинг ранкеров — разнообразие через данные."""
+"""039 (fold 0): fold-bagging of rankers — diversity through data."""
 import sys, time
 sys.path.insert(0, "repo/src")
 import numpy as np
@@ -30,15 +30,15 @@ for drop in (1, 2, 3, 4):
         verbose=-1, lambdarank_truncation_level=2000, label_gain=[0, 1])
     r.fit(Xtr, ytr, group=sizes)
     sc = r.predict(X[va])
-    print(f"ранкер без фолда {drop}: соло {ts_auc(sc, yf, sf):.4f}  [{time.time()-t0:.0f}s]", flush=True)
+    print(f"ranker without fold {drop}: alone {ts_auc(sc, yf, sf):.4f}  [{time.time()-t0:.0f}s]", flush=True)
     sigs.append(1.0 / (1.0 + np.exp(-sc)))
 ens = np.mean(sigs, axis=0)
-print(f"фолд-бэггинг ранкеров: соло {ts_auc(ens, yf, sf):.4f} (одиночный: 0.6016)", flush=True)
+print(f"fold-bagging of rankers: alone {ts_auc(ens, yf, sf):.4f} (single: 0.6016)", flush=True)
 np.save("rank_foldbag_fold0.npy", ens)
 net_ens = np.load("tcn_foldens_fold0.npy").astype("float64")
 for w_net in (0.4, 0.5):
     for w_clf in (0.15, 0.2):
         mix = (1 - w_net - w_clf) * ens + w_clf * clf + w_net * net_ens
-        print(f"тройка bag-ранкер {1-w_net-w_clf:.2f}/клф {w_clf:.2f}/сети {w_net:.2f}: "
-              f"{ts_auc(mix, yf, sf):.4f} (эталон #19: 0.6090)", flush=True)
-print(f"всего {time.time()-t0:.0f}s", flush=True)
+        print(f"triple bag-ranker {1-w_net-w_clf:.2f}/clf {w_clf:.2f}/nets {w_net:.2f}: "
+              f"{ts_auc(mix, yf, sf):.4f} (reference #19: 0.6090)", flush=True)
+print(f"total {time.time()-t0:.0f}s", flush=True)

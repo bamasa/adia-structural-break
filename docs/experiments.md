@@ -580,7 +580,7 @@ the trees to rank per step — groups are cross-sections, truncation deep at
 2000 — pays more than every channel family added this week. And this ran on
 the *pre-resweep* hyperparameters; the combination with 63 leaves and
 colsample 0.5 is measured next, and every later combiner (the ensemble
-включая) moves to the ranking objective.
+including) moves to the ranking objective.
 
 ---
 

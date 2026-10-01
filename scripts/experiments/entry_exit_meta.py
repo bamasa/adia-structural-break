@@ -1,4 +1,4 @@
-"""092b: обучаемый верификатор над траекториями счетов (деревья и сети) — CV по рядам внутри фолда-2."""
+"""092b: trainable verifier over score trajectories (trees and nets) — CV by series within fold 2."""
 import sys, numpy as np, lightgbm as lgb
 sys.path.insert(0, "repo/src")
 from structural_break.combiners import split_by_series, ts_auc
@@ -24,23 +24,23 @@ def traj_feats(x):
 F = np.empty((len(base), 3 * 11 + 1))
 for a, b in zip(starts, bounds[1:]):
     F[a:b] = np.hstack([traj_feats(base[a:b]), traj_feats(trees[a:b]), traj_feats(net[a:b]), (trees[a:b] - net[a:b])[:, None]])
-print(f"признаков {F.shape[1]}, строк {len(F)}; база {ts_auc(base, yf, sf):.4f}", flush=True)
+print(f"features {F.shape[1]}, rows {len(F)}; baseline {ts_auc(base, yf, sf):.4f}", flush=True)
 
-# CV по рядам внутри фолда-2 (5 частей)
+# CV by series within fold 2 (5 parts)
 series_ids = gf[starts]; rng = np.random.default_rng(0); part_of = {int(sid): i % 5 for i, sid in enumerate(rng.permutation(series_ids))}
 part = np.array([part_of[int(v)] for v in gf])
-for name, params in (("logit-подобный (3 листа)", dict(num_leaves=3, n_estimators=200, learning_rate=0.05)),
-                     ("маленький (15 листьев)", dict(num_leaves=15, n_estimators=300, learning_rate=0.03)),
-                     ("средний (63 листа)", dict(num_leaves=63, n_estimators=300, learning_rate=0.03))):
+for name, params in (("logit-like (3 leaves)", dict(num_leaves=3, n_estimators=200, learning_rate=0.05)),
+                     ("small (15 leaves)", dict(num_leaves=15, n_estimators=300, learning_rate=0.03)),
+                     ("medium (63 leaves)", dict(num_leaves=63, n_estimators=300, learning_rate=0.03))):
     oof = np.zeros(len(base))
     for k in range(5):
         tr, te = part != k, part == k
         m = lgb.LGBMClassifier(**params, subsample=0.8, subsample_freq=1, colsample_bytree=0.8, min_child_samples=200, verbose=-1, n_jobs=8).fit(F[tr], yf[tr])
         oof[te] = m.predict_proba(F[te])[:, 1]
-    print(f"верификатор {name}: OOF внутри фолда-2 {ts_auc(oof, yf, sf):.4f} | смесь 0.5 с базой {ts_auc(0.5*base + 0.5*oof, yf, sf):.4f}", flush=True)
-# контроль: та же CV на одном признаке base (должно ≈ база)
+    print(f"verifier {name}: OOF within fold 2 {ts_auc(oof, yf, sf):.4f} | 0.5 blend with the baseline {ts_auc(0.5*base + 0.5*oof, yf, sf):.4f}", flush=True)
+# control: the same CV on the single feature base (should be ≈ baseline)
 oof = np.zeros(len(base))
 for k in range(5):
     tr, te = part != k, part == k
     m = lgb.LGBMClassifier(num_leaves=3, n_estimators=100, learning_rate=0.05, verbose=-1, n_jobs=8).fit(F[tr, :1], yf[tr]); oof[te] = m.predict_proba(F[te, :1])[:, 1]
-print(f"контроль (только текущий счёт): {ts_auc(oof, yf, sf):.4f}")
+print(f"control (current score only): {ts_auc(oof, yf, sf):.4f}")

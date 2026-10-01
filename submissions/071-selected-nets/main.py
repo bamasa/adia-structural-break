@@ -1288,7 +1288,7 @@ def infer(
             prob = float(clf_booster.predict(row, num_threads=1)[0])
             bag = sum(1.0 / (1.0 + math.exp(-float(rb.predict(row, num_threads=1)[0])))
                       for rb in rank_boosters) / len(rank_boosters)
-            trees = 0.7 * bag + 0.3 * prob   # два ранкера усреднены в bag
+            trees = 0.7 * bag + 0.3 * prob   # the two rankers are averaged in bag
             if bag_net is None:
                 yield trees
             else:

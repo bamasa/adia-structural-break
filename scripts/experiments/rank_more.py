@@ -1,4 +1,4 @@
-"""028 (фолд-0): ранкер длиннее — 600 деревьев на lr 0.03, 900 на 0.02."""
+"""028 (fold 0): a longer ranker — 600 trees at lr 0.03, 900 at 0.02."""
 import sys, time
 sys.path.insert(0, "repo/src")
 import numpy as np
@@ -31,6 +31,6 @@ for n_est, lr in ((600, 0.03), (900, 0.02)):
     sig = 1.0 / (1.0 + np.exp(-sc))
     solo = ts_auc(sc, yf, sf)
     mix = ts_auc(0.6 * sig + 0.4 * clf, yf, sf)
-    print(f"{n_est} деревьев, lr {lr}: соло {solo:.4f}, смесь {mix:.4f} "
-          f"(эталоны 0.6006 / 0.6035)  [{time.time()-t0:.0f}s]", flush=True)
-print(f"всего {time.time()-t0:.0f}s", flush=True)
+    print(f"{n_est} trees, lr {lr}: alone {solo:.4f}, blend {mix:.4f} "
+          f"(references 0.6006 / 0.6035)  [{time.time()-t0:.0f}s]", flush=True)
+print(f"total {time.time()-t0:.0f}s", flush=True)

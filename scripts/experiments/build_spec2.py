@@ -1,4 +1,4 @@
-"""054: спектр v2 — окна 32/64/128, спектр приращений, отношения полос."""
+"""054: spectrum v2 — windows 32/64/128, spectrum of increments, band ratios."""
 import sys, time
 sys.path.insert(0, "repo/src")
 import numpy as np
@@ -9,7 +9,7 @@ from structural_break.stream import iter_series
 t0 = time.time()
 x = pd.read_parquet("structural-break-real-time-test/data/X_train.parquet")
 y = pd.read_parquet("structural-break-real-time-test/data/y_train.parquet")
-print(f"загрузка {time.time()-t0:.0f}s", flush=True)
+print(f"loading {time.time()-t0:.0f}s", flush=True)
 
 WINS = (32, 128)
 BANDS = 6
@@ -42,7 +42,7 @@ def profile(z, nfft):
             Bm.std(0) + 1e-3, float(np.std(LH)) + 1e-3, float(np.std(E)) + 1e-3)
 
 rows, count = [], 0
-NFEAT = len(WINS) * 2 * (BANDS + 2)      # окна x (уровень, приращения) x (полосы+2)
+NFEAT = len(WINS) * 2 * (BANDS + 2)      # windows x (level, increments) x (bands+2)
 for sid, hist, online, labels in iter_series(x, y):
     norm = Normalisation.fit(hist)
     n = len(hist)
@@ -76,8 +76,8 @@ for sid, hist, online, labels in iter_series(x, y):
         rows.append(list(cur))
     count += 1
     if count % 2000 == 0:
-        print(f"  {count} рядов, {time.time()-t0:.0f}s", flush=True)
+        print(f"  {count} series, {time.time()-t0:.0f}s", flush=True)
 
 S = np.asarray(rows, dtype="float32")
 np.save("SPEC2.npy", S)
-print(f"готово {time.time()-t0:.0f}s: {S.shape}", flush=True)
+print(f"done {time.time()-t0:.0f}s: {S.shape}", flush=True)

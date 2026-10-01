@@ -1,7 +1,7 @@
-"""097: дивергенции распределений история vs префикс — блок признаков победителей 2025 (Alphabot).
+"""097: distribution divergences history vs prefix — the feature block of the 2025 winners (Alphabot).
 
-Бины — 32 квантиля истории. Каналы (8): JS, Хеллингер, Вассерштейн-1 (в sd истории),
-разность энтропий — для всего префикса и для окна последних 100 точек. O(бины) на шаг.
+Bins — 32 history quantiles. Channels (8): JS, Hellinger, Wasserstein-1 (in history sd),
+entropy difference — for the whole prefix and for the window of the last 100 points. O(bins) per step.
 python build_divergence.py <shard> <n> | merge <n> | test
 """
 import sys, time, os, numpy as np
@@ -31,9 +31,9 @@ def divergences(hist, online):
 if __name__ == "__main__":
     if sys.argv[1] == "test":
         rng = np.random.default_rng(0); hist = rng.normal(0, 1, 2000)
-        online = np.concatenate([rng.normal(0, 1, 400), rng.standard_t(3, 400) * 0.6])  # смена формы, та же дисперсия ~
+        online = np.concatenate([rng.normal(0, 1, 400), rng.standard_t(3, 400) * 0.6])  # shape change, roughly the same variance
         t0 = time.time(); o = divergences(hist, online); dt = (time.time() - t0) / len(online) * 1000
-        print(f"тест: JS окна до {o[300:400,4].mean():.4f} после {o[450:550,4].mean():.4f}; Хеллингер {o[300:400,5].mean():.3f}->{o[450:550,5].mean():.3f}; W1 {o[300:400,6].mean():.3f}->{o[450:550,6].mean():.3f}; энтропия {o[300:400,7].mean():+.3f}->{o[450:550,7].mean():+.3f}; {dt:.3f} мс/шаг")
+        print(f"test: window JS before {o[300:400,4].mean():.4f} after {o[450:550,4].mean():.4f}; Hellinger {o[300:400,5].mean():.3f}->{o[450:550,5].mean():.3f}; W1 {o[300:400,6].mean():.3f}->{o[450:550,6].mean():.3f}; entropy {o[300:400,7].mean():+.3f}->{o[450:550,7].mean():+.3f}; {dt:.3f} ms/step")
         sys.exit(0)
     if sys.argv[1] == "merge":
         n = int(sys.argv[2]); parts = [np.load(f"{PARTS}/part_{i}.npz", allow_pickle=True) for i in range(n)]
@@ -53,4 +53,4 @@ if __name__ == "__main__":
         sids.append(int(sid)); arrs.append(divergences(hist, online))
     os.makedirs(PARTS, exist_ok=True)
     np.savez(f"{PARTS}/part_{shard}.npz", sids=np.array(sids), arrs=np.array(arrs, dtype=object), allow_pickle=True)
-    print(f"шард {shard} готов {time.time()-t0:.0f}s: {len(sids)} рядов", flush=True)
+    print(f"shard {shard} done {time.time()-t0:.0f}s: {len(sids)} series", flush=True)

@@ -1,4 +1,4 @@
-"""033b: выровненные скоры сети-по-каналам + ансамбль."""
+"""033b: aligned scores of the channel net + ensemble."""
 import sys, time
 sys.path.insert(0, "repo/src")
 import numpy as np
@@ -59,15 +59,15 @@ net = np.concatenate(scores)
 mask = assignment == 0
 yf, sf = y[mask], s[mask]
 np.save("tcn_chan_aligned.npy", net)
-print(f"сеть соло (выровнено): {ts_auc(net, yf, sf):.4f}  [{time.time()-t0:.0f}s]", flush=True)
+print(f"net alone (aligned): {ts_auc(net, yf, sf):.4f}  [{time.time()-t0:.0f}s]", flush=True)
 
 clf = np.load("oof_cfg5.npy")[mask].astype("float64")
 rnk = np.load("oof_rank.npy")[mask].astype("float64")
 sig_r = 1.0 / (1.0 + np.exp(-rnk))
 sig_n = 1.0 / (1.0 + np.exp(-net.astype("float64")))
 blend = 0.6 * sig_r + 0.4 * clf
-print(f"смесь эталон: {ts_auc(blend, yf, sf):.4f}", flush=True)
+print(f"blend reference: {ts_auc(blend, yf, sf):.4f}", flush=True)
 for w in (0.1, 0.2, 0.3, 0.4):
-    print(f"смесь + {w:.0%} сети: {ts_auc((1-w)*blend + w*sig_n, yf, sf):.4f}", flush=True)
+    print(f"blend + {w:.0%} net: {ts_auc((1-w)*blend + w*sig_n, yf, sf):.4f}", flush=True)
 tri = 0.45 * sig_r + 0.3 * clf + 0.25 * sig_n
-print(f"тройка 45/30/25: {ts_auc(tri, yf, sf):.4f}", flush=True)
+print(f"triple 45/30/25: {ts_auc(tri, yf, sf):.4f}", flush=True)

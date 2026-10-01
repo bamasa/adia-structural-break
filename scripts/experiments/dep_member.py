@@ -11,23 +11,23 @@ slow = dict(n_estimators=1500, learning_rate=0.015, num_leaves=31, colsample_byt
 fast = dict(n_estimators=600, learning_rate=0.03, num_leaves=63, colsample_bytree=0.5, subsample=0.8, subsample_freq=1, min_child_samples=100, verbose=-1, n_jobs=8)
 sp = lambda a, b: pd.Series(a).corr(pd.Series(b), method="spearman")
 res = {}
-for name, prm in (("медленный", slow), ("быстрый", fast)):
+for name, prm in (("slow", slow), ("fast", fast)):
     p = lgb.LGBMClassifier(**prm).fit(D[tr], y[tr]).predict_proba(D[te])[:, 1]; res[name] = p
-    np.save(f"fold2_clf_dep_{'slow' if name == 'медленный' else 'fast'}.npy", p)
-    print(f"зависимость-CUSUM ({name}): соло {ts_auc(p, yf, sf):.4f} | Spearman с #39 {sp(p, s39):.3f}, с частотным {sp(p, fq):.3f}, со связкой {sp(p, un):.3f}, с массой {sp(p, mass):.3f} [{time.time()-t0:.0f}s]", flush=True)
-p = res["медленный"]
+    np.save(f"fold2_clf_dep_{'slow' if name == 'slow' else 'fast'}.npy", p)
+    print(f"dependence-CUSUM ({name}): alone {ts_auc(p, yf, sf):.4f} | Spearman with #39 {sp(p, s39):.3f}, with frequency {sp(p, fq):.3f}, with the union {sp(p, un):.3f}, with mass {sp(p, mass):.3f} [{time.time()-t0:.0f}s]", flush=True)
+p = res["slow"]
 print(f"#39: {ts_auc(s39, yf, sf):.4f}")
 for w in (0.10, 0.15, 0.20, 0.25):
-    print(f"  #39 + член зависимости доля {w:.2f}: {ts_auc((1 - w) * s39 + w * p, yf, sf):.4f}")
-print("--- по диапазонам шагов: #39 против #39 + 0.15·зависимость ---")
+    print(f"  #39 + dependence member share {w:.2f}: {ts_auc((1 - w) * s39 + w * p, yf, sf):.4f}")
+print("--- by step range: #39 versus #39 + 0.15·dependence ---")
 for a, b in ((0, 30), (30, 100), (100, 300), (300, 700), (700, 3000)):
     m = (sf >= a) & (sf < b)
-    print(f"  шаги {a}-{b}: {ts_auc(s39[m], yf[m], sf[m]):.4f} -> {ts_auc(0.85 * s39[m] + 0.15 * p[m], yf[m], sf[m]):.4f}")
-# один классификатор на зависимость + частоту (семья зависимости, 123 канала)
+    print(f"  steps {a}-{b}: {ts_auc(s39[m], yf[m], sf[m]):.4f} -> {ts_auc(0.85 * s39[m] + 0.15 * p[m], yf[m], sf[m]):.4f}")
+# one classifier for dependence + frequency (dependence family, 123 channels)
 F = np.hstack([np.load("MSPEC32.npy"), np.load("MSPEC60.npy"), np.load("ACF8.npy"), D])
 pf = lgb.LGBMClassifier(**slow).fit(F[tr], y[tr]).predict_proba(F[te])[:, 1]; np.save("fold2_clf_freqdep_dep.npy", pf)
-print(f"частота+зависимость-CUSUM одним классификатором: соло {ts_auc(pf, yf, sf):.4f} (частотный один: {ts_auc(fq, yf, sf):.4f}) | Spearman с #39 {sp(pf, s39):.3f}")
+print(f"frequency+dependence-CUSUM in one classifier: alone {ts_auc(pf, yf, sf):.4f} (frequency alone: {ts_auc(fq, yf, sf):.4f}) | Spearman with #39 {sp(pf, s39):.3f}")
 for wm, wf in ((0.25, 0.20), (0.25, 0.25), (0.20, 0.30)):
     ref2 = (1 - wm - wf) * base + wm * mass + wf * pf; late2 = (1 - wm - 0.25 - wf * 0.5) * base + wm * mass + 0.25 * un + wf * 0.5 * pf
-    print(f"  вместо частотного члена (масса {wm}, доля {wf}): без гейта {ts_auc(ref2, yf, sf):.4f} | с гейтом и связкой {ts_auc(np.where(sf < 100, ref2, late2), yf, sf):.4f}")
-print(f"готово [{time.time()-t0:.0f}s]")
+    print(f"  instead of the frequency member (mass {wm}, share {wf}): without gate {ts_auc(ref2, yf, sf):.4f} | with gate and union {ts_auc(np.where(sf < 100, ref2, late2), yf, sf):.4f}")
+print(f"done [{time.time()-t0:.0f}s]")

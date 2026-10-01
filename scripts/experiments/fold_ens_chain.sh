@@ -62,14 +62,14 @@ yf, sf = y[mask], s[mask]
 sigs = []
 for d in (1, 2, 3, 4):
     v = aligned(f"tcn_fd{d}.pt").astype("float64")
-    print(f"без фолда {d}: соло {ts_auc(v, yf, sf):.4f}", flush=True)
+    print(f"without fold {d}: alone {ts_auc(v, yf, sf):.4f}", flush=True)
     sigs.append(1.0 / (1.0 + np.exp(-v)))
 ens = np.mean(sigs, axis=0)
-print(f"фолд-ансамбль (4 сети): соло {ts_auc(ens, yf, sf):.4f} (одиночная: 0.5939)", flush=True)
+print(f"fold ensemble (4 nets): alone {ts_auc(ens, yf, sf):.4f} (single: 0.5939)", flush=True)
 np.save("tcn_foldens_fold0.npy", ens)
 clf = np.load("oof_cfg5.npy")[mask].astype("float64")
 rnk = np.load("oof_rank.npy")[mask].astype("float64")
 blend = 0.6/(1.0+np.exp(-rnk)) + 0.4*clf
 for w in (0.4, 0.5, 0.6):
-    print(f"тройка с {w:.0%} фолд-ансамбля: {ts_auc((1-w)*blend + w*ens, yf, sf):.4f} (эталон #18: 0.6068)", flush=True)
+    print(f"triple with {w:.0%} fold ensemble: {ts_auc((1-w)*blend + w*ens, yf, sf):.4f} (reference #18: 0.6068)", flush=True)
 PY

@@ -21,7 +21,7 @@ if __name__ == "__main__":
     for i, (sid, part) in enumerate(x.groupby(level="id")):
         hist = part.loc[part.period == 1, "value"].to_numpy("float64"); online = part.loc[part.period == 2, "value"].to_numpy("float64")
         mb = MassBattery(hist[-TAIL:]); arrs.append(np.clip(np.nan_to_num(np.array([mb.update(float(v)) for v in online], dtype="float32")), -50, 50)); sids.append(int(sid))
-        if (i + 1) % 250 == 0: print(f"шард {shard}: {i+1} рядов, {time.time()-t0:.0f}s", flush=True)
+        if (i + 1) % 250 == 0: print(f"shard {shard}: {i+1} series, {time.time()-t0:.0f}s", flush=True)
     os.makedirs(PARTS, exist_ok=True)
     np.savez(f"{PARTS}/part_{shard}.npz", sids=np.array(sids), arrs=np.array(arrs, dtype=object), allow_pickle=True)
-    print(f"шард {shard} готов {time.time()-t0:.0f}s: {len(sids)} рядов", flush=True)
+    print(f"shard {shard} done {time.time()-t0:.0f}s: {len(sids)} series", flush=True)

@@ -171,9 +171,9 @@ if __name__ == "__main__":
         hist = ar(0.6, 3000) * (1 + 0.5 * np.sin(np.arange(3000) / 300))   # heteroskedastic AR history
         online = np.concatenate([ar(0.6, 300), ar(0.6, 300, sd=1.5)])
         t0 = time.time(); o = white_channels(hist, online); dt = (time.time() - t0) * 1000
-        print(f"каналов {o.shape[1]} (ожидалось {NCH}), {dt:.0f} мс на ряд; слом масштаба: CUSUM масштаба {o[250:300,4].mean():.2f} -> {o[450:600,4].mean():.2f}, GLR-max масштаба {o[250:300,53].mean():.1f} -> {o[450:600,53].mean():.1f}, KS-max {o[250:300,73].mean():.2f} -> {o[450:600,73].mean():.2f}, лог-масштаб {o[250:300,86].mean():+.2f} -> {o[450:600,86].mean():+.2f}")
+        print(f"{o.shape[1]} channels (expected {NCH}), {dt:.0f} ms per series; scale break: scale CUSUM {o[250:300,4].mean():.2f} -> {o[450:600,4].mean():.2f}, scale GLR-max {o[250:300,53].mean():.1f} -> {o[450:600,53].mean():.1f}, KS-max {o[250:300,73].mean():.2f} -> {o[450:600,73].mean():.2f}, log-scale {o[250:300,86].mean():+.2f} -> {o[450:600,86].mean():+.2f}")
         online2 = np.concatenate([ar(0.6, 300), ar(0.9, 300, sd=np.sqrt((1 - 0.9 ** 2) / (1 - 0.6 ** 2)))]); o2 = white_channels(hist, online2)
-        print(f"слом зависимости при равной дисперсии: CUSUM лаг1 {o2[250:300,8].mean():.2f} -> {o2[450:600,8].mean():.2f}, GLR-max зависимости {o2[250:300,54].mean():.1f} -> {o2[450:600,54].mean():.1f}")
+        print(f"dependence break at equal variance: CUSUM lag1 {o2[250:300,8].mean():.2f} -> {o2[450:600,8].mean():.2f}, dependence GLR-max {o2[250:300,54].mean():.1f} -> {o2[450:600,54].mean():.1f}")
         sys.exit(0)
     if sys.argv[1] == "merge":
         n = int(sys.argv[2]); g = np.load("G40.npy"); s = np.load("S40.npy")
@@ -191,7 +191,7 @@ if __name__ == "__main__":
     for i, (sid, part) in enumerate(x.groupby(level="id")):
         hist = part.loc[part.period == 1, "value"].to_numpy("float64"); online = part.loc[part.period == 2, "value"].to_numpy("float64")
         sids.append(int(sid)); arrs.append(white_channels(hist, online))
-        if (i + 1) % 250 == 0: print(f"шард {shard}: {i+1} рядов, {time.time()-t0:.0f}s", flush=True)
+        if (i + 1) % 250 == 0: print(f"shard {shard}: {i+1} series, {time.time()-t0:.0f}s", flush=True)
     os.makedirs(PARTS, exist_ok=True)
     np.savez(f"{PARTS}/part_{shard}.npz", sids=np.array(sids), arrs=np.array(arrs, dtype=object), allow_pickle=True)
-    print(f"шард {shard} готов {time.time()-t0:.0f}s: {len(sids)} рядов", flush=True)
+    print(f"shard {shard} done {time.time()-t0:.0f}s: {len(sids)} series", flush=True)

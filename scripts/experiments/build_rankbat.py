@@ -1,11 +1,11 @@
-"""117: ранговая батарея — тот же приём, что дал +0.004, но в непараметрическом виде.
+"""117: rank battery — the same trick that gave +0.004, but in non-parametric form.
 
-Массовая батарея описывает точку в сигмах истории. Здесь — её местом в истории:
-u = доля исторических точек ниже. Под нулевой гипотезой u равномерно на [0,1],
-поэтому отклонения читаются без предположений о форме распределения.
-Представления: u-0.5, |u-0.5|, знак, нормальная квантиль u (обратная к Ф),
-и «крайность» min(u,1-u). Окна те же (10..500), сравнения: среднее против 0,
-дисперсия против равномерной, доля в верхнем/нижнем децилях. ~66 каналов.
+The mass battery describes a point in sigmas of the history. Here — by its place in the history:
+u = fraction of historical points below. Under the null hypothesis u is uniform on [0,1],
+so deviations can be read without assumptions about the distribution shape.
+Representations: u-0.5, |u-0.5|, sign, normal quantile of u (inverse of Phi),
+and the "extremeness" min(u,1-u). Same windows (10..500), comparisons: mean against 0,
+variance against uniform, fraction in the top/bottom deciles. ~66 channels.
 python build_rankbat.py <shard> <n> | merge <n> | test
 """
 import sys, time, os, numpy as np
@@ -19,7 +19,7 @@ def rank_channels(hist, online):
     n = len(online); out = np.empty((n, NCH), dtype="float32")
     W = np.array(WINS, float); a = 1.0 / W
     s1 = np.zeros((NREP, len(WINS))); s2 = np.zeros((NREP, len(WINS))); dec = np.zeros((2, len(WINS)))
-    # эталоны под равномерным u
+    # reference values under uniform u
     hm = np.array([0.0, 0.25, 0.0, 0.0, 0.25])
     hv = np.array([1/12, 1/48, 1.0, 1.0, 1/48]) + 1e-9
     for t, x in enumerate(online):
@@ -41,8 +41,8 @@ if __name__ == "__main__":
         rng = np.random.default_rng(0); hist = rng.normal(0, 1, 2000)
         online = np.concatenate([rng.normal(0, 1, 200), rng.standard_t(3, 200) * 0.7])
         t0 = time.time(); o = rank_channels(hist, online); dt = (time.time() - t0) / len(online) * 1000
-        print(f"каналов {o.shape[1]}, {dt:.3f} мс/шаг; смена формы: дисперсия-окно100 {o[150:200, NREP*len(WINS)+3].mean():+.2f} -> {o[300:400, NREP*len(WINS)+3].mean():+.2f}, "
-              f"крайности {o[150:200,-2]. mean():+.3f} -> {o[300:400,-2].mean():+.3f}")
+        print(f"channels {o.shape[1]}, {dt:.3f} ms/step; shape change: variance-window100 {o[150:200, NREP*len(WINS)+3].mean():+.2f} -> {o[300:400, NREP*len(WINS)+3].mean():+.2f}, "
+              f"extremeness {o[150:200,-2]. mean():+.3f} -> {o[300:400,-2].mean():+.3f}")
         sys.exit(0)
     if sys.argv[1] == "merge":
         n = int(sys.argv[2]); parts = [np.load(f"{PARTS}/part_{i}.npz", allow_pickle=True) for i in range(n)]
@@ -62,4 +62,4 @@ if __name__ == "__main__":
         sids.append(int(sid)); arrs.append(rank_channels(hist, online))
     os.makedirs(PARTS, exist_ok=True)
     np.savez(f"{PARTS}/part_{shard}.npz", sids=np.array(sids), arrs=np.array(arrs, dtype=object), allow_pickle=True)
-    print(f"шард {shard} готов {time.time()-t0:.0f}s: {len(sids)} рядов", flush=True)
+    print(f"shard {shard} done {time.time()-t0:.0f}s: {len(sids)} series", flush=True)

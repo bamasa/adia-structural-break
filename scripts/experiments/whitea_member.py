@@ -9,12 +9,12 @@ s39 = np.where(sf < 100, 0.55 * base + 0.25 * mass + 0.20 * fq, 0.50 * base + 0.
 ref = np.load("fold2_clf_white_sr_slower.npy")
 slow = dict(n_estimators=3000, learning_rate=0.0075, num_leaves=31, colsample_bytree=0.5, subsample=0.8, subsample_freq=1, min_child_samples=500, reg_lambda=10.0, verbose=-1, n_jobs=8)
 sp = lambda a, b: pd.Series(a).corr(pd.Series(b), method="spearman")
-print(f"опора: сырое отбеливание 90 + SR: соло {ts_auc(ref, yf, sf):.4f} | #39 + 0.40: {ts_auc(0.6 * s39 + 0.4 * ref, yf, sf):.4f}", flush=True)
+print(f"anchor: raw whitening 90 + SR: alone {ts_auc(ref, yf, sf):.4f} | #39 + 0.40: {ts_auc(0.6 * s39 + 0.4 * ref, yf, sf):.4f}", flush=True)
 D = np.hstack([np.load("WHITE90.npy"), np.load("WHITEA90.npy"), np.load("SR22.npy")]); Dtr, Dte = D[tr], D[te]; del D
 p = lgb.LGBMClassifier(**slow).fit(Dtr, y[tr]).predict_proba(Dte)[:, 1]; np.save("fold2_clf_white_asinh_sr.npy", p)
-print(f"сырое + asinh отбеливание + SR (201): соло {ts_auc(p, yf, sf):.4f} | Spearman с опорой {sp(p, ref):.3f} | #39 + 0.40: {ts_auc(0.6 * s39 + 0.4 * p, yf, sf):.4f} [{time.time()-t0:.0f}s]", flush=True)
+print(f"raw + asinh whitening + SR (201): alone {ts_auc(p, yf, sf):.4f} | Spearman with the anchor {sp(p, ref):.3f} | #39 + 0.40: {ts_auc(0.6 * s39 + 0.4 * p, yf, sf):.4f} [{time.time()-t0:.0f}s]", flush=True)
 del Dtr, Dte
 D = np.load("WHITEA90.npy"); Dtr, Dte = D[tr], D[te]; del D
 pa = lgb.LGBMClassifier(**slow).fit(Dtr, y[tr]).predict_proba(Dte)[:, 1]; np.save("fold2_clf_whitea.npy", pa)
-print(f"asinh отбеливание одно (90): соло {ts_auc(pa, yf, sf):.4f} | Spearman с сырым {sp(pa, ref):.3f} | как отдельный член: #39 + 0.40·сырое + 0.15·asinh: {ts_auc(0.5 * s39 + 0.4 * ref + 0.15 * pa, yf, sf):.4f} [{time.time()-t0:.0f}s]")
-print(f"готово [{time.time()-t0:.0f}s]")
+print(f"asinh whitening only (90): alone {ts_auc(pa, yf, sf):.4f} | Spearman with raw {sp(pa, ref):.3f} | as a separate member: #39 + 0.40·raw + 0.15·asinh: {ts_auc(0.5 * s39 + 0.4 * ref + 0.15 * pa, yf, sf):.4f} [{time.time()-t0:.0f}s]")
+print(f"done [{time.time()-t0:.0f}s]")

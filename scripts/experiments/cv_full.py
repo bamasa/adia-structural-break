@@ -21,7 +21,7 @@ def cv(mat, tag):
     print(f"{tag}: {np.mean(scores):.4f}  " + " ".join(f"{v:.4f}" for v in scores)
           + f"   [{time.time()-t0:.0f}s]", flush=True)
 
-print("соло амплитудный, пик:", f"{ts_auc(M4[:, 2], y, s):.4f}", flush=True)
-cv(np.hstack([X100, E4, M4]), "108 (104 + амплитудный)")
-cv(np.hstack([X100, E4, E8, D50, M4]), "170 (ПОЛНАЯ комбинация всего)")
-print(f"всего {time.time()-t0:.0f}s", flush=True)
+print("amplitude alone, peak:", f"{ts_auc(M4[:, 2], y, s):.4f}", flush=True)
+cv(np.hstack([X100, E4, M4]), "108 (104 + amplitude)")
+cv(np.hstack([X100, E4, E8, D50, M4]), "170 (FULL combination of everything)")
+print(f"total {time.time()-t0:.0f}s", flush=True)

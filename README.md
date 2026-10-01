@@ -4,6 +4,37 @@ Solutions for the [ADIA Lab Structural Break Challenge: Real-Time
 Edition](https://hub.crunchdao.com/competitions/structural-break-real-time)
 (CrunchDAO, May–October 2026; the deadline was extended from 17 September to 1 October).
 
+## Result in one screen
+
+**Final: 0.6299 TS-AUC on the platform, about rank 160 of 1,716** (the
+leader 0.680). Five weeks, 158 logged experiments, 45 submissions; the
+score moved from 0.5877 at the first network blend to 0.6299 at the close,
+and +0.024 of that came in the last five days from one idea found by
+research rather than by iteration: whitening each series by its own
+history (an AR(p) fit, a conditional scale and the innovation ECDF) and
+reading every test on the whitened stream.
+
+What this repository is for is as much the *process* as the score. The
+search was run by an engineer directing an LLM assistant as a research
+team: a fast local evaluator identical to the platform's metric, cached
+member predictions so that an idea is read in seconds, a shipping bar
+learned from what did and did not transfer to the platform, streaming
+implementations verified against the batch matrices before every push,
+and a journal that records every experiment with its verdict and the
+reason — the failures with the same care as the gains. The method is in
+[docs/method.md](docs/method.md); the journal in
+[docs/experiments.md](docs/experiments.md); the two surveys that
+produced the turn in [docs/research/](docs/research/); the mapping of
+submission directories to platform numbers in
+[docs/submissions.md](docs/submissions.md).
+
+| | |
+|---|---|
+| Library | `src/structural_break/` — streaming channel families (detectors, retrospective scans, BOCPD run-length, mass battery, spectra, novelty, dependence CUSUM, the whitened stream with Shiryaev-Roberts odds), each verified against its batch builder to 1e-6 |
+| Models | LightGBM classifier and lambdarank ranker per step, dilated causal networks over channel trajectories, independent members on their own inputs, blended by hand on an untouched fold |
+| Protocol | `scripts/assemble_submission.py` (width checks) → `verify_*.py` (channels, speed) → `scripts/ship_submission.sh`; one change per cloud run |
+| Record | 158 experiments, 45 submissions, 8 platform moves, 3 silent bugs caught by verification, 2 research surveys |
+
 ## The task
 
 A univariate series arrives in two parts. The **historical segment** — 1,000 to

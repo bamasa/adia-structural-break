@@ -1,10 +1,10 @@
-"""126: спектр на ДЛИННЫХ окнах (64..1024) и 10 полосах — усиление 124 (корр. 0.12, соло 0.5285).
+"""126: spectrum on LONG windows (64..1024) and 10 bands — strengthening 124 (corr. 0.12, alone 0.5285).
 
-SPEC14 в основном наборе считает спектр на одном окне (SPEC_NFFT) по геометрической
-сетке шагов. Здесь та же массовость по окнам, что дала прирост в 114, но над
-частотной областью: на окнах 32/64/128/256 точек — мощность в 6 логарифмических
-полосах относительно истории (в сигмах исторического разброса), спектральная
-энтропия и центроид. 4 окна x 8 = 32 канала. FFT на каждом шаге, O(W log W).
+SPEC14 in the main set computes the spectrum on a single window (SPEC_NFFT) over a geometric
+step grid. Here the same window multiplicity that gave the gain in 114, but over the
+frequency domain: on windows of 32/64/128/256 points — power in 6 logarithmic
+bands relative to the history (in sigmas of the historical spread), spectral
+entropy and centroid. 4 windows x 8 = 32 channels. FFT at every step, O(W log W).
 python build_mspec.py <shard> <n> | merge <n> | test
 """
 import sys, time, os, numpy as np
@@ -32,13 +32,13 @@ def mspec_channels(hist, online):
     n = len(zo); out = np.zeros((n, NCH), dtype="float32")
     edges = {w: band_edges(w) for w in WINS}
     ref = {}
-    for w in WINS:                                   # исторический профиль с перекрытием в полокна; окно эталона не длиннее истории
+    for w in WINS:                                   # historical profile with half-window overlap; the reference window is no longer than the history
         we = min(w, len(zh)); step = max(we // 2, 1)
         segs = [spec_feats(zh[i:i + we], edges[w]) for i in range(0, len(zh) - we + 1, step)]
-        if len(segs) < 2: segs = segs + segs           # один сегмент — разброс нулевой, страхуемся дублем
+        if len(segs) < 2: segs = segs + segs           # a single segment — zero spread, guard by duplicating
         S = np.array(segs); ref[w] = (S.mean(0), S.std(0) + 1e-3)
     tail = zh[-max(WINS):]
-    if len(tail) < max(WINS):                        # история короче самого длинного окна — дополняем слева нулями (z-масштаб)
+    if len(tail) < max(WINS):                        # history shorter than the longest window — left-pad with zeros (z scale)
         tail = np.concatenate([np.zeros(max(WINS) - len(tail)), tail])
     full = np.concatenate([tail, zo])
     for t in range(n):
@@ -57,7 +57,7 @@ if __name__ == "__main__":
             return x
         hist = ar(0.0, 2000); online = np.concatenate([ar(0.0, 300), ar(0.7, 300)])
         t0 = time.time(); o = mspec_channels(hist, online); dt = (time.time() - t0) / len(online) * 1000
-        print(f"каналов {o.shape[1]}, {dt:.3f} мс/шаг; смена спектра (белый -> AR 0.7): нижняя полоса/окно128 {o[250:300,16].mean():+.2f} -> {o[450:600,16].mean():+.2f}, центроид {o[250:300,23].mean():+.2f} -> {o[450:600,23].mean():+.2f}")
+        print(f"channels {o.shape[1]}, {dt:.3f} ms/step; spectrum change (white -> AR 0.7): low band/window128 {o[250:300,16].mean():+.2f} -> {o[450:600,16].mean():+.2f}, centroid {o[250:300,23].mean():+.2f} -> {o[450:600,23].mean():+.2f}")
         sys.exit(0)
     if sys.argv[1] == "merge":
         n = int(sys.argv[2]); parts = [np.load(f"{PARTS}/part_{i}.npz", allow_pickle=True) for i in range(n)]
@@ -75,7 +75,7 @@ if __name__ == "__main__":
     for i, (sid, part) in enumerate(x.groupby(level="id")):
         hist = part.loc[part.period == 1, "value"].to_numpy("float64"); online = part.loc[part.period == 2, "value"].to_numpy("float64")
         sids.append(int(sid)); arrs.append(mspec_channels(hist, online))
-        if (i + 1) % 200 == 0: print(f"шард {shard}: {i+1} рядов, {time.time()-t0:.0f}s", flush=True)
+        if (i + 1) % 200 == 0: print(f"shard {shard}: {i+1} series, {time.time()-t0:.0f}s", flush=True)
     os.makedirs(PARTS, exist_ok=True)
     np.savez(f"{PARTS}/part_{shard}.npz", sids=np.array(sids), arrs=np.array(arrs, dtype=object), allow_pickle=True)
-    print(f"шард {shard} готов {time.time()-t0:.0f}s: {len(sids)} рядов", flush=True)
+    print(f"shard {shard} done {time.time()-t0:.0f}s: {len(sids)} series", flush=True)

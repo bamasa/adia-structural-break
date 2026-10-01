@@ -9,7 +9,7 @@ from structural_break.stream import iter_series
 t0 = time.time()
 x = pd.read_parquet("structural-break-real-time-test/data/X_train.parquet")
 y = pd.read_parquet("structural-break-real-time-test/data/y_train.parquet")
-print(f"загрузка {time.time()-t0:.0f}s", flush=True)
+print(f"loading {time.time()-t0:.0f}s", flush=True)
 
 def acf1(v):
     if len(v) <= 3:
@@ -52,11 +52,11 @@ def two_sample2(h, p):
     pos = np.searchsorted(h["sorted"], ps, side="right") / len(h["sorted"])
     ecdf = np.arange(1, n + 1) / n
     gap = pos - ecdf
-    out.append(float(np.mean(gap ** 2)))                                  # Крамер–фон Мизес
+    out.append(float(np.mean(gap ** 2)))                                  # Cramér–von Mises
     w = np.clip(pos * (1 - pos), 1e-3, None)
-    out.append(float(np.clip(np.mean(gap ** 2 / w), 0, 10)))              # Андерсон–Дарлинг (обрезан)
+    out.append(float(np.clip(np.mean(gap ** 2 / w), 0, 10)))              # Anderson–Darling (clipped)
     dev = np.abs(p - np.median(p))
-    out.append(float(np.log((dev.mean() + 1e-9) / (h["lev"] + 1e-9))))    # Левен
+    out.append(float(np.log((dev.mean() + 1e-9) / (h["lev"] + 1e-9))))    # Levene
     d = np.diff(p)
     if len(d) > 2:
         out.append(float(np.log((d.std() + 1e-9) / (h["d_std"] + 1e-9))))
@@ -68,14 +68,14 @@ def two_sample2(h, p):
         tail = p[-wlen:]
         out.append(float(tail.mean() - h["mean"]))
         out.append(float(np.log((tail.std() + 1e-9) / (h["std"] + 1e-9))))
-    out.append(float((p > h["q95"]).mean() - 0.05))                       # выходы за хвосты истории
+    out.append(float((p > h["q95"]).mean() - 0.05))                       # exceedances of the history tails
     out.append(float((p < h["q05"]).mean() - 0.05))
-    out.append(float((p > 0).mean() - h["sign"]))                         # знаковые статистики
+    out.append(float((p > 0).mean() - h["sign"]))                         # sign statistics
     sg = np.sign(p)
     out.append(acf1(sg))
-    out.append(slope_t(p))                                                # t-статистика тренда
-    out.append(slope_t(np.abs(p)))                                        # тренд амплитуды
-    return out  # 20 признаков
+    out.append(slope_t(p))                                                # trend t-statistic
+    out.append(slope_t(np.abs(p)))                                        # amplitude trend
+    return out  # 20 features
 
 rows, count = [], 0
 for sid, hist, online, labels in iter_series(x, y):
@@ -98,8 +98,8 @@ for sid, hist, online, labels in iter_series(x, y):
         rows.append(list(current))
     count += 1
     if count % 2000 == 0:
-        print(f"  {count} рядов, {time.time()-t0:.0f}s", flush=True)
+        print(f"  {count} series, {time.time()-t0:.0f}s", flush=True)
 
 a = np.asarray(rows, dtype="float32")
 np.save("B2.npy", a)
-print(f"готово {time.time()-t0:.0f}s: {a.shape}", flush=True)
+print(f"done {time.time()-t0:.0f}s: {a.shape}", flush=True)

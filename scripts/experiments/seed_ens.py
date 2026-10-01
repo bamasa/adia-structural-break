@@ -1,4 +1,4 @@
-"""027 (фолд-0): сид-ансамбль ранкеров + смесь с классификатором."""
+"""027 (fold 0): seed ensemble of rankers + blend with the classifier."""
 import sys, time
 sys.path.insert(0, "repo/src")
 import numpy as np
@@ -29,13 +29,13 @@ for seed in (0, 1, 2):
     r.fit(Xtr, ytr, group=sizes)
     sc = r.predict(X[va])
     sigs.append(1.0 / (1.0 + np.exp(-sc)))
-    print(f"сид {seed}: {ts_auc(sc, yf, sf):.4f}  [{time.time()-t0:.0f}s]", flush=True)
+    print(f"seed {seed}: {ts_auc(sc, yf, sf):.4f}  [{time.time()-t0:.0f}s]", flush=True)
 
 mean_sig = np.mean(sigs, axis=0)
-print(f"ансамбль 3 сидов: {ts_auc(mean_sig, yf, sf):.4f}", flush=True)
+print(f"ensemble of 3 seeds: {ts_auc(mean_sig, yf, sf):.4f}", flush=True)
 clf = np.load("oof_cfg5.npy")[va].astype("float64")
 for w in (0.5, 0.6, 0.7):
-    print(f"смесь {w:.0%} сид-ансамбля + классификатор: "
+    print(f"blend {w:.0%} seed ensemble + classifier: "
           f"{ts_auc(w * mean_sig + (1 - w) * clf, yf, sf):.4f}", flush=True)
-print(f"(эталон текущей посылки #15: 0.6035)", flush=True)
-print(f"всего {time.time()-t0:.0f}s", flush=True)
+print(f"(reference of the current submission #15: 0.6035)", flush=True)
+print(f"total {time.time()-t0:.0f}s", flush=True)

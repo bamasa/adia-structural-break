@@ -1,4 +1,4 @@
-"""#085: каналы против матриц (206 + 90 + 100 + 20 + 23), скорость, прогон."""
+"""#085: channels versus matrices (206 + 90 + 100 + 20 + 23), speed, end-to-end run."""
 import importlib.util, sys, time
 import numpy as np, pandas as pd
 spec = importlib.util.spec_from_file_location("sub", "repo/submissions/085-dependence-cusum/main.py")

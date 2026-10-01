@@ -1,8 +1,8 @@
-"""079: ещё шесть срезов границы на ряд (AUG6) — к тройной аугментации, итого девять.
+"""079: six more boundary cuts per series (AUG6) — on top of the triple augmentation, nine in total.
 
-Строится шардами параллельно: python build_aug6.py <shard> <n_shards>; каждый
-процесс держит только свои ряды. Группы 200000 + sid*10 + j, j = 0..5.
-Слияние: python build_aug6.py merge <n_shards>."""
+Built in parallel shards: python build_aug6.py <shard> <n_shards>; each
+process holds only its own series. Groups 200000 + sid*10 + j, j = 0..5.
+Merge: python build_aug6.py merge <n_shards>."""
 import sys, time, os
 import numpy as np
 
@@ -17,11 +17,11 @@ if sys.argv[1] == "merge":
     out.flush(); del out
     for name, dt in (("Y", "int8"), ("G", "int64"), ("S", "int32")):
         np.save(f"AUG6_{name}.npy", np.concatenate([np.load(f"aug6_parts/{name}_{i}.npy") for i in range(n)]).astype(dt))
-    print(f"AUG6: {total} строк, {len(np.unique(np.load('AUG6_G.npy')))} псевдорядов", flush=True)
+    print(f"AUG6: {total} rows, {len(np.unique(np.load('AUG6_G.npy')))} pseudo-series", flush=True)
     sys.exit(0)
 
 shard, n_shards = int(sys.argv[1]), int(sys.argv[2])
-time.sleep(shard * 15)  # разнести пики памяти при загрузке parquet
+time.sleep(shard * 15)  # spread out the memory peaks while loading parquet
 sys.path.insert(0, "repo/src")
 import importlib.util, pandas as pd
 spec = importlib.util.spec_from_file_location("sub", "repo/submissions/053-spectral/main.py")
@@ -34,7 +34,7 @@ x = pd.read_parquet("structural-break-real-time-test/data/X_train.parquet")
 ids = x.index.get_level_values("id")
 x = x[(ids % n_shards) == shard]
 yl = pd.read_parquet("structural-break-real-time-test/data/y_train.parquet")
-print(f"шард {shard}: загрузка {time.time()-t0:.0f}s", flush=True)
+print(f"shard {shard}: loading {time.time()-t0:.0f}s", flush=True)
 
 rows, labels, groups, steps = [], [], [], []
 count = 0
@@ -62,11 +62,11 @@ for sid, part in x.groupby(level="id"):
             groups.append(200000 + int(sid) * 10 + j); steps.append(i)
     count += 1
     if count % 200 == 0:
-        print(f"шард {shard}: {count} рядов, {time.time()-t0:.0f}s", flush=True)
+        print(f"shard {shard}: {count} series, {time.time()-t0:.0f}s", flush=True)
 
 os.makedirs("aug6_parts", exist_ok=True)
 np.save(f"aug6_parts/X_{shard}.npy", np.asarray(rows, dtype="float32"))
 np.save(f"aug6_parts/Y_{shard}.npy", np.asarray(labels, dtype="int8"))
 np.save(f"aug6_parts/G_{shard}.npy", np.asarray(groups, dtype="int64"))
 np.save(f"aug6_parts/S_{shard}.npy", np.asarray(steps, dtype="int32"))
-print(f"шард {shard} готов {time.time()-t0:.0f}s: {len(rows)} строк из {count} рядов", flush=True)
+print(f"shard {shard} done {time.time()-t0:.0f}s: {len(rows)} rows from {count} series", flush=True)

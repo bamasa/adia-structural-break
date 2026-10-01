@@ -1,4 +1,4 @@
-"""#30 на рядах первой редакции: честный кросс-датасетный замер (torch-only: сети; деревья отдельно)."""
+"""#30 on the first-revision series: an honest cross-dataset measurement (torch-only: the nets; trees separately)."""
 import sys, numpy as np, torch, torch.nn as nn, torch.nn.functional as F
 sys.path.insert(0, "repo/src")
 from structural_break.combiners import ts_auc
@@ -34,4 +34,4 @@ for p in paths:
                 net_sig[a:b] += 1/(1+np.exp(-o[i, L-(b-a):].astype("float64")))
 net_sig /= len(paths)
 np.save("fe_net_sig.npy", net_sig)
-print(f"сети (12) на первой редакции: TS-AUC {ts_auc(net_sig, y, s):.4f}", flush=True)
+print(f"nets (12) on the first revision: TS-AUC {ts_auc(net_sig, y, s):.4f}", flush=True)

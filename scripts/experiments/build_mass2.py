@@ -1,9 +1,9 @@
-"""118: расширенная массовая батарея — восемь окон, четыре сравнения на каждое.
+"""118: extended mass battery — eight windows, four comparisons per window.
 
-114 дал +0.004 на 90 каналах (6 представлений x 6 окон x 2 сравнения). Здесь то же
-самое, но шире: окна 5..1000, плюс третий и четвёртый моменты на окне (асимметрия и
-эксцесс против исторических). 6 x 8 x 4 = 192 + 8 x 3 квантильных = 216 каналов.
-Всё через скользящие моменты, O(представлений x окон) на шаг.
+114 gave +0.004 on 90 channels (6 representations x 6 windows x 2 comparisons). Here the same
+thing, but wider: windows 5..1000, plus the third and fourth moments on the window (skewness and
+kurtosis against the historical ones). 6 x 8 x 4 = 192 + 8 x 3 quantile = 216 channels.
+All via rolling moments, O(representations x windows) per step.
 python build_mass2.py <shard> <n> | merge <n> | test
 """
 import sys, time, os, numpy as np
@@ -50,7 +50,7 @@ if __name__ == "__main__":
         rng = np.random.default_rng(0); hist = rng.normal(0, 1, 2000)
         online = np.concatenate([rng.normal(0, 1, 300), rng.normal(0.3, 1.2, 300)])
         t0 = time.time(); o = mass2(hist, online); dt = (time.time() - t0) / len(online) * 1000
-        print(f"каналов {o.shape[1]}, {dt:.3f} мс/шаг; среднее-окно100 {o[250:300,4].mean():+.2f} -> {o[450:600,4].mean():+.2f}")
+        print(f"channels {o.shape[1]}, {dt:.3f} ms/step; mean/window100 {o[250:300,4].mean():+.2f} -> {o[450:600,4].mean():+.2f}")
         sys.exit(0)
     if sys.argv[1] == "merge":
         n = int(sys.argv[2]); parts = [np.load(f"{PARTS}/part_{i}.npz", allow_pickle=True) for i in range(n)]
@@ -70,4 +70,4 @@ if __name__ == "__main__":
         sids.append(int(sid)); arrs.append(mass2(hist, online))
     os.makedirs(PARTS, exist_ok=True)
     np.savez(f"{PARTS}/part_{shard}.npz", sids=np.array(sids), arrs=np.array(arrs, dtype=object), allow_pickle=True)
-    print(f"шард {shard} готов {time.time()-t0:.0f}s: {len(sids)} рядов", flush=True)
+    print(f"shard {shard} done {time.time()-t0:.0f}s: {len(sids)} series", flush=True)

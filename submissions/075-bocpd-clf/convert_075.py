@@ -1,4 +1,4 @@
-"""torch-only: 12 сетей (#28 шесть + шесть последней эпохи) -> npz."""
+"""torch-only: 12 nets (six from #28 + six last-epoch) -> npz."""
 import numpy as np, torch
 paths = [f"nets_aug3/member_p{i}.pt" for i in range(6)] + [f"nets_aug3_last/member_z{i}.pt" for i in range(6)]
 out = {}

@@ -1,4 +1,4 @@
-"""#075: каналы против матриц (200 + 6 BOCPD), скорость, прогон."""
+"""#075: channels against the matrices (200 + 6 BOCPD), speed, a full pass."""
 import importlib.util, sys, time
 import numpy as np, pandas as pd
 spec = importlib.util.spec_from_file_location("sub", "repo/submissions/078-two-classifiers/main.py")

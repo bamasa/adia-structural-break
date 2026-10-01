@@ -9,5 +9,5 @@ nets = [{k.split("|", 1)[1]: arc[k] for k in arc.files if int(k.split("|")[0]) =
 model = {"booster": clf, "rankers": [rank_aug], "forecaster": forecaster,
          "nets": nets, "net_mu": np.load("mu200.npy"), "net_sd": np.load("sd200.npy")}
 joblib.dump(model, "resources075/model.joblib", compress=3)
-print(f"resources075: clf {clf.booster_.num_feature()} признаков, {len(nets)} nets, "
+print(f"resources075: clf {clf.booster_.num_feature()} features, {len(nets)} nets, "
       f"{os.path.getsize('resources075/model.joblib')/1e6:.1f} MB")

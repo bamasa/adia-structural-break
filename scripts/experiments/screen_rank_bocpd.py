@@ -1,4 +1,4 @@
-"""085r: ранкер (конфиг #28) на оригиналах(≠2)+AUG: 200 против 206 каналов (BOCPD, хазард 1/50)."""
+"""085r: ranker (#28 config) on originals(≠2)+AUG: 200 vs 206 channels (BOCPD, hazard 1/50)."""
 import sys, time, numpy as np, lightgbm as lgb
 sys.path.insert(0, "repo/src")
 from structural_break.combiners import split_by_series, ts_auc
@@ -27,7 +27,7 @@ for st in np.unique(str_):
         chunk_id[idx[c::n_chunks]] = int(st) * 10 + c
 order = np.argsort(chunk_id, kind="stable")
 _, sizes = np.unique(chunk_id[order], return_counts=True)
-print(f"строк {len(ytr)}, групп {len(sizes)} [{time.time()-t0:.0f}s]", flush=True)
+print(f"rows {len(ytr)}, groups {len(sizes)} [{time.time()-t0:.0f}s]", flush=True)
 res = {}
 for name, Xtr, Xva in (("200", np.vstack([X[tr], AX]), X[va]),
                        ("206", np.vstack([np.hstack([X[tr], B[tr]]), np.hstack([AX, AB])]), np.hstack([X[va], B[va]]))):
@@ -38,6 +38,6 @@ for name, Xtr, Xva in (("200", np.vstack([X[tr], AX]), X[va]),
     r.fit(Xtr[order], ytr[order], group=sizes)
     rs = r.predict(Xva); res[name] = ts_auc(rs, yf, sf)
     np.save(f"fold2_rank_bocpd_{name}.npy", rs)
-    print(f"ранкер {name}: фолд-2 {res[name]:.4f} [{time.time()-t0:.0f}s]", flush=True)
+    print(f"ranker {name}: fold 2 {res[name]:.4f} [{time.time()-t0:.0f}s]", flush=True)
     del Xtr
-print(f"ИТОГ ранкер: прирост {res['206'] - res['200']:+.4f}", flush=True)
+print(f"RESULT ranker: gain {res['206'] - res['200']:+.4f}", flush=True)

@@ -12,7 +12,7 @@ from sklearn.metrics import roc_auc_score
 OUT = os.path.dirname(os.path.abspath(__file__))
 df = pd.read_csv(os.path.join(OUT, "t4_stats.csv"))
 f2 = pd.read_csv("/Users/organist/projects/adia-structural-break/fold2_break_kinds.csv")
-inv353 = set(f2[f2.kind == "нет явного"].sid); vis_f2 = set(f2[f2.kind != "нет явного"].sid)
+inv353 = set(f2[f2.kind == "none evident"].sid); vis_f2 = set(f2[f2.kind != "none evident"].sid)
 kinds = pd.read_csv(os.path.join(OUT, "t3_break_kinds_full.csv"), usecols=["id", "kind", "post_len"])
 none_full = set(kinds[(kinds.kind == "none") & (kinds.post_len >= 100)].id); vis_full = set(kinds[(kinds.kind != "none") & (kinds.post_len >= 100)].id)
 base = [c[5:] for c in df.columns if c.startswith("post_") and c != "post_len" and c != "post_n"]

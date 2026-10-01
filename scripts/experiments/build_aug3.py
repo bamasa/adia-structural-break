@@ -1,4 +1,4 @@
-"""065: аугментация обучающего набора — перенос границы истории вправо."""
+"""065: training-set augmentation — shifting the history boundary to the right."""
 import sys, time
 sys.path.insert(0, "structural-break-real-time-test")
 sys.path.insert(0, "repo/src")
@@ -16,7 +16,7 @@ base_fc = lgb.Booster(model_str=joblib.load("resources053/model.joblib")["foreca
 t0 = time.time()
 x = pd.read_parquet("structural-break-real-time-test/data/X_train.parquet")
 yl = pd.read_parquet("structural-break-real-time-test/data/y_train.parquet")
-print(f"загрузка {time.time()-t0:.0f}s", flush=True)
+print(f"loading {time.time()-t0:.0f}s", flush=True)
 
 rng = np.random.default_rng(1)
 rows, labels, groups, steps = [], [], [], []
@@ -28,7 +28,7 @@ for sid, part in x.groupby(level="id"):
         continue
     lab = yl.loc[sid, "target"].to_numpy()
     tau = int(lab.argmax()) if lab.max() > 0 else None
-    # Сдвигаем границу вправо: k из первой трети «чистого» участка.
+    # Shift the boundary to the right: k from the first third of the "clean" segment.
     limit = tau if tau is not None else len(online)
     if limit < 30:
         continue
@@ -48,10 +48,10 @@ for sid, part in x.groupby(level="id"):
             steps.append(i)
     count += 1
     if count % 1000 == 0:
-        print(f"  {count} рядов, {time.time()-t0:.0f}s", flush=True)
+        print(f"  {count} series, {time.time()-t0:.0f}s", flush=True)
 
 np.save("AUG3_X.npy", np.asarray(rows, dtype="float32"))
 np.save("AUG3_Y.npy", np.asarray(labels, dtype="int8"))
 np.save("AUG3_G.npy", np.asarray(groups, dtype="int64"))
 np.save("AUG3_S.npy", np.asarray(steps, dtype="int32"))
-print(f"готово {time.time()-t0:.0f}s: {len(rows)} строк из {count} рядов", flush=True)
+print(f"done {time.time()-t0:.0f}s: {len(rows)} rows from {count} series", flush=True)

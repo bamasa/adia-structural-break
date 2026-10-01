@@ -12,5 +12,5 @@ for i, (sid, part) in enumerate(x.groupby(level="id")):
     fit = fit_history(zh); u = fit["suu"]; m2 = (u ** 2).mean() + 1e-12
     a, b = pos[int(sid)]
     out[a:b] = [fit["p"], fit["coef"][0] if fit["p"] else 0.0, fit["lam"], np.log(fit["v0"]), (u ** 4).mean() / m2 ** 2 - 3.0, (u ** 3).mean() / m2 ** 1.5, np.log(len(h)), np.abs(zh).max()]
-    if (i + 1) % 2500 == 0: print(f"{i+1} рядов, {time.time()-t0:.0f}s", flush=True)
+    if (i + 1) % 2500 == 0: print(f"{i+1} series, {time.time()-t0:.0f}s", flush=True)
 np.save("HISTCTX8.npy", out); print(f"HISTCTX8: {out.shape} [{time.time()-t0:.0f}s]")

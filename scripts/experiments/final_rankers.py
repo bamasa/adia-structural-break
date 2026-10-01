@@ -26,4 +26,4 @@ r = lgb.LGBMRanker(
 r.fit(Xtr, ytr, group=sizes)
 os.makedirs("resources039", exist_ok=True)
 joblib.dump(r, f"resources039/ranker_drop{drop}.joblib")
-print(f"ранкер без фолда {drop} готов {time.time()-t0:.0f}s", flush=True)
+print(f"ranker without fold {drop} ready {time.time()-t0:.0f}s", flush=True)

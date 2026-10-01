@@ -16,7 +16,7 @@ for fold in range(5):
     tr, va = assignment != fold, assignment == fold
     m = Boosted.fit(X144[tr], y[tr], names, step_weights(s[tr]))
     oof[va] = m.predict(X144[va])
-    print(f"  фолд {fold} готов [{time.time()-t0:.0f}s]", flush=True)
+    print(f"  fold {fold} done [{time.time()-t0:.0f}s]", flush=True)
 np.save("oof144.npy", oof)
 
 starts = np.flatnonzero(np.concatenate([[True], g[1:] != g[:-1]]))
@@ -32,8 +32,8 @@ def peak_hold(p, alpha):
             out[i] = acc
     return out
 base = fold_scores(oof)
-print(f"144 без холда: {np.mean(base):.4f}  " + " ".join(f"{v:.4f}" for v in base), flush=True)
+print(f"144 without hold: {np.mean(base):.4f}  " + " ".join(f"{v:.4f}" for v in base), flush=True)
 for alpha in (0.995, 0.999):
     sc = fold_scores(peak_hold(oof, alpha))
-    print(f"144 + пик-холд α={alpha}: {np.mean(sc):.4f}  " + " ".join(f"{v:.4f}" for v in sc), flush=True)
-print(f"всего {time.time()-t0:.0f}s", flush=True)
+    print(f"144 + peak-hold α={alpha}: {np.mean(sc):.4f}  " + " ".join(f"{v:.4f}" for v in sc), flush=True)
+print(f"total {time.time()-t0:.0f}s", flush=True)

@@ -18,7 +18,7 @@ sid = (AG - 100000) // 10; cut = AG % 10
 keep = np.flatnonzero((cut == 0) & np.array([fold_by_sid.get(int(x), 0) != 2 for x in sid]))
 Xtr = np.vstack([stack(CORE, tr_idx), np.hstack([stack(["AUG3_X.npy", "AUG3_BOCPD6_H50.npy"], keep), stack(["AUG3_WHITE111.npy"], keep)])])
 Dte = stack(CORE, te_idx); ytr = np.concatenate([y[tr], AY[keep]]); str_ = np.concatenate([s[tr], AS[keep]])
-print(f"обучение {Xtr.shape}, тест {Dte.shape} [{time.time()-t0:.0f}s]", flush=True)
+print(f"train {Xtr.shape}, test {Dte.shape} [{time.time()-t0:.0f}s]", flush=True)
 rng = np.random.default_rng(0); key = str_.astype("int64") * 8
 for t_ in np.unique(str_):
     idx = np.flatnonzero(str_ == t_); k = int(np.ceil(len(idx) / 9000))
@@ -33,7 +33,7 @@ r0 = np.load("fold2_rank_white_sr.npy"); r1 = np.load("fold2_rank_white_ctx.npy"
 sig = lambda a: 1.0 / (1.0 + np.exp(-a)); pool = sum(sig(np.load(f"nets_white_w/fold2_logits_w{i}.npy")) for i in range(3)) / 3
 s44 = 0.85 * (0.6 * s39 + 0.4 * (0.7 * 0.5 * (r0 + r1) + 0.3 * c1)) + 0.15 * pool
 sp = lambda a, b: pd.Series(a).corr(pd.Series(b), method="spearman")
-print(f"ранкер ядро+отбелённые (317, с аугментацией): соло {ts_auc(r, yf, sf):.4f} | Spearman с ядром {sp(r, base):.3f}, с отбелённым ранкером {sp(r, r0):.3f} | #44-рецепт {ts_auc(s44, yf, sf):.4f} [{time.time()-t0:.0f}s]")
+print(f"ranker core+whitened (317, with augmentation): alone {ts_auc(r, yf, sf):.4f} | Spearman with the core {sp(r, base):.3f}, with the whitened ranker {sp(r, r0):.3f} | #44 recipe {ts_auc(s44, yf, sf):.4f} [{time.time()-t0:.0f}s]")
 for w in (0.10, 0.20, 0.30, 0.40):
-    print(f"  #44 + доля {w:.2f}: {ts_auc((1 - w) * s44 + w * r, yf, sf):.4f}")
-print(f"готово [{time.time()-t0:.0f}s]")
+    print(f"  #44 + share {w:.2f}: {ts_auc((1 - w) * s44 + w * r, yf, sf):.4f}")
+print(f"done [{time.time()-t0:.0f}s]")

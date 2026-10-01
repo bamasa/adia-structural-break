@@ -11,7 +11,7 @@ slow = dict(n_estimators=3000, learning_rate=0.0075, num_leaves=31, colsample_by
 sp = lambda a, b: pd.Series(a).corr(pd.Series(b), method="spearman")
 D = np.hstack([np.load("WHITE90.npy"), np.load("SR22.npy"), np.load("HISTCTX8.npy")]); Dtr, Dte = D[tr], D[te]; del D
 p = lgb.LGBMClassifier(**slow).fit(Dtr, y[tr]).predict_proba(Dte)[:, 1]; np.save("fold2_clf_white_ctx.npy", p)
-print(f"клф + контекст истории (119): соло {ts_auc(p, yf, sf):.4f} (без контекста {ts_auc(ref, yf, sf):.4f}) | Spearman {sp(p, ref):.3f}", flush=True)
-for name, c in (("без контекста", ref), ("с контекстом", p)):
-    m = 0.7 * r + 0.3 * c; print(f"  член 0.7·ранкер + 0.3·{name}: #39 + 0.40 → {ts_auc(0.6 * s39 + 0.4 * m, yf, sf):.4f}")
-print(f"готово [{time.time()-t0:.0f}s]")
+print(f"clf + history context (119): alone {ts_auc(p, yf, sf):.4f} (without context {ts_auc(ref, yf, sf):.4f}) | Spearman {sp(p, ref):.3f}", flush=True)
+for name, c in (("without context", ref), ("with context", p)):
+    m = 0.7 * r + 0.3 * c; print(f"  member 0.7·ranker + 0.3·{name}: #39 + 0.40 → {ts_auc(0.6 * s39 + 0.4 * m, yf, sf):.4f}")
+print(f"done [{time.time()-t0:.0f}s]")

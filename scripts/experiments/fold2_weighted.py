@@ -1,4 +1,4 @@
-"""Замер: ансамбль с обновлённым набором сетей (включая рекордсмена)."""
+"""Measurement: ensemble with the updated set of nets (including the record holder)."""
 import sys, time, re, os, glob
 sys.path.insert(0, "repo/src")
 import numpy as np, torch
@@ -59,15 +59,15 @@ def fold_scores(model):
     return np.concatenate([out[a] for a, b in sorted(rows2)])
 
 hold = {}
-for src, pat, folder in (("heavy200.log", r"heavy (\d+): приватный холдаут ([0-9.]+)", "heavy200"),
-                         ("nets_aug.log", r"aug-сеть (\d+): холдаут ([0-9.]+)", "nets_aug")):
+for src, pat, folder in (("heavy200.log", r"heavy (\d+): private holdout ([0-9.]+)", "heavy200"),
+                         ("nets_aug.log", r"aug-net (\d+): holdout ([0-9.]+)", "nets_aug")):
     for line in open(src, errors="ignore"):
         m = re.match(pat, line)
         if m:
             p = f"{folder}/member_{m.group(1)}.pt"
             if os.path.exists(p):
                 hold[p] = float(m.group(2))
-print("пул:", len(hold), "членов", flush=True)
+print("pool:", len(hold), "members", flush=True)
 
 sigs = {}
 for p in hold:
@@ -75,17 +75,17 @@ for p in hold:
     model.load_state_dict(torch.load(p, map_location=DEVICE))
     model.eval()
     sigs[p] = 1.0 / (1.0 + np.exp(-fold_scores(model).astype("float64")))
-print(f"прогнано [{time.time()-t0:.0f}s]", flush=True)
+print(f"scored [{time.time()-t0:.0f}s]", flush=True)
 
 m2 = assignment == 2
 yf, sf = y[m2], s[m2]
 r_aug = 1/(1+np.exp(-np.load("fold2_rank_aug.npy").astype("float64")))
 r_aug3 = 1/(1+np.exp(-np.load("fold2_rank_aug3.npy").astype("float64")))
-c_plain = np.load("fold2_clf_эталон.npy").astype("float64")
+c_plain = np.load("fold2_clf_reference.npy").astype("float64")
 pair = 0.35*r_aug + 0.35*r_aug3 + 0.3*c_plain
 order = sorted(hold, key=hold.get, reverse=True)
 best = (0, None)
-# Взвешенное усреднение: вес члена растёт с его холдаутом (мягкий softmax).
+# Weighted averaging: a member's weight grows with its holdout (soft softmax).
 for k in (8, 10, 12, len(order)):
     if k > len(order):
         continue
@@ -94,7 +94,7 @@ for k in (8, 10, 12, len(order)):
     for temp in (0.0, 0.01, 0.02, 0.04):
         if temp == 0.0:
             wts = np.ones(len(sel)) / len(sel)
-            tag = "равные"
+            tag = "equal"
         else:
             e = np.exp((q - q.max()) / temp)
             wts = e / e.sum()
@@ -103,6 +103,6 @@ for k in (8, 10, 12, len(order)):
         for w in (0.45, 0.5, 0.55):
             v = ts_auc((1 - w) * pair + w * net, yf, sf)
             if v > best[0]:
-                best = (v, f"{k} сетей, {tag}, вес {w}")
-    print(f"{k:2d} членов пройдено", flush=True)
-print(f"\nЛУЧШЕЕ: {best[0]:.4f} — {best[1]}  (отправлено #27 при 0.6106, равные веса дали 0.6116)", flush=True)
+                best = (v, f"{k} nets, {tag}, weight {w}")
+    print(f"{k:2d} members done", flush=True)
+print(f"\nBEST: {best[0]:.4f} — {best[1]}  (shipped as #27 at 0.6106, equal weights gave 0.6116)", flush=True)

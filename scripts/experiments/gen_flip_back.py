@@ -1,10 +1,10 @@
-"""105: два новых обучающих набора из рядов соревнования.
+"""105: two new training sets from the competition series.
 
-FLIP — зеркальные ряды (x -> -x), tau тот же; id = 300000 + sid.
-BACK — граница сдвинута назад на m точек: история = hist[:-m], онлайн = hist[-m:] + online,
-       tau' = tau + m (или -1); перестандартизация по новой истории, как делает платформа; id = 400000 + sid.
-       m ~ U[50, min(400, len(hist) - 1000, 999 - L)], ряды без запаса пропускаются.
-Формат как у данных соревнования: *_series.parquet (id, time, value, period 1/2), *_index.parquet (tau_index).
+FLIP — mirrored series (x -> -x), same tau; id = 300000 + sid.
+BACK — the boundary shifted back by m points: history = hist[:-m], online = hist[-m:] + online,
+       tau' = tau + m (or -1); re-standardization by the new history, as the platform does; id = 400000 + sid.
+       m ~ U[50, min(400, len(hist) - 1000, 999 - L)], series without enough slack are skipped.
+Format as the competition data: *_series.parquet (id, time, value, period 1/2), *_index.parquet (tau_index).
 """
 import numpy as np, pandas as pd
 D = "structural-break-real-time-test/data/"
@@ -18,8 +18,8 @@ def pack(rows, idx, prefix):
     df.to_parquet(f"{prefix}_series.parquet")
     ix = pd.DataFrame(idx, columns=["id", "tau_index", "online_len"]).set_index("id"); ix.to_parquet(f"{prefix}_index.parquet")
     b = ix[ix.tau_index >= 0]
-    print(f"{prefix}: {len(ix)} рядов; со сломом {(ix.tau_index >= 0).mean():.3f}; онлайн {ix.online_len.min()}–{ix.online_len.max()} "
-          f"(медиана {int(ix.online_len.median())}); tau/L медиана {(b.tau_index / b.online_len).median():.3f}", flush=True)
+    print(f"{prefix}: {len(ix)} series; with a break {(ix.tau_index >= 0).mean():.3f}; online {ix.online_len.min()}–{ix.online_len.max()} "
+          f"(median {int(ix.online_len.median())}); tau/L median {(b.tau_index / b.online_len).median():.3f}", flush=True)
 flip_rows, flip_idx, back_rows, back_idx = [], [], [], []
 for sid, part in X.groupby(level="id"):
     v = part.value.to_numpy("float64"); p = part.period.to_numpy()

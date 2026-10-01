@@ -1,4 +1,4 @@
-"""069: сети на аугментированных данных — оригинал плюс псевдоряды."""
+"""069: nets on augmented data — originals plus pseudo-series."""
 import sys, time, os
 sys.path.insert(0, "repo/src")
 import numpy as np
@@ -19,26 +19,26 @@ starts = np.flatnonzero(np.concatenate([[True], g[1:] != g[:-1]]))
 bounds = np.append(starts, len(g))
 mu = np.load("mu200.npy"); sd = np.load("sd200.npy")
 
-# Оригинальные ряды (фолд-2 держим в стороне — он линейка).
+# Original series (fold 2 is kept aside — it is the yardstick).
 orig, orig_fold = [], []
 for a, b in zip(starts, bounds[1:]):
     orig.append((((X[a:b] - mu) / sd), y[a:b].astype("float32")))
     orig_fold.append(int(assignment[a]))
 del X
 
-# Аугментированные псевдоряды.
+# Augmented pseudo-series.
 AX = np.load("AUG_X.npy"); AY = np.load("AUG_Y.npy"); AG = np.load("AUG_G.npy")
 a_starts = np.flatnonzero(np.concatenate([[True], AG[1:] != AG[:-1]]))
 a_bounds = np.append(a_starts, len(AG))
 aug = []
 for a, b in zip(a_starts, a_bounds[1:]):
     sid = int(AG[a]) - 100000
-    # псевдоряд наследует фолд родителя; фолд-2 исключаем
+    # a pseudo-series inherits the parent's fold; fold 2 is excluded
     aug.append((((AX[a:b] - mu) / sd), AY[a:b].astype("float32"), sid))
 del AX, AY
 fold_by_sid = {int(g[a]): int(assignment[a]) for a in starts}
 aug = [(f, lab) for f, lab, sid in aug if fold_by_sid.get(sid, 0) != 2]
-print(f"оригинал {len(orig)}, аугментация {len(aug)} [{time.time()-t0:.0f}s]", flush=True)
+print(f"originals {len(orig)}, augmentation {len(aug)} [{time.time()-t0:.0f}s]", flush=True)
 
 class Block(nn.Module):
     def __init__(self, ch, dil):
@@ -139,5 +139,5 @@ for member in range(10):
         if a > best[0]:
             best = (a, {k: v.cpu().clone() for k, v in model.state_dict().items()})
     torch.save(best[1], path)
-    print(f"aug-сеть {member}: холдаут {best[0]:.4f}  [{time.time()-t0:.0f}s]", flush=True)
+    print(f"aug net {member}: holdout {best[0]:.4f}  [{time.time()-t0:.0f}s]", flush=True)
 print("done", flush=True)

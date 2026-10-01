@@ -1,15 +1,15 @@
-"""114: массовая батарея — много простых статистик на многих окнах и представлениях.
+"""114: the mass battery — many simple statistics over many windows and representations.
 
-Не новая «умная» модальность (четыре такие подряд дали ноль), а объём: решение
-2-го места 2025 года имело 2408 признаков против наших 200. Строим то же дёшево:
-6 представлений ряда x 6 скользящих окон x несколько сравнений с историей.
-Всё через скользящие суммы, O(представлений x окон) на шаг.
+Not a new "smart" modality (four such in a row gave zero), but volume: the
+2nd-place solution of 2025 had 2408 features vs our 200. We build the same cheaply:
+6 representations of the series x 6 rolling windows x several comparisons with the history.
+Everything via rolling sums, O(representations x windows) per step.
 
-Представления: z, |z|, z^2, приращение, отклонение накопленной суммы, знак.
-Окна: 10, 25, 50, 100, 250, 500.
-На каждое: (mean_W - mu_hist)/se, log(var_W/var_hist) -> 72 канала.
-Плюс доля превышений исторических квантилей q75/q95/q99 на окнах -> 18.
-Итого 90. python build_mass.py <shard> <n> | merge <n> | test
+Representations: z, |z|, z^2, increment, cumulative-sum deviation, sign.
+Windows: 10, 25, 50, 100, 250, 500.
+For each: (mean_W - mu_hist)/se, log(var_W/var_hist) -> 72 channels.
+Plus the share of exceedances of the historical quantiles q75/q95/q99 on the windows -> 18.
+90 in total. python build_mass.py <shard> <n> | merge <n> | test
 """
 import sys, time, os, numpy as np
 WINS = (10, 25, 50, 100, 250, 500); NREP = 6
@@ -24,14 +24,14 @@ def mass_channels(hist, online):
     q = np.quantile(np.abs(zh), [0.75, 0.95, 0.99])
     n = len(online); out = np.empty((n, NCH), dtype="float32")
     W = np.array(WINS, float)
-    s1 = np.zeros((NREP, len(WINS))); s2 = np.zeros((NREP, len(WINS)))   # скользящие EWMA-суммы
+    s1 = np.zeros((NREP, len(WINS))); s2 = np.zeros((NREP, len(WINS)))   # rolling EWMA sums
     qs = np.zeros((3, len(WINS)))
     prev = zh[-1]; cum = 0.0
     for t, x in enumerate(online):
         z = (x - mu_h) / sd_h
         cum += z
         vals = np.array([z, abs(z), z * z, z - prev, cum / np.sqrt(t + 1), np.sign(z)])
-        a = 1.0 / W                                   # затухание = 1/окно
+        a = 1.0 / W                                   # decay = 1/window
         s1 = (1 - a) * s1 + a * vals[:, None]
         s2 = (1 - a) * s2 + a * (vals * vals)[:, None]
         var = np.maximum(s2 - s1 * s1, 1e-9)
@@ -49,9 +49,9 @@ if __name__ == "__main__":
         rng = np.random.default_rng(0); hist = rng.normal(0, 1, 2000)
         online = np.concatenate([rng.normal(0, 1, 300), rng.normal(0.3, 1.2, 300)])
         t0 = time.time(); o = mass_channels(hist, online); dt = (time.time() - t0) / len(online) * 1000
-        print(f"каналов {o.shape[1]}, {dt:.3f} мс/шаг; до/после слома: "
-              f"среднее-окно100 {o[250:300,3].mean():+.2f}->{o[450:600,3].mean():+.2f}, "
-              f"дисперсия-окно100 {o[250:300,NREP*len(WINS)+3].mean():+.2f}->{o[450:600,NREP*len(WINS)+3].mean():+.2f}")
+        print(f"{o.shape[1]} channels, {dt:.3f} ms/step; before/after the break: "
+              f"mean-window100 {o[250:300,3].mean():+.2f}->{o[450:600,3].mean():+.2f}, "
+              f"variance-window100 {o[250:300,NREP*len(WINS)+3].mean():+.2f}->{o[450:600,NREP*len(WINS)+3].mean():+.2f}")
         sys.exit(0)
     if sys.argv[1] == "merge":
         n = int(sys.argv[2]); parts = [np.load(f"{PARTS}/part_{i}.npz", allow_pickle=True) for i in range(n)]
@@ -81,13 +81,13 @@ if __name__ == "__main__":
             hist, online = series[sid]
             k = len(online) - (b - a)
             sids.append(gid); arrs.append(mass_channels(np.concatenate([hist, online[:k]]), online[k:]))
-            if len(sids) % 500 == 0: print(f"шард {shard}: {len(sids)} псевдорядов, {time.time()-t0:.0f}s", flush=True)
+            if len(sids) % 500 == 0: print(f"shard {shard}: {len(sids)} pseudo-series, {time.time()-t0:.0f}s", flush=True)
     else:
         ids = x.index.get_level_values("id"); x = x[(ids % n_shards) == shard]
         for i, (sid, part) in enumerate(x.groupby(level="id")):
             hist = part.loc[part.period == 1, "value"].to_numpy("float64"); online = part.loc[part.period == 2, "value"].to_numpy("float64")
             sids.append(int(sid)); arrs.append(mass_channels(hist, online))
-            if (i + 1) % 300 == 0: print(f"шард {shard}: {i+1} рядов, {time.time()-t0:.0f}s", flush=True)
+            if (i + 1) % 300 == 0: print(f"shard {shard}: {i+1} series, {time.time()-t0:.0f}s", flush=True)
     os.makedirs(PARTS, exist_ok=True)
     np.savez(f"{PARTS}/part_{shard}.npz", sids=np.array(sids), arrs=np.array(arrs, dtype=object), allow_pickle=True)
-    print(f"шард {shard} готов {time.time()-t0:.0f}s: {len(sids)} рядов", flush=True)
+    print(f"shard {shard} done {time.time()-t0:.0f}s: {len(sids)} series", flush=True)

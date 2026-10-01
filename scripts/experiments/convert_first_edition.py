@@ -1,12 +1,12 @@
-"""091: первая редакция (2025) -> формат real-time.
+"""091: first edition (2025) -> real-time format.
 
-В первой редакции слом (если есть) стоит ровно на границе period 0 -> 1.
-Чтобы получить равномерный tau, как в real-time, граница сдвигается назад:
-последние k точек pre-сегмента становятся началом онлайн-части (tau = k),
-история — остаток (>= 1000). k ~ U[0, L_online) как в real-time (tau/L ~ 0.49).
-Ряды без слома: та же процедура с k=0..; tau = -1.
-Выход: FE_series.parquet (id, time, value, period 1/2) и FE_index.parquet (tau_index).
-Использование: python convert_first_edition.py <workspace первой редакции>/data
+In the first edition the break (if any) sits exactly at the period 0 -> 1 boundary.
+To get a uniform tau, as in real-time, the boundary is shifted back:
+the last k points of the pre-segment become the start of the online part (tau = k),
+the history is the remainder (>= 1000). k ~ U[0, L_online) as in real-time (tau/L ~ 0.49).
+Series without a break: the same procedure with k=0..; tau = -1.
+Output: FE_series.parquet (id, time, value, period 1/2) and FE_index.parquet (tau_index).
+Usage: python convert_first_edition.py <first-edition workspace>/data
 """
 import sys, numpy as np, pandas as pd
 D = sys.argv[1].rstrip("/") + "/"
@@ -22,14 +22,14 @@ for sid, part in X.groupby(level="id"):
     if len(pre) < 1010 or len(post) < 10:
         continue
     brk = bool(lab.loc[sid])
-    # длина онлайн-части real-time: 10..999; сохраняем длину post, ограниченную 999
+    # real-time online-part length: 10..999; keep the post length, capped at 999
     post = post[:999]
     L = len(post)
-    # k — сколько pre-точек уходит в онлайн (tau = k при сломе)
+    # k — how many pre-points go into the online part (tau = k when there is a break)
     k_max = min(len(pre) - 1000, L - 1)
     k = int(rng.integers(0, k_max + 1)) if k_max > 0 else 0
     hist = pre[:len(pre) - k]; online = np.concatenate([pre[len(pre) - k:], post])[:999]
-    # стандартизация по истории (как в real-time)
+    # standardization by the history (as in real-time)
     mu, sd = hist.mean(), hist.std() + 1e-12
     hist = (hist - mu) / sd; online = (online - mu) / sd
     new_id = 200000 + int(sid)
@@ -42,5 +42,5 @@ df = pd.DataFrame({"id": np.concatenate(out_id), "time": np.concatenate(out_t), 
                    "period": np.concatenate(out_per)}).set_index(["id", "time"])
 df.to_parquet("FE_series.parquet")
 ix = pd.DataFrame(idx, columns=["id", "tau_index", "online_len"]).set_index("id"); ix.to_parquet("FE_index.parquet")
-print(f"конвертировано {n_ok} рядов; со сломом {(ix.tau_index >= 0).mean():.3f}; онлайн {ix.online_len.min()}–{ix.online_len.max()} (медиана {int(ix.online_len.median())}); "
-      f"tau/L медиана {(ix[ix.tau_index>=0].tau_index / ix[ix.tau_index>=0].online_len).median():.3f}")
+print(f"converted {n_ok} series; with a break {(ix.tau_index >= 0).mean():.3f}; online {ix.online_len.min()}–{ix.online_len.max()} (median {int(ix.online_len.median())}); "
+      f"tau/L median {(ix[ix.tau_index>=0].tau_index / ix[ix.tau_index>=0].online_len).median():.3f}")

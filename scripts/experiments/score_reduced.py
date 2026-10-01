@@ -1,4 +1,4 @@
-"""Оценка собранной посылки на локальной выборке теста платформы (100 рядов с метками)."""
+"""Evaluate the built submission on the platform's local test sample (100 labelled series)."""
 import importlib.util, sys, time
 import numpy as np, pandas as pd
 sys.path.insert(0, "repo/src")
@@ -22,5 +22,5 @@ for (sid, n) in keys:
     for t in range(n):
         scores.append(next(gen)); labels.append(int(lab[t])); steps.append(t)
 scores, labels, steps = map(np.asarray, (scores, labels, steps))
-print(f"{sub_path}: TS-AUC на test.reduced (100 рядов) = {ts_auc(scores, labels, steps):.4f}  [{time.time()-t0:.0f}s, {len(scores)} шагов]", flush=True)
+print(f"{sub_path}: TS-AUC on test.reduced (100 series) = {ts_auc(scores, labels, steps):.4f}  [{time.time()-t0:.0f}s, {len(scores)} steps]", flush=True)
 np.save(f"reduced_scores_{res_dir.rstrip('/').split('/')[-1]}.npy", scores)

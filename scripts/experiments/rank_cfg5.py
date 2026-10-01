@@ -26,6 +26,6 @@ for fold in range(5):
         verbose=-1, lambdarank_truncation_level=2000, label_gain=[0, 1])
     r.fit(Xtr, ytr, group=sizes)
     scores.append(ts_auc(r.predict(X[va]), y[va], s[va]))
-    print(f"  фолд {fold}: {scores[-1]:.4f}  [{time.time()-t0:.0f}s]", flush=True)
+    print(f"  fold {fold}: {scores[-1]:.4f}  [{time.time()-t0:.0f}s]", flush=True)
 print(f"lambdarank+cfg5: {np.mean(scores):.4f}  " + " ".join(f"{v:.4f}" for v in scores), flush=True)
-print(f"всего {time.time()-t0:.0f}s", flush=True)
+print(f"total {time.time()-t0:.0f}s", flush=True)

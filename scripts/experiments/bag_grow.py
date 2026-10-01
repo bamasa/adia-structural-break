@@ -1,4 +1,4 @@
-"""046: закон масштабирования пачки — 48 новых членов с расширенным разнообразием."""
+"""046: bag scaling law — 48 new members with extended diversity."""
 import sys, time
 sys.path.insert(0, "repo/src")
 import numpy as np
@@ -21,7 +21,7 @@ bounds = np.append(starts, len(g))
 mu = np.load("net_bag_mac/mu.npy"); sd = np.load("net_bag_mac/sd.npy")
 series = [(((X[a:b] - mu) / sd), y[a:b].astype("float32"), int(assignment[a]))
           for a, b in zip(starts, bounds[1:])]
-print(f"{len(series)} рядов готово [{time.time()-t0:.0f}s]", flush=True)
+print(f"{len(series)} series ready [{time.time()-t0:.0f}s]", flush=True)
 
 class Block(nn.Module):
     def __init__(self, ch, dil):
@@ -107,5 +107,5 @@ for member in range(48):
             opt.step()
         sched.step()
     torch.save({"cfg": cfg, "state": model.state_dict()}, f"net_bag_mac/grow_{member}.pt")
-    print(f"member {member} (ch{cfg['ch']}, dils{len(cfg['dils'])}, frac{frac}) готов [{time.time()-t0:.0f}s]", flush=True)
+    print(f"member {member} (ch{cfg['ch']}, dils{len(cfg['dils'])}, frac{frac}) done [{time.time()-t0:.0f}s]", flush=True)
 print("done", flush=True)

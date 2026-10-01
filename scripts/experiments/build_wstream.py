@@ -43,4 +43,4 @@ if __name__ == "__main__":
         for sid, part in x.groupby(level="id"):
             groups.append(int(sid)); arrs.append(stream_channels(part.loc[part.period == 1, "value"].to_numpy("float64"), part.loc[part.period == 2, "value"].to_numpy("float64")))
     os.makedirs(PARTS, exist_ok=True); np.savez(f"{PARTS}/part_{shard}.npz", groups=np.array(groups), arrs=np.array(arrs, dtype=object), allow_pickle=True)
-    print(f"шард {shard} готов {time.time()-t0:.0f}s: {len(groups)}", flush=True)
+    print(f"shard {shard} done {time.time()-t0:.0f}s: {len(groups)}", flush=True)

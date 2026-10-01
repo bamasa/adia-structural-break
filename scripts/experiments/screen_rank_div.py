@@ -1,4 +1,4 @@
-"""097r: ранкер (конфиг #28) на оригиналах(≠2) БЕЗ аугментации: 200 против 208 (дивергенции) — парно."""
+"""097r: ranker (config #28) on originals(≠2) WITHOUT augmentation: 200 versus 208 (divergences) — paired."""
 import sys, time, numpy as np, lightgbm as lgb
 sys.path.insert(0, "repo/src")
 from structural_break.combiners import split_by_series, ts_auc
@@ -21,7 +21,7 @@ for st in np.unique(str_):
         chunk_id[idx[c::n_chunks]] = int(st) * 10 + c
 order = np.argsort(chunk_id, kind="stable")
 _, sizes = np.unique(chunk_id[order], return_counts=True)
-print(f"строк {len(ytr)}, групп {len(sizes)} [{time.time()-t0:.0f}s]", flush=True)
+print(f"rows {len(ytr)}, groups {len(sizes)} [{time.time()-t0:.0f}s]", flush=True)
 res = {}
 for name, Xtr, Xva in (("200", X[tr], X[va]),
                        ("208", np.hstack([X[tr], B[tr]]), np.hstack([X[va], B[va]]))):
@@ -32,6 +32,6 @@ for name, Xtr, Xva in (("200", X[tr], X[va]),
     r.fit(Xtr[order], ytr[order], group=sizes)
     rs = r.predict(Xva); res[name] = ts_auc(rs, yf, sf)
     np.save(f"fold2_rank_div_{name}.npy", rs)
-    print(f"ранкер {name}: фолд-2 {res[name]:.4f} [{time.time()-t0:.0f}s]", flush=True)
+    print(f"ranker {name}: fold 2 {res[name]:.4f} [{time.time()-t0:.0f}s]", flush=True)
     del Xtr
-print(f"ИТОГ ранкер: прирост {res['208'] - res['200']:+.4f}", flush=True)
+print(f"RESULT ranker: gain {res['208'] - res['200']:+.4f}", flush=True)

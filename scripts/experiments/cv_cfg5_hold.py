@@ -21,7 +21,7 @@ for fold in range(5):
     m = lgb.LGBMClassifier(**PARAMS)
     m.fit(X[tr], y[tr], sample_weight=step_weights(s[tr]))
     oof[va] = m.predict_proba(X[va])[:, 1]
-    print(f"  фолд {fold} готов [{time.time()-t0:.0f}s]", flush=True)
+    print(f"  fold {fold} done [{time.time()-t0:.0f}s]", flush=True)
 np.save("oof_cfg5.npy", oof)
 starts = np.flatnonzero(np.concatenate([[True], g[1:] != g[:-1]]))
 bounds = np.append(starts, len(g))
@@ -36,8 +36,8 @@ def peak_hold(p, alpha):
             out[i] = acc
     return out
 base = fold_scores(oof)
-print(f"конфиг5 без холда: {np.mean(base):.4f}  " + " ".join(f"{v:.4f}" for v in base), flush=True)
+print(f"config5 without hold: {np.mean(base):.4f}  " + " ".join(f"{v:.4f}" for v in base), flush=True)
 for alpha in (0.99, 0.995):
     sc = fold_scores(peak_hold(oof, alpha))
-    print(f"конфиг5 + холд α={alpha}: {np.mean(sc):.4f}  " + " ".join(f"{v:.4f}" for v in sc), flush=True)
-print(f"всего {time.time()-t0:.0f}s", flush=True)
+    print(f"config5 + hold α={alpha}: {np.mean(sc):.4f}  " + " ".join(f"{v:.4f}" for v in sc), flush=True)
+print(f"total {time.time()-t0:.0f}s", flush=True)

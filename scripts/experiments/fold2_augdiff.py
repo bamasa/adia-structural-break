@@ -1,4 +1,4 @@
-"""075b: diff-сети на аугментации в ансамбле — замер на фолде-2."""
+"""075b: diff nets on augmentation in the ensemble — measured on fold 2."""
 import sys, time, re, os
 sys.path.insert(0, "repo/src")
 import numpy as np, torch
@@ -72,16 +72,16 @@ def fold_scores(model, diffs):
 
 hold, isdiff = {}, {}
 for src, pat, folder, d in (
-        ("heavy200.log", r"heavy (\d+): приватный холдаут ([0-9.]+)", "heavy200", False),
-        ("nets_aug.log", r"aug-сеть (\d+): холдаут ([0-9.]+)", "nets_aug", False),
-        ("nets_aug_diff.log", r"aug-diff-сеть (\d+): холдаут ([0-9.]+)", "nets_aug_diff", True)):
+        ("heavy200.log", r"heavy (\d+): private holdout ([0-9.]+)", "heavy200", False),
+        ("nets_aug.log", r"aug[- ]net (\d+): holdout ([0-9.]+)", "nets_aug", False),
+        ("nets_aug_diff.log", r"aug-diff[- ]net (\d+): holdout ([0-9.]+)", "nets_aug_diff", True)):
     for line in open(src, errors="ignore"):
         m = re.match(pat, line)
         if m:
             p = f"{folder}/member_{m.group(1)}.pt"
             if os.path.exists(p):
                 hold[p] = float(m.group(2)); isdiff[p] = d
-print(f"пул: {len(hold)} членов, из них diff {sum(isdiff.values())}", flush=True)
+print(f"pool: {len(hold)} members, of which diff {sum(isdiff.values())}", flush=True)
 
 sigs = {}
 for p in hold:
@@ -90,23 +90,23 @@ for p in hold:
     model.eval()
     sigs[p] = 1.0 / (1.0 + np.exp(-fold_scores(model, isdiff[p]).astype("float64")))
     np.save(f"fold2_sig_{p.replace('/', '_')}.npy", sigs[p])
-print(f"прогнано [{time.time()-t0:.0f}s]", flush=True)
+print(f"scored [{time.time()-t0:.0f}s]", flush=True)
 
 m2 = assignment == 2
 yf, sf = y[m2], s[m2]
 r_aug = 1/(1+np.exp(-np.load("fold2_rank_aug.npy").astype("float64")))
 r_aug3 = 1/(1+np.exp(-np.load("fold2_rank_aug3.npy").astype("float64")))
-c_plain = np.load("fold2_clf_эталон.npy").astype("float64")
+c_plain = np.load("fold2_clf_reference.npy").astype("float64")
 pair = 0.35*r_aug + 0.35*r_aug3 + 0.3*c_plain
 
 diff_only = sorted([p for p in hold if isdiff[p]], key=hold.get, reverse=True)
-print("diff-члены соло на фолде-2:", flush=True)
+print("diff members alone on fold 2:", flush=True)
 for p in diff_only:
-    print(f"  {p} холдаут {hold[p]:.4f} -> фолд-2 {ts_auc(sigs[p], yf, sf):.4f}", flush=True)
+    print(f"  {p} holdout {hold[p]:.4f} -> fold 2 {ts_auc(sigs[p], yf, sf):.4f}", flush=True)
 
 order = sorted(hold, key=hold.get, reverse=True)
 best = (0, None)
-# Смешанный отбор: k лучших plain + m лучших diff.
+# Mixed selection: k best plain + m best diff.
 plain_only = sorted([p for p in hold if not isdiff[p]], key=hold.get, reverse=True)
 for k in (8, 10, 12):
     for md in (0, 2, 3, 4, 6):
@@ -115,7 +115,7 @@ for k in (8, 10, 12):
         for w in (0.45, 0.5, 0.55):
             v = ts_auc((1-w)*pair + w*net, yf, sf)
             if v > best[0]:
-                best = (v, f"{k} plain + {md} diff, вес {w}")
+                best = (v, f"{k} plain + {md} diff, weight {w}")
         print(f"{k} plain + {md} diff: " + " ".join(
             f"{w}:{ts_auc((1-w)*pair + w*net, yf, sf):.4f}" for w in (0.45, 0.5, 0.55)), flush=True)
-print(f"\nЛУЧШЕЕ: {best[0]:.4f} — {best[1]}  (рекорд без diff 0.6116, отправлено #27 = 0.6106)", flush=True)
+print(f"\nBEST: {best[0]:.4f} — {best[1]}  (record without diff 0.6116, shipped as #27 = 0.6106)", flush=True)

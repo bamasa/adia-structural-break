@@ -36,7 +36,7 @@ if __name__ == "__main__":
             ok = (b - a == len(o2)) and np.array_equal(AY[a:b], lab) and np.abs(np.clip(z, -20, 20) - np.asarray(R[a:b, 0])).max() < 1e-3
             bad += not ok; n += 1
             if n >= 3000: break
-        print(f"проверка выравнивания: {n} псевдорядов, расхождений {bad}; групп в AUG3 {len(st)}")
+        print(f"alignment check: {n} pseudo-series, {bad} mismatches; groups in AUG3 {len(st)}")
         sys.exit(0)
     if sys.argv[1] == "merge":
         n = int(sys.argv[2]); AG = np.load("AUG3_G.npy"); AS = np.load("AUG3_S.npy")
@@ -46,13 +46,13 @@ if __name__ == "__main__":
             p = np.load(f"{PARTS}/part_{i}.npz", allow_pickle=True)
             for grp, arr in zip(p["groups"], p["arrs"]):
                 a, b = pos[int(grp)]; out[a:b] = arr[AS[a:b]]; filled += b - a
-        out.flush(); print(f"{OUT}: {out.shape}, заполнено {filled} из {len(AG)}", flush=True); sys.exit(0)
+        out.flush(); print(f"{OUT}: {out.shape}, filled {filled} of {len(AG)}", flush=True); sys.exit(0)
     shard, n_shards = int(sys.argv[1]), int(sys.argv[2]); t0 = time.time(); groups, arrs = [], []
     for grp, h2, o2, lab in pseudo_series():
         sid = (grp - 100000) // 10
         if sid % n_shards != shard: continue
         arrs.append(np.hstack([white_channels(h2, o2), sr_channels(h2, o2)]).astype("float32")); groups.append(grp)
-        if len(groups) % 500 == 0: print(f"шард {shard}: {len(groups)} псевдорядов, {time.time()-t0:.0f}s", flush=True)
+        if len(groups) % 500 == 0: print(f"shard {shard}: {len(groups)} pseudo-series, {time.time()-t0:.0f}s", flush=True)
     os.makedirs(PARTS, exist_ok=True)
     np.savez(f"{PARTS}/part_{shard}.npz", groups=np.array(groups), arrs=np.array(arrs, dtype=object), allow_pickle=True)
-    print(f"шард {shard} готов {time.time()-t0:.0f}s: {len(groups)} псевдорядов", flush=True)
+    print(f"shard {shard} done {time.time()-t0:.0f}s: {len(groups)} pseudo-series", flush=True)

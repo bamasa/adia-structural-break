@@ -1,4 +1,4 @@
-"""Потоковый numpy-инференс ChanTCN + сверка с torch."""
+"""Streaming numpy inference of ChanTCN + cross-check against torch."""
 import sys, math, time
 sys.path.insert(0, "repo/src")
 import numpy as np
@@ -10,13 +10,13 @@ def gelu(x):
     return 0.5 * x * (1.0 + erf(x / np.sqrt(2.0)))
 
 class StreamingChanTCN:
-    """Каузальная TCN по шагам: на каждый шаг O(ch^2 * k * слои)."""
+    """Causal TCN step by step: O(ch^2 * k * layers) per step."""
 
     def __init__(self, weights: dict, mu, sd):
         self.w = {k: np.asarray(v, dtype="float64") for k, v in weights.items()}
         self.mu = np.asarray(mu, dtype="float64")
         self.sd = np.asarray(sd, dtype="float64")
-        self.hist = [[] for _ in range(len(DILS) + 1)]  # выходы: inp, затем каждый блок
+        self.hist = [[] for _ in range(len(DILS) + 1)]  # outputs: inp, then each block
 
     def update(self, chan_vec) -> float:
         x = (np.asarray(chan_vec, dtype="float64") - self.mu) / self.sd
@@ -72,7 +72,7 @@ if __name__ == "__main__":
     model.eval()
     weights = {k: v.numpy() for k, v in model.state_dict().items()}
     mu, sd = np.load("chan_mu.npy") if False else (None, None)
-    # сверка на случайной последовательности каналов
+    # cross-check on a random channel sequence
     rng = np.random.default_rng(0)
     T = 300
     seq = rng.random((T, 186)).astype("float32")
@@ -83,6 +83,6 @@ if __name__ == "__main__":
     got = np.array([stream.update(seq[t]) for t in range(T)])
     dt = (time.time() - t0) / T * 1000
     diff = np.abs(got - ref).max()
-    print(f"расхождение поток/torch: {diff:.2e}, скорость {dt:.2f} мс/шаг")
+    print(f"streaming/torch discrepancy: {diff:.2e}, speed {dt:.2f} ms/step")
     assert diff < 1e-4
     print("OK")

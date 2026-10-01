@@ -28,6 +28,6 @@ for fold in range(5):
     )
     ranker.fit(Xtr, ytr, group=group_sizes)
     scores.append(ts_auc(ranker.predict(X[va]), y[va], s[va]))
-    print(f"  фолд {fold}: {scores[-1]:.4f}  [{time.time()-t0:.0f}s]", flush=True)
+    print(f"  fold {fold}: {scores[-1]:.4f}  [{time.time()-t0:.0f}s]", flush=True)
 print(f"lambdarank: {np.mean(scores):.4f}  " + " ".join(f"{v:.4f}" for v in scores), flush=True)
-print(f"всего {time.time()-t0:.0f}s", flush=True)
+print(f"total {time.time()-t0:.0f}s", flush=True)

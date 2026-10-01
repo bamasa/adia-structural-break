@@ -1,9 +1,9 @@
-"""108: сеть по СЫРОМУ сигналу — независимая модальность, не видит наших 200 каналов.
+"""108: a net on the RAW signal — an independent modality that does not see our 200 channels.
 
-084 подмешивал сырой ряд к каналам и терял; здесь сеть учится представлению с нуля,
-а её выход входит в ансамбль как отдельный член. Вход 2 канала: z по истории и asinh(z).
-Контекст: хвост истории CTX=512 точек + вся онлайн-часть; лосс только на онлайн-части.
-Поле зрения 2047 шагов (дилатации 1..512). Парные сиды к 082b (0.6057/0.6065/0.6051).
+084 mixed the raw series into the channels and lost; here the net learns a representation from scratch,
+and its output enters the ensemble as a separate member. Input 2 channels: z over the history and asinh(z).
+Context: history tail of CTX=512 points + the whole online part; loss only on the online part.
+Receptive field 2047 steps (dilations 1..512). Seeds paired with 082b (0.6057/0.6065/0.6051).
 """
 import os, sys, time, numpy as np, pandas as pd, torch
 import torch.nn as nn, torch.nn.functional as F
@@ -27,7 +27,7 @@ for sid, part in X.groupby(level="id"):
     series.append((feat, lab, len(online), fold_of[int(sid)]))
 del X
 train = [s for s in series if s[3] != 2]; fold2 = [s for s in series if s[3] == 2]
-print(f"обучение {len(train)} рядов, фолд-2 {len(fold2)} [{time.time()-t0:.0f}s]", flush=True)
+print(f"training {len(train)} series, fold 2 {len(fold2)} [{time.time()-t0:.0f}s]", flush=True)
 
 class Block(nn.Module):
     def __init__(self, ch, d):
@@ -48,7 +48,7 @@ def batch(rows):
     Xb = torch.zeros(len(rows), 2, L); M = torch.zeros(len(rows), L, dtype=torch.bool); Yb = torch.zeros(len(rows), L)
     for i, (f, lab, n, _) in enumerate(rows):
         w = f.shape[1]; Xb[i, :, L - w:] = torch.from_numpy(f)
-        M[i, L - n:] = True; Yb[i, L - n:] = torch.from_numpy(lab)   # лосс только на онлайн-части
+        M[i, L - n:] = True; Yb[i, L - n:] = torch.from_numpy(lab)   # loss only on the online part
     return Xb.to(DEVICE), M.to(DEVICE), Yb.to(DEVICE)
 
 def rank_loss(logits, onmask, Y, rng):
@@ -83,7 +83,7 @@ for member in range(3):
     sched = torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=10)
     order = sorted(range(len(train)), key=lambda i: train[i][0].shape[1])
     batches = [[train[i] for i in order[k:k + 16]] for k in range(0, len(order), 16)]
-    print(f"  член w{member}: {len(train)} рядов, {len(batches)} батчей, параметров "
+    print(f"  member w{member}: {len(train)} series, {len(batches)} batches, parameters "
           f"{sum(p.numel() for p in model.parameters())/1000:.0f}k", flush=True)
     for epoch in range(10):
         for bi in rng.permutation(len(batches)):
@@ -93,7 +93,7 @@ for member in range(3):
             (rank_loss(logits, M, Yb, rng) + 0.3 * bce).backward(); opt.step()
         sched.step()
         if epoch in (4, 9):
-            print(f"    член w{member} эпоха {epoch}: фолд-2 {fold2_auc(model):.4f}  [{time.time()-t0:.0f}s]", flush=True)
+            print(f"    member w{member} epoch {epoch}: fold 2 {fold2_auc(model):.4f}  [{time.time()-t0:.0f}s]", flush=True)
     torch.save({k: v.cpu() for k, v in model.state_dict().items()}, path)
-    print(f"raw-сеть w{member}: фолд-2 на последней эпохе {fold2_auc(model):.4f}  [{time.time()-t0:.0f}s]", flush=True)
+    print(f"raw net w{member}: fold 2 at the last epoch {fold2_auc(model):.4f}  [{time.time()-t0:.0f}s]", flush=True)
 print("done", flush=True)

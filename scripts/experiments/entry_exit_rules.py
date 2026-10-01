@@ -1,4 +1,4 @@
-"""092: вход/выход над траекторией счёта ансамбля — правила (без обучения)."""
+"""092: entry/exit on top of the ensemble score trajectory — rules (no training)."""
 import sys, numpy as np
 sys.path.insert(0, "repo/src")
 from structural_break.combiners import split_by_series, ts_auc
@@ -11,7 +11,7 @@ net = np.mean([np.load(f"fold2_sig_nets_aug3_member_p{i}.pt.npy") for i in range
 base = 0.45*trees + 0.55*net
 np.save("fold2_base30.npy", base)
 starts = np.flatnonzero(np.concatenate([[True], gf[1:] != gf[:-1]])); bounds = np.append(starts, len(gf))
-print(f"база (#30 на фолде-2): {ts_auc(base, yf, sf):.4f}")
+print(f"base (#30 on fold 2): {ts_auc(base, yf, sf):.4f}")
 
 def apply(rule):
     out = np.empty_like(base)
@@ -28,7 +28,7 @@ def peak_hold(decay):
     return r
 
 def entry_exit(decay, w, beta):
-    """Вход: удержание пика с затуханием decay. Выход: если среднее последних w шагов < beta·удержанного — сброс к среднему."""
+    """Entry: hold the peak with decay. Exit: if the mean of the last w steps < beta·held value — reset to the mean."""
     def r(x):
         o = np.empty_like(x); h = 0.0
         for t, v in enumerate(x):
@@ -59,19 +59,19 @@ def running_mean_mix(w, wmix):
 
 res = {}
 for d in (0.99, 0.995, 0.999):
-    res[f"удержание пика decay={d}"] = ts_auc(apply(peak_hold(d)), yf, sf)
+    res[f"peak hold decay={d}"] = ts_auc(apply(peak_hold(d)), yf, sf)
 for d in (0.995, 0.999):
     for w in (20, 50, 100):
         for beta in (0.7, 0.85):
-            res[f"вход/выход decay={d} w={w} beta={beta}"] = ts_auc(apply(entry_exit(d, w, beta)), yf, sf)
+            res[f"entry/exit decay={d} w={w} beta={beta}"] = ts_auc(apply(entry_exit(d, w, beta)), yf, sf)
 for a in (0.9, 0.97):
     for wm in (0.3, 0.5):
-        res[f"EMA alpha={a} доля={wm}"] = ts_auc(apply(ema_mix(a, wm)), yf, sf)
+        res[f"EMA alpha={a} share={wm}"] = ts_auc(apply(ema_mix(a, wm)), yf, sf)
 for wm in (0.3, 0.5):
-    res[f"cummax доля={wm}"] = ts_auc(apply(cummax_mix(wm)), yf, sf)
+    res[f"cummax share={wm}"] = ts_auc(apply(cummax_mix(wm)), yf, sf)
 for w in (20, 60, 200):
     for wm in (0.3, 0.5):
-        res[f"скользящее среднее w={w} доля={wm}"] = ts_auc(apply(running_mean_mix(w, wm)), yf, sf)
+        res[f"running mean w={w} share={wm}"] = ts_auc(apply(running_mean_mix(w, wm)), yf, sf)
 for k, v in sorted(res.items(), key=lambda kv: -kv[1])[:12]:
     print(f"  {v:.4f}  {k}")
-print(f"  ...худшее: {min(res.values()):.4f}")
+print(f"  ...worst: {min(res.values()):.4f}")

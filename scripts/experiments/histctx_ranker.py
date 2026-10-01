@@ -12,8 +12,8 @@ str_ = s[tr]; order = np.argsort(str_, kind="stable"); _, sizes = np.unique(str_
 rk = lgb.LGBMRanker(objective="lambdarank", n_estimators=600, learning_rate=0.03, num_leaves=31, min_child_samples=500, subsample=0.8, subsample_freq=1, colsample_bytree=0.5, reg_lambda=10.0, lambdarank_truncation_level=2000, label_gain=[0, 1], verbose=-1, n_jobs=6)
 rk.fit(Dtr[order], y[tr][order], group=sizes); r1 = 1.0 / (1.0 + np.exp(-rk.predict(Dte))); np.save("fold2_rank_white_ctx.npy", r1)
 sp = lambda a, b: pd.Series(a).corr(pd.Series(b), method="spearman")
-print(f"ранкер + контекст: соло {ts_auc(r1, yf, sf):.4f} (без контекста {ts_auc(r0, yf, sf):.4f}) | Spearman {sp(r1, r0):.3f} [{time.time()-t0:.0f}s]")
-for rn, r in (("ранкер без ктх", r0), ("ранкер с ктх", r1)):
-    for cn, c in (("клф без ктх", c0), ("клф с ктх", c1)):
+print(f"ranker + context: alone {ts_auc(r1, yf, sf):.4f} (without context {ts_auc(r0, yf, sf):.4f}) | Spearman {sp(r1, r0):.3f} [{time.time()-t0:.0f}s]")
+for rn, r in (("ranker w/o ctx", r0), ("ranker with ctx", r1)):
+    for cn, c in (("clf w/o ctx", c0), ("clf with ctx", c1)):
         m = 0.7 * r + 0.3 * c; print(f"  {rn} + {cn}: #39 + 0.40 → {ts_auc(0.6 * s39 + 0.4 * m, yf, sf):.4f} | + 0.45 → {ts_auc(0.55 * s39 + 0.45 * m, yf, sf):.4f}")
-print(f"готово [{time.time()-t0:.0f}s]")
+print(f"done [{time.time()-t0:.0f}s]")

@@ -1,20 +1,20 @@
-"""079b: девять срезов, но объём тройной — каждую эпоху случайная треть псевдорядов.
+"""079b: nine cuts, but triple volume — a random third of the pseudo-series each epoch.
 
-079 (все 80k псевдорядов сразу) дал 0.5824/0.5748: псевдоряды 8:1 увели
-модель от настоящих рядов. Здесь на эпоху берётся столько же псевдорядов,
-сколько у тройной (~21.5k), но каждый раз новых. Kill: соло не выше 0.605.
-Исходный 079: девять срезов на ряд — AUG3 + AUG6.
+079 (all 80k pseudo-series at once) gave 0.5824/0.5748: pseudo-series at 8:1 pulled
+the model away from the real series. Here each epoch takes as many pseudo-series
+as the triple set (~21.5k), but new ones every time. Kill: alone not above 0.605.
+Original 079: nine cuts per series — AUG3 + AUG6.
 
-Единственная ось, дававшая прирост, — объём аугментации (одинарная →
-тройная подняла членов с <0.60 до >0.60). Псевдоряды хранятся в float16,
-иначе 25 ГБ копий не влезают в память. Фолд-2 исключён (линейка).
-Kill: соло членов на фолде-2 не выше медианы AUG3-членов (≈0.600).
-Исходный 076: сети на ТРОЙНОЙ аугментации — втрое больше псевдорядов.
+The only axis that gave a gain was augmentation volume (single →
+triple lifted members from <0.60 to >0.60). Pseudo-series are stored in float16,
+otherwise 25 GB of copies do not fit in memory. Fold 2 is excluded (the yardstick).
+Kill: members alone on fold 2 not above the median of the AUG3 members (≈0.600).
+Original 076: nets on TRIPLE augmentation — three times more pseudo-series.
 
-Сети data-bound: одинарная аугментация дала рекорды обоим архитектурам.
-Тройную (AUG3, три случайных среза на ряд) видели только ранкеры.
-AUG3_X 8.3 ГБ — читаем через mmap по-рядно. Половина членов plain (200
-входов), половина diff (600). Kill: холдауты не выше пулов на одинарной."""
+The nets are data-bound: single augmentation gave records to both architectures.
+Triple (AUG3, three random cuts per series) was only seen by the rankers.
+AUG3_X is 8.3 GB — read via mmap series by series. Half of the members plain (200
+inputs), half diff (600). Kill: holdouts not above the single-augmentation pools."""
 import sys, time, os
 sys.path.insert(0, "repo/src")
 import numpy as np
@@ -35,7 +35,7 @@ starts = np.flatnonzero(np.concatenate([[True], g[1:] != g[:-1]]))
 bounds = np.append(starts, len(g))
 mu = np.load("mu200.npy"); sd = np.load("sd200.npy")
 
-# Оригинальные ряды (фолд-2 держим в стороне — он линейка).
+# Original series (fold 2 is kept aside — it is the yardstick).
 orig, orig_fold = [], []
 for a, b in zip(starts, bounds[1:]):
     orig.append((((X[a:b] - mu) / sd), y[a:b].astype("float32")))
@@ -51,13 +51,13 @@ for prefix, base in (("AUG3", 100000), ("AUG6", 200000)):
     a_bounds = np.append(a_starts, len(AG))
     for a, b in zip(a_starts, a_bounds[1:]):
         sid = (int(AG[a]) - base) // 10
-        # псевдоряд наследует фолд родителя; фолд-2 исключаем
+        # a pseudo-series inherits the parent's fold; fold 2 is excluded
         if fold_by_sid.get(sid, 0) != 2:
             aug.append((((np.asarray(AX[a:b]) - mu) / sd).astype("float16"),
                         AY[a:b].astype("float32")))
     del AX, AY, AG
-    print(f"{prefix} загружена: всего псевдорядов {len(aug)} [{time.time()-t0:.0f}s]", flush=True)
-print(f"оригинал {len(orig)}, аугментация {len(aug)} [{time.time()-t0:.0f}s]", flush=True)
+    print(f"{prefix} loaded: {len(aug)} pseudo-series in total [{time.time()-t0:.0f}s]", flush=True)
+print(f"original {len(orig)}, augmentation {len(aug)} [{time.time()-t0:.0f}s]", flush=True)
 
 class Block(nn.Module):
     def __init__(self, ch, dil):
@@ -133,8 +133,8 @@ def holdout_auc(model, rows, use_diffs):
 
 os.makedirs("nets_aug9b", exist_ok=True)
 pool_orig = [orig[i] for i in range(len(orig)) if orig_fold[i] != 2]
-# После пробы d0 (холдаут 0.6543 -> фолд-2 0.5875) diff-члены из очереди
-# убраны: они не переносятся, а стоят по 4.4 часа каждый.
+# After the d0 probe (holdout 0.6543 -> fold 2 0.5875) the diff members were removed
+# from the queue: they do not transfer, and cost 4.4 hours each.
 JOBS = [("s", i, False) for i in range(3)]
 for tag, member, use_diffs in JOBS:
     path = f"nets_aug9b/member_{tag}{member}.pt"
@@ -147,7 +147,7 @@ for tag, member, use_diffs in JOBS:
     hold_n = int(0.08 * len(pool_orig))
     hold = [pool_orig[i] for i in idx[:hold_n]]
     train_orig = [pool_orig[i] for i in idx[hold_n:]]
-    AUG_PER_EPOCH = 21542  # объём тройной аугментации
+    AUG_PER_EPOCH = 21542  # triple-augmentation volume
     model = ChanTCN(600 if use_diffs else 200).to(DEVICE)
     opt = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
     sched = torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=10)
@@ -171,5 +171,5 @@ for tag, member, use_diffs in JOBS:
         if a > best[0]:
             best = (a, {k: v.cpu().clone() for k, v in model.state_dict().items()})
     torch.save(best[1], path)
-    print(f"aug9b-сеть {tag}{member}: холдаут {best[0]:.4f}  [{time.time()-t0:.0f}s]", flush=True)
+    print(f"aug9b net {tag}{member}: holdout {best[0]:.4f}  [{time.time()-t0:.0f}s]", flush=True)
 print("done", flush=True)

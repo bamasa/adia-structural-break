@@ -1,4 +1,4 @@
-"""121: сети по массовой батарее — фолд-2 соло, корреляция с #36, доля в смеси."""
+"""121: nets on the mass battery — fold 2 alone, correlation with #36, weight in the blend."""
 import sys, glob, numpy as np, pandas as pd, torch, torch.nn as nn, torch.nn.functional as F
 sys.path.insert(0, "repo/src")
 from structural_break.combiners import split_by_series, ts_auc
@@ -33,16 +33,16 @@ sigs = []
 for p in sorted(glob.glob("nets_mass/member_q?.pt")):
     m = ChanTCN(90).to(DEV); m.load_state_dict(torch.load(p, map_location=DEV)); m.eval()
     sg = 1 / (1 + np.exp(-fold_scores(m).astype("float64"))); np.save(f"fold2_sig_{p.replace('/', '_')}.npy", sg); sigs.append(sg)
-    print(f"{p}: фолд-2 соло {ts_auc(sg, yf, sf):.4f}", flush=True)
+    print(f"{p}: fold 2 alone {ts_auc(sg, yf, sf):.4f}", flush=True)
 net = np.mean(sigs, 0)
 base = np.load("fold2_base30.npy"); mass = np.load(glob.glob("fold2_clf_mass_90*.npy")[0])
 cur = 0.75 * base + 0.25 * mass
-print(f"\n{len(sigs)} масс-сети вместе: {ts_auc(net, yf, sf):.4f} | корреляция с #36 {pd.Series(net).corr(pd.Series(cur), method='spearman'):.3f}, "
-      f"с массовым клф {pd.Series(net).corr(pd.Series(mass), method='spearman'):.3f}")
+print(f"\n{len(sigs)} mass nets together: {ts_auc(net, yf, sf):.4f} | correlation with #36 {pd.Series(net).corr(pd.Series(cur), method='spearman'):.3f}, "
+      f"with the mass classifier {pd.Series(net).corr(pd.Series(mass), method='spearman'):.3f}")
 print(f"#36: {ts_auc(cur, yf, sf):.4f}")
 best = (0, None)
 for w in (0.10, 0.15, 0.20, 0.25, 0.30):
     v = ts_auc((1 - w) * cur + w * net, yf, sf)
     if v > best[0]: best = (v, w)
-    print(f"  #36 + {w:.2f}·масс-сети: {v:.4f}  ({v - ts_auc(cur, yf, sf):+.4f})")
-print(f"ЛУЧШЕЕ: {best[0]:.4f} при доле {best[1]}")
+    print(f"  #36 + {w:.2f}·mass nets: {v:.4f}  ({v - ts_auc(cur, yf, sf):+.4f})")
+print(f"BEST: {best[0]:.4f} at weight {best[1]}")

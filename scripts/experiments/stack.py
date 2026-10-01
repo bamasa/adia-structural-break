@@ -1,4 +1,4 @@
-"""029 (фолд-0): стекинг — мета-модель поверх OOF-скоров базовых моделей."""
+"""029 (fold 0): stacking — a meta-model on top of the OOF scores of the base models."""
 import sys, time
 sys.path.insert(0, "repo/src")
 import numpy as np
@@ -11,12 +11,12 @@ assignment = split_by_series(g, folds=5, seed=0)
 clf = np.load("oof_cfg5.npy").astype("float64")
 sig = 1.0 / (1.0 + np.exp(-np.load("oof_rank.npy").astype("float64")))
 E4 = np.load("E4.npy").astype("float64")
-B_slope = np.load("B2.npy")[:, [18, 19, 38, 39]].astype("float64")  # t-статистики трендов, оба вида
+B_slope = np.load("B2.npy")[:, [18, 19, 38, 39]].astype("float64")  # trend t-statistics, both kinds
 
 META = {
-    "2 скора": np.column_stack([clf, sig]),
-    "скоры+прогнозист": np.column_stack([clf, sig, E4]),
-    "скоры+прогнозист+тренды": np.column_stack([clf, sig, E4, B_slope]),
+    "2 scores": np.column_stack([clf, sig]),
+    "scores+forecaster": np.column_stack([clf, sig, E4]),
+    "scores+forecaster+trends": np.column_stack([clf, sig, E4, B_slope]),
 }
 tr, va = assignment != 0, assignment == 0
 yf, sf = y[va], s[va]
@@ -32,6 +32,6 @@ for name, F in META.items():
         deterministic=True, force_row_wise=True, verbose=-1,
         lambdarank_truncation_level=2000, label_gain=[0, 1])
     meta.fit(Ftr, ytr, group=sizes)
-    print(f"мета [{name}]: {ts_auc(meta.predict(F[va]), yf, sf):.4f} "
-          f"(эталон смеси 60/40: 0.6035)  [{time.time()-t0:.0f}s]", flush=True)
-print(f"всего {time.time()-t0:.0f}s", flush=True)
+    print(f"meta [{name}]: {ts_auc(meta.predict(F[va]), yf, sf):.4f} "
+          f"(60/40 blend reference: 0.6035)  [{time.time()-t0:.0f}s]", flush=True)
+print(f"total {time.time()-t0:.0f}s", flush=True)

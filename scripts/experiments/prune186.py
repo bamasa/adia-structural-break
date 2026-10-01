@@ -16,14 +16,14 @@ PARAMS = dict(objective="binary", learning_rate=0.05, num_leaves=63, min_child_s
               n_estimators=300, random_state=0, n_jobs=4, deterministic=True,
               force_row_wise=True, verbose=-1)
 
-# Важности с фолда 0 (не смотрим на его валидацию при отборе — отбор по gain).
+# Importances from fold 0 (we do not look at its validation during selection — selection by gain).
 tr = assignment != 0
 m = lgb.LGBMClassifier(**PARAMS)
 m.fit(X[tr], y[tr], sample_weight=step_weights(s[tr]))
 imp = m.booster_.feature_importance(importance_type="gain")
 order = np.argsort(imp)[::-1]
-print("топ-15 каналов по gain:", order[:15].tolist(), flush=True)
-print("хвост-15 (кандидаты на вылет):", order[-15:].tolist(), flush=True)
+print("top-15 channels by gain:", order[:15].tolist(), flush=True)
+print("bottom-15 (candidates for removal):", order[-15:].tolist(), flush=True)
 
 for keep in (150, 120, 90):
     cols = np.sort(order[:keep])
@@ -33,6 +33,6 @@ for keep in (150, 120, 90):
         mm = lgb.LGBMClassifier(**PARAMS)
         mm.fit(X[tr][:, cols], y[tr], sample_weight=step_weights(s[tr]))
         scores.append(ts_auc(mm.predict_proba(X[va][:, cols])[:, 1], y[va], s[va]))
-    print(f"топ-{keep}: {np.mean(scores):.4f}  " + " ".join(f"{v:.4f}" for v in scores)
+    print(f"top-{keep}: {np.mean(scores):.4f}  " + " ".join(f"{v:.4f}" for v in scores)
           + f"  [{time.time()-t0:.0f}s]", flush=True)
-print(f"всего {time.time()-t0:.0f}s", flush=True)
+print(f"total {time.time()-t0:.0f}s", flush=True)

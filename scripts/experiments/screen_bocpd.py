@@ -1,4 +1,4 @@
-"""085: проверка BOCPD-каналов классификатором на фолде-2 (200 против 206)."""
+"""085: checking the BOCPD channels with the classifier on fold 2 (200 vs 206)."""
 import sys, time, numpy as np, lightgbm as lgb
 sys.path.insert(0, "repo/src")
 from structural_break.combiners import split_by_series, ts_auc
@@ -18,9 +18,9 @@ for name, M in (("200", X), ("206 (+BOCPD)", np.hstack([X, B]))):
     p = clf.predict_proba(M[te])[:, 1]
     res[name] = ts_auc(p, y[te], s[te])
     np.save(f"fold2_clf_bocpd_{name[:3]}.npy", p)
-    print(f"clf {name}: фолд-2 {res[name]:.4f} [{time.time()-t0:.0f}s]", flush=True)
+    print(f"clf {name}: fold 2 {res[name]:.4f} [{time.time()-t0:.0f}s]", flush=True)
     if name.startswith("206"):
         imp = clf.booster_.feature_importance("gain"); order = np.argsort(-imp)
         ranks = [int(np.where(order == j)[0][0]) + 1 for j in range(200, 206)]
-        print(f"  ранги BOCPD-каналов по gain из 206: {ranks}", flush=True)
-print(f"ИТОГ: прирост {res['206 (+BOCPD)'] - res['200']:+.4f}  (принятие: ≥ +0.002)", flush=True)
+        print(f"  gain ranks of the BOCPD channels out of 206: {ranks}", flush=True)
+print(f"RESULT: gain {res['206 (+BOCPD)'] - res['200']:+.4f}  (acceptance: ≥ +0.002)", flush=True)

@@ -1,4 +1,4 @@
-"""Галерея фолда-1: худшие добытчики по заработку (OOF ранкера)."""
+"""Fold-1 gallery: the worst earners by earnings (ranker OOF)."""
 import sys
 sys.path.insert(0, "repo/src")
 import numpy as np
@@ -14,7 +14,7 @@ assignment = split_by_series(g, folds=5, seed=0)
 m1 = assignment == 1
 yy, ss, gg, pp = y[m1], s[m1], g[m1], oof[m1]
 
-# Заработок ряда: доля выигранных пар по шагам (внутри фолда).
+# Series earnings: share of won pairs across steps (within the fold).
 earn = {}
 for t_step in np.unique(ss):
     mt = ss == t_step
@@ -28,7 +28,7 @@ for t_step in np.unique(ss):
         earn.setdefault(int(sd), []).append(win)
 earn = {k: float(np.mean(v)) for k, v in earn.items()}
 worst = sorted(earn, key=earn.get)[:6]
-print("худшие ряды фолда-1:", [(sid, round(earn[sid], 3)) for sid in worst])
+print("worst fold-1 series:", [(sid, round(earn[sid], 3)) for sid in worst])
 
 x = pd.read_parquet("structural-break-real-time-test/data/X_train.parquet")
 starts = np.flatnonzero(np.concatenate([[True], gg[1:] != gg[:-1]]))
@@ -49,14 +49,14 @@ for row, sid in enumerate(worst):
     axL.plot(t_on, online, lw=0.7, color="#1a73e8")
     if tau is not None:
         axL.axvline(tau, color="#d93025", ls="--", lw=1.2)
-    axL.set_ylabel(f"ряд {sid}\nзаработок {earn[sid]:.2f}")
+    axL.set_ylabel(f"series {sid}\nearnings {earn[sid]:.2f}")
     axR.plot(t_on, 1/(1+np.exp(-sc)), lw=1.1, color="#7b1fa2")
     if tau is not None:
         axR.axvline(tau, color="#d93025", ls="--", lw=1.2)
     axR.set_ylim(0, 1)
     if row == 0:
-        axL.set_title("ряд (серое — хвост истории, красное — истинный слом)", fontsize=9)
-        axR.set_title("счёт ранкера (сигмоида)", fontsize=9)
+        axL.set_title("series (grey — history tail, red — true break)", fontsize=9)
+        axR.set_title("ranker score (sigmoid)", fontsize=9)
 plt.tight_layout()
 fig.savefig("/tmp/fold1_worst.png", dpi=115)
-print("сохранено /tmp/fold1_worst.png")
+print("saved /tmp/fold1_worst.png")

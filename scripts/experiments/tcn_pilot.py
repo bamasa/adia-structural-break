@@ -40,7 +40,7 @@ for sid, hist, online, labels in iter_series(x, y):
                      dtype="float32")
     lab = labels.astype("float32")
     series.append((int(sid), z_h, z_o, lab, sid_fold[int(sid)]))
-print(f"подготовка {time.time()-t0:.0f}s: {len(series)} рядов", flush=True)
+print(f"preparation {time.time()-t0:.0f}s: {len(series)} series", flush=True)
 
 class Block(nn.Module):
     def __init__(self, ch, dil):
@@ -68,7 +68,7 @@ class TCN(nn.Module):
         return self.head(h).squeeze(1)
 
 model = TCN().to(DEVICE)
-print("параметров:", sum(p.numel() for p in model.parameters()), flush=True)
+print("parameters:", sum(p.numel() for p in model.parameters()), flush=True)
 opt = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
 
 train_set = [r for r in series if r[4] != 0]
@@ -120,6 +120,6 @@ for epoch in range(8):
         opt.step()
         total += float(loss)
     auc = validate()
-    print(f"эпоха {epoch}: loss {total/len(batches):.4f}, TS-AUC фолд-0 {auc:.4f}  [{time.time()-t0:.0f}s]", flush=True)
+    print(f"epoch {epoch}: loss {total/len(batches):.4f}, TS-AUC fold 0 {auc:.4f}  [{time.time()-t0:.0f}s]", flush=True)
     torch.save(model.state_dict(), "tcn_pilot.pt")
-print("готово", flush=True)
+print("done", flush=True)

@@ -1,4 +1,4 @@
-"""053: спектр + номер шага (201 канал) — фолд-0."""
+"""053: spectrum + step index (201 channels) — fold 0."""
 import sys, time
 sys.path.insert(0, "repo/src")
 import numpy as np
@@ -30,14 +30,14 @@ r.fit(Xtr, ytr, group=sizes)
 sc = r.predict(X[va])
 sig = 1.0 / (1.0 + np.exp(-sc))
 clf = np.load("oof_cfg5.npy")[va].astype("float64")
-print(f"201 (спектр+шаг): ранкер {ts_auc(sc, yf, sf):.4f} (186: 0.6016, +спектр: 0.6032), "
-      f"пара {ts_auc(0.6*sig + 0.4*clf, yf, sf):.4f} (0.6045 / 0.6060)  [{time.time()-t0:.0f}s]", flush=True)
+print(f"201 (spectrum+step): ranker {ts_auc(sc, yf, sf):.4f} (186: 0.6016, +spectrum: 0.6032), "
+      f"pair {ts_auc(0.6*sig + 0.4*clf, yf, sf):.4f} (0.6045 / 0.6060)  [{time.time()-t0:.0f}s]", flush=True)
 np.save("oof_rank_specstep.npy", sc)
-# и с сетями старого поколения
+# and with the old-generation nets
 net = np.load("tcn_foldens_fold0.npy").astype("float64")
 bag_r = np.load("rank_foldbag_fold0.npy").astype("float64")
 for w in (0.4, 0.5):
     trees = 0.7*sig + 0.3*clf
-    print(f"тройка (новый ранкер) вес сетей {w}: {ts_auc((1-w)*trees + w*net, yf, sf):.4f} "
-          f"(эталон девятки 0.6099)", flush=True)
-print(f"всего {time.time()-t0:.0f}s", flush=True)
+    print(f"triple (new ranker) net weight {w}: {ts_auc((1-w)*trees + w*net, yf, sf):.4f} "
+          f"(reference of the nine 0.6099)", flush=True)
+print(f"total {time.time()-t0:.0f}s", flush=True)

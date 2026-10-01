@@ -1,19 +1,19 @@
-"""080b: батч 96 при 30 эпохах — число обновлений как у батча 24 × 10 эпох.
+"""080b: batch 96 at 30 epochs — the same number of updates as batch 24 × 10 epochs.
 
-080 (батч 96, 10 эпох) дал 0.5939: вчетверо меньше шагов оптимизатора —
-конфаундер. Здесь шагов столько же (с запасом), косинус на 30 эпох.
-Исходный 080: кросс-секционный батч 96 вместо 24.
+080 (batch 96, 10 epochs) gave 0.5939: four times fewer optimiser steps —
+a confounder. Here the step count is the same (with margin), cosine over 30 epochs.
+Original 080: cross-sectional batch 96 instead of 24.
 
-Метрика ранжирует тысячи рядов на каждом шаге, а ранговый лосс видит
-пары только внутри батча из 24 рядов. Батч 96 даёт вчетверо больше
-кросс-секционных пар на шаг — ближе к тому, что измеряется. Данные и
-рецепт #28 (тройная аугментация). Kill: соло на фолде-2 не выше 0.605.
-Исходный 076: сети на ТРОЙНОЙ аугментации — втрое больше псевдорядов.
+The metric ranks thousands of series at every step, while the ranking loss sees
+pairs only within a batch of 24 series. Batch 96 gives four times more
+cross-sectional pairs per step — closer to what is measured. Data and
+recipe of #28 (triple augmentation). Kill: alone on fold 2 not above 0.605.
+Original 076: nets on TRIPLE augmentation — three times more pseudo-series.
 
-Сети data-bound: одинарная аугментация дала рекорды обоим архитектурам.
-Тройную (AUG3, три случайных среза на ряд) видели только ранкеры.
-AUG3_X 8.3 ГБ — читаем через mmap по-рядно. Половина членов plain (200
-входов), половина diff (600). Kill: холдауты не выше пулов на одинарной."""
+The nets are data-bound: single augmentation gave records to both architectures.
+Only the rankers have seen the triple one (AUG3, three random cuts per series).
+AUG3_X is 8.3 GB — read via mmap series by series. Half of the members are plain (200
+inputs), half diff (600). Kill: holdouts not above the pools on single augmentation."""
 import sys, time, os
 sys.path.insert(0, "repo/src")
 import numpy as np
@@ -34,14 +34,14 @@ starts = np.flatnonzero(np.concatenate([[True], g[1:] != g[:-1]]))
 bounds = np.append(starts, len(g))
 mu = np.load("mu200.npy"); sd = np.load("sd200.npy")
 
-# Оригинальные ряды (фолд-2 держим в стороне — он линейка).
+# Original series (fold 2 is kept aside — it is the yardstick).
 orig, orig_fold = [], []
 for a, b in zip(starts, bounds[1:]):
     orig.append((((X[a:b] - mu) / sd), y[a:b].astype("float32")))
     orig_fold.append(int(assignment[a]))
 del X
 
-# Тройная аугментация: 8.3 ГБ, читаем mmap по-рядно.
+# Triple augmentation: 8.3 GB, read via mmap series by series.
 AX = np.load("AUG3_X.npy", mmap_mode="r")
 AY = np.load("AUG3_Y.npy"); AG = np.load("AUG3_G.npy")
 a_starts = np.flatnonzero(np.concatenate([[True], AG[1:] != AG[:-1]]))
@@ -50,12 +50,12 @@ fold_by_sid = {int(g[a]): int(assignment[a]) for a in starts}
 aug = []
 for a, b in zip(a_starts, a_bounds[1:]):
     sid = (int(AG[a]) - 100000) // 10
-    # псевдоряд наследует фолд родителя; фолд-2 исключаем
+    # a pseudo-series inherits the parent's fold; fold 2 is excluded
     if fold_by_sid.get(sid, 0) != 2:
         aug.append((((np.asarray(AX[a:b]) - mu) / sd).astype("float32"),
                     AY[a:b].astype("float32")))
 del AX, AY
-print(f"оригинал {len(orig)}, аугментация {len(aug)} [{time.time()-t0:.0f}s]", flush=True)
+print(f"original {len(orig)}, augmentation {len(aug)} [{time.time()-t0:.0f}s]", flush=True)
 
 class Block(nn.Module):
     def __init__(self, ch, dil):
@@ -131,8 +131,8 @@ def holdout_auc(model, rows, use_diffs):
 
 os.makedirs("nets_aug3_b96e30", exist_ok=True)
 pool_orig = [orig[i] for i in range(len(orig)) if orig_fold[i] != 2]
-# После пробы d0 (холдаут 0.6543 -> фолд-2 0.5875) diff-члены из очереди
-# убраны: они не переносятся, а стоят по 4.4 часа каждый.
+# After the d0 trial (holdout 0.6543 -> fold 2 0.5875) the diff members were
+# removed from the queue: they do not transfer and cost 4.4 hours each.
 JOBS = [("e", i, False) for i in range(2)]
 for tag, member, use_diffs in JOBS:
     path = f"nets_aug3_b96e30/member_{tag}{member}.pt"
@@ -167,5 +167,5 @@ for tag, member, use_diffs in JOBS:
         if a > best[0]:
             best = (a, {k: v.cpu().clone() for k, v in model.state_dict().items()})
     torch.save(best[1], path)
-    print(f"b96e30-сеть {tag}{member}: холдаут {best[0]:.4f}  [{time.time()-t0:.0f}s]", flush=True)
+    print(f"b96e30 net {tag}{member}: holdout {best[0]:.4f}  [{time.time()-t0:.0f}s]", flush=True)
 print("done", flush=True)

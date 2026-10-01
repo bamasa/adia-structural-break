@@ -11,7 +11,7 @@ K, LAGS = 10, 8
 t0 = time.time()
 x = pd.read_parquet("structural-break-real-time-test/data/X_train.parquet")
 y = pd.read_parquet("structural-break-real-time-test/data/y_train.parquet")
-print(f"загрузка {time.time()-t0:.0f}s", flush=True)
+print(f"loading {time.time()-t0:.0f}s", flush=True)
 
 def deviations(z):
     csum = np.concatenate([[0.0], np.cumsum(z)])
@@ -43,7 +43,7 @@ base = lgb.train(
     lgb.Dataset(np.vstack(fa).astype("float32"), np.concatenate(ta).astype("float32")),
     num_boost_round=200)
 del fa, ta
-print(f"амплитудный прогнозист готов, {time.time()-t0:.0f}s", flush=True)
+print(f"magnitude forecaster ready, {time.time()-t0:.0f}s", flush=True)
 
 rows, count = [], 0
 for z_h, z_o in cache:
@@ -72,7 +72,7 @@ for z_h, z_o in cache:
         rows.append([fast, slow, peak, e])
     count += 1
     if count % 2000 == 0:
-        print(f"  {count} рядов, {time.time()-t0:.0f}s", flush=True)
+        print(f"  {count} series, {time.time()-t0:.0f}s", flush=True)
 a = np.asarray(rows, dtype="float32")
 np.save("M4.npy", a)
-print(f"готово {time.time()-t0:.0f}s: {a.shape}", flush=True)
+print(f"done {time.time()-t0:.0f}s: {a.shape}", flush=True)

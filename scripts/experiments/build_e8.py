@@ -11,7 +11,7 @@ K, LAGS = 10, 8
 t0 = time.time()
 x = pd.read_parquet("structural-break-real-time-test/data/X_train.parquet")
 y = pd.read_parquet("structural-break-real-time-test/data/y_train.parquet")
-print(f"загрузка {time.time()-t0:.0f}s", flush=True)
+print(f"loading {time.time()-t0:.0f}s", flush=True)
 
 def deviations(z):
     csum = np.concatenate([[0.0], np.cumsum(z)])
@@ -49,7 +49,7 @@ for h in HORIZONS:
         lgb.Dataset(np.vstack(pre[h][0]).astype("float32"),
                     np.concatenate(pre[h][1]).astype("float32")),
         num_boost_round=200)
-    print(f"горизонт {h}: модель готова, {time.time()-t0:.0f}s", flush=True)
+    print(f"horizon {h}: model ready, {time.time()-t0:.0f}s", flush=True)
 del pre
 
 rows, count = [], 0
@@ -91,8 +91,8 @@ for z_h, z_o in cache:
         rows.append([f1, s1, p1, f5, s5, p5, sg, e1])
     count += 1
     if count % 2000 == 0:
-        print(f"  {count} рядов, {time.time()-t0:.0f}s", flush=True)
+        print(f"  {count} series, {time.time()-t0:.0f}s", flush=True)
 
 a = np.asarray(rows, dtype="float32")
 np.save("E8.npy", a)
-print(f"готово {time.time()-t0:.0f}s: {a.shape}", flush=True)
+print(f"done {time.time()-t0:.0f}s: {a.shape}", flush=True)

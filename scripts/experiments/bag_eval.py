@@ -1,4 +1,4 @@
-"""045: пачка из 24 сетей — усреднение на фолдах 0 и 1, вклад в ансамбль."""
+"""045: a bag of 24 nets — averaging on folds 0 and 1, contribution to the ensemble."""
 import sys, time
 sys.path.insert(0, "repo/src")
 import numpy as np, torch
@@ -80,12 +80,12 @@ for f in (0, 1):
     yf, sf = y[m], s[m]
     ens = np.mean(sigs[f], axis=0)
     np.save(f"bag24_fold{f}.npy", ens)
-    print(f"фолд {f}: пачка-24 соло {ts_auc(ens, yf, sf):.4f}", flush=True)
+    print(f"fold {f}: bag-24 alone {ts_auc(ens, yf, sf):.4f}", flush=True)
     for n in (8, 12, 16):
         sub = np.mean(sigs[f][:n], axis=0)
-        print(f"  первые {n} членов: {ts_auc(sub, yf, sf):.4f}", flush=True)
+        print(f"  first {n} members: {ts_auc(sub, yf, sf):.4f}", flush=True)
 
-# Ансамбль на фолде 0: заменяем старую четвёрку на пачку.
+# Ensemble on fold 0: replace the old four with the bag.
 m0 = assignment == 0
 yf, sf = y[m0], s[m0]
 clf = np.load("oof_cfg5.npy")[m0].astype("float64")
@@ -94,8 +94,8 @@ blend = 0.6/(1+np.exp(-rnk)) + 0.4*clf
 bag_r = np.load("rank_foldbag_fold0.npy").astype("float64")
 ens0 = np.load("bag24_fold0.npy")
 old4 = np.load("tcn_foldens_fold0.npy").astype("float64")
-print(f"старая четвёрка соло (эталон): {ts_auc(old4, yf, sf):.4f}", flush=True)
+print(f"old four alone (reference): {ts_auc(old4, yf, sf):.4f}", flush=True)
 for w in (0.5, 0.6):
     full = (1-w)*(0.7*bag_r + 0.3*clf) + w*ens0
-    print(f"ансамбль с пачкой-24 (вес {w}): {ts_auc(full, yf, sf):.4f} (эталон девятки 0.6099)", flush=True)
-print(f"всего {time.time()-t0:.0f}s", flush=True)
+    print(f"ensemble with bag-24 (weight {w}): {ts_auc(full, yf, sf):.4f} (nine-member reference 0.6099)", flush=True)
+print(f"total {time.time()-t0:.0f}s", flush=True)

@@ -19,10 +19,10 @@ def cv(mat, tag):
         tr, va = assignment != fold, assignment == fold
         m = Boosted.fit(mat[tr], y[tr], names, step_weights(s[tr]))
         scores.append(ts_auc(m.predict(mat[va]), y[va], s[va]))
-        print(f"  фолд {fold}: {scores[-1]:.4f}", flush=True)
+        print(f"  fold {fold}: {scores[-1]:.4f}", flush=True)
     print(f"{tag}: {np.mean(scores):.4f}  " + " ".join(f"{v:.4f}" for v in scores)
           + f"   [{time.time()-t0:.0f}s]", flush=True)
 
-cv(B, "40 (батарея СОЛО)")
-cv(np.hstack([X104, B]), "144 (104 + батарея)")
-print(f"всего {time.time()-t0:.0f}s", flush=True)
+cv(B, "40 (battery ALONE)")
+cv(np.hstack([X104, B]), "144 (104 + battery)")
+print(f"total {time.time()-t0:.0f}s", flush=True)

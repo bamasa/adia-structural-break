@@ -50,7 +50,7 @@ assignment = split_by_series(g, folds=5, seed=0)
 starts = np.flatnonzero(np.concatenate([[True], g[1:] != g[:-1]]))
 sid_fold = {int(g[st]): int(assignment[st]) for st in starts}
 
-# Скоры сети в порядке строк G40 (sid-порядок, шаги подряд).
+# Net scores in G40 row order (sid order, consecutive steps).
 scores = []
 with torch.no_grad():
     for sid, hist, online, labels in iter_series(x, yp):
@@ -74,12 +74,12 @@ mask = assignment == 0
 assert len(tcn) == mask.sum(), (len(tcn), int(mask.sum()))
 np.save("tcn_fold0_aligned.npy", tcn)
 yf, sf = y[mask], s[mask]
-print(f"сеть на фолде 0 (выровнено): {ts_auc(tcn, yf, sf):.4f}  [{time.time()-t0:.0f}s]", flush=True)
+print(f"net on fold 0 (aligned): {ts_auc(tcn, yf, sf):.4f}  [{time.time()-t0:.0f}s]", flush=True)
 
 stack = np.load("oof_cfg5.npy")[mask]
-print(f"стек (классификатор cfg5) фолд 0: {ts_auc(stack, yf, sf):.4f}", flush=True)
+print(f"stack (cfg5 classifier) fold 0: {ts_auc(stack, yf, sf):.4f}", flush=True)
 
-# Ансамбль: пошаговые кросс-секционные ранги, взвешенное среднее.
+# Ensemble: per-step cross-sectional ranks, weighted mean.
 def step_ranks(v):
     out = np.empty_like(v, dtype="float64")
     for t_step in np.unique(sf):
@@ -90,5 +90,5 @@ def step_ranks(v):
 r_stack, r_tcn = step_ranks(stack), step_ranks(tcn)
 for w in (0.1, 0.2, 0.3):
     mix = (1 - w) * r_stack + w * r_tcn
-    print(f"ансамбль стек+{w:.0%} сети: {ts_auc(mix, yf, sf):.4f}", flush=True)
-print(f"всего {time.time()-t0:.0f}s", flush=True)
+    print(f"ensemble stack+{w:.0%} net: {ts_auc(mix, yf, sf):.4f}", flush=True)
+print(f"total {time.time()-t0:.0f}s", flush=True)

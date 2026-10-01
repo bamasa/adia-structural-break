@@ -1,4 +1,4 @@
-"""047: тяжёлые члены — 88% всех данных каждому, долгое обучение, возобновляемо."""
+"""047: heavy members — 88% of all data for each, long training, resumable."""
 import sys, time, os
 sys.path.insert(0, "repo/src")
 import numpy as np
@@ -17,7 +17,7 @@ starts = np.flatnonzero(np.concatenate([[True], g[1:] != g[:-1]]))
 bounds = np.append(starts, len(g))
 mu = np.load("net_bag_mac/mu.npy"); sd = np.load("net_bag_mac/sd.npy")
 series = [(((X[a:b] - mu) / sd), y[a:b].astype("float32")) for a, b in zip(starts, bounds[1:])]
-print(f"{len(series)} рядов готово [{time.time()-t0:.0f}s]", flush=True)
+print(f"{len(series)} series ready [{time.time()-t0:.0f}s]", flush=True)
 
 class Block(nn.Module):
     def __init__(self, ch, dil):
@@ -116,5 +116,5 @@ for member in range(30):
         if a > best[0]:
             best = (a, {k: v.cpu().clone() for k, v in model.state_dict().items()})
     torch.save(best[1], path)
-    print(f"heavy {member}: приватный холдаут {best[0]:.4f}  [{time.time()-t0:.0f}s]", flush=True)
+    print(f"heavy {member}: private holdout {best[0]:.4f}  [{time.time()-t0:.0f}s]", flush=True)
 print("done", flush=True)

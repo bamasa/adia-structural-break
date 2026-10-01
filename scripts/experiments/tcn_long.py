@@ -1,4 +1,4 @@
-"""033: сеть поверх траекторий каналов (186-мерная последовательность на вход)."""
+"""033: a net on top of the channel trajectories (186-dimensional sequence as input)."""
 import sys, time
 sys.path.insert(0, "repo/src")
 import numpy as np
@@ -25,7 +25,7 @@ for a, b in zip(starts, bounds[1:]):
     fold = int(assignment[a])
     series.append((((X[a:b] - mu) / sd), y[a:b].astype("float32"), fold))
 del X
-print(f"подготовка {time.time()-t0:.0f}s: {len(series)} рядов", flush=True)
+print(f"preparation {time.time()-t0:.0f}s: {len(series)} series", flush=True)
 
 class Block(nn.Module):
     def __init__(self, ch, dil):
@@ -53,7 +53,7 @@ class ChanTCN(nn.Module):
         return self.head(h).squeeze(1)
 
 model = ChanTCN().to(DEVICE)
-print("параметров:", sum(p.numel() for p in model.parameters()), flush=True)
+print("parameters:", sum(p.numel() for p in model.parameters()), flush=True)
 EPOCHS = 48
 opt = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
 sched = torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=EPOCHS)
@@ -112,8 +112,8 @@ for epoch in range(EPOCHS):
     total = 0.0
     for bi in rng.permutation(len(batches)):
         Xb, M, Yb = batch_tensors(batches[bi])
-        # Аугментации: гауссов шум на входы и выпадение случайных каналов —
-        # длинному обучению нужен корм, иначе хвост переобучается.
+        # Augmentations: Gaussian noise on the inputs and dropout of random channels —
+        # long training needs feeding, otherwise the tail overfits.
         Xb = Xb + 0.05 * torch.randn_like(Xb)
         drop_mask = (torch.rand(Xb.shape[0], Xb.shape[1], 1, device=Xb.device) > 0.10).float()
         Xb = Xb * drop_mask
@@ -129,5 +129,5 @@ for epoch in range(EPOCHS):
     if epoch == 0 or auc > best_auc:
         best_auc = auc
         torch.save(model.state_dict(), "tcn_long_best.pt")
-    print(f"эпоха {epoch}: loss {total/len(batches):.4f}, TS-AUC фолд-0 {auc:.4f} (лучший {best_auc:.4f})  [{time.time()-t0:.0f}s]", flush=True)
-print("готово", flush=True)
+    print(f"epoch {epoch}: loss {total/len(batches):.4f}, TS-AUC fold 0 {auc:.4f} (best {best_auc:.4f})  [{time.time()-t0:.0f}s]", flush=True)
+print("done", flush=True)

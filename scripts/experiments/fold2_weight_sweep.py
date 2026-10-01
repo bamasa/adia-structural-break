@@ -1,4 +1,4 @@
-"""Совместный свип весов: доли ранкеров/классификатора и вес сетевой половины."""
+"""Joint weight sweep: ranker/classifier shares and the weight of the net half."""
 import sys, re, os, itertools
 sys.path.insert(0, "repo/src")
 import numpy as np
@@ -11,23 +11,23 @@ yf, sf = y[m2], s[m2]
 
 r_aug = 1/(1+np.exp(-np.load("fold2_rank_aug.npy").astype("float64")))
 r_aug3 = 1/(1+np.exp(-np.load("fold2_rank_aug3.npy").astype("float64")))
-c_plain = np.load("fold2_clf_эталон.npy").astype("float64")
+c_plain = np.load("fold2_clf_reference.npy").astype("float64")
 
-# Сетевая половина: топ-10 равными весами (лучшая конфигурация из 073).
+# Net half: top-10 with equal weights (the best configuration from 073).
 hold, sigs = {}, {}
 starts = np.flatnonzero(np.concatenate([[True], g[1:] != g[:-1]]))
-for src, pat, folder in (("heavy200.log", r"heavy (\d+): приватный холдаут ([0-9.]+)", "heavy200"),
-                         ("nets_aug.log", r"aug-сеть (\d+): холдаут ([0-9.]+)", "nets_aug")):
+for src, pat, folder in (("heavy200.log", r"heavy (\d+): private holdout ([0-9.]+)", "heavy200"),
+                         ("nets_aug.log", r"aug[- ]net (\d+): holdout ([0-9.]+)", "nets_aug")):
     for line in open(src, errors="ignore"):
         m = re.match(pat, line)
         if m and os.path.exists(f"{folder}/member_{m.group(1)}.pt"):
             hold[f"{folder}/member_{m.group(1)}.pt"] = float(m.group(2))
 top10 = sorted(hold, key=hold.get, reverse=True)[:10]
-print("топ-10:", [f"{hold[p]:.4f}" for p in top10])
+print("top-10:", [f"{hold[p]:.4f}" for p in top10])
 
-# Пер-членные счёта фолда-2 уже прогнаны в 073? Нет — там считалось на лету.
-# Пересчитывать дорого; вместо этого использую кэш связки из fold2_newnets:
-# восстановить нельзя, поэтому прогоняю сети заново одним батчем.
+# Were the per-member fold 2 scores already computed in 073? No — there they were computed on the fly.
+# Recomputing is expensive; instead I use the union cache from fold2_newnets:
+# it cannot be recovered, so I rerun the nets in a single batch.
 import torch, torch.nn as nn, torch.nn.functional as F
 DEVICE = torch.device("mps")
 X = np.hstack([np.load("X40.npy"), np.load("C_cnn.npy")[:, None],
@@ -86,11 +86,11 @@ for p in top10:
     sig = 1.0/(1.0+np.exp(-fold_scores(model).astype("float64")))
     acc = sig if acc is None else acc + sig
 net = acc / len(top10)
-np.save("fold2_net_top10.npy", net)  # кэш на будущее
-print("сети прогнаны, кэш сохранён", flush=True)
+np.save("fold2_net_top10.npy", net)  # cache for later
+print("nets run, cache saved", flush=True)
 
 best = (0, None)
-# Доли древесной половины по сетке 0.05, вес сетей 0.40–0.60.
+# Tree-half shares on a 0.05 grid, net weight 0.40–0.60.
 for a in np.arange(0.0, 0.75, 0.05):
     for b in np.arange(0.0, 0.75 - a + 1e-9, 0.05):
         c = 1.0 - a - b
@@ -101,5 +101,5 @@ for a in np.arange(0.0, 0.75, 0.05):
             v = ts_auc((1-w)*pair + w*net, yf, sf)
             if v > best[0]:
                 best = (v, (round(a,2), round(b,2), round(c,2), w))
-                print(f"новый максимум {v:.4f} при r_aug={a:.2f} r_aug3={b:.2f} clf={c:.2f} net={w}", flush=True)
-print(f"\nИТОГ: {best[0]:.4f} {best[1]}  (текущий рекорд 0.6116 при 0.35/0.35/0.30, net 0.5)", flush=True)
+                print(f"new maximum {v:.4f} at r_aug={a:.2f} r_aug3={b:.2f} clf={c:.2f} net={w}", flush=True)
+print(f"\nRESULT: {best[0]:.4f} {best[1]}  (current record 0.6116 at 0.35/0.35/0.30, net 0.5)", flush=True)

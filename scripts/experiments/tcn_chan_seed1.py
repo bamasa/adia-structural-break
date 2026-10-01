@@ -1,4 +1,4 @@
-"""033: сеть поверх траекторий каналов (186-мерная последовательность на вход)."""
+"""033: a net on top of the channel trajectories (186-dimensional sequence as input)."""
 import sys, time
 sys.path.insert(0, "repo/src")
 import numpy as np
@@ -25,7 +25,7 @@ for a, b in zip(starts, bounds[1:]):
     fold = int(assignment[a])
     series.append((((X[a:b] - mu) / sd), y[a:b].astype("float32"), fold))
 del X
-print(f"подготовка {time.time()-t0:.0f}s: {len(series)} рядов", flush=True)
+print(f"preparation {time.time()-t0:.0f}s: {len(series)} series", flush=True)
 
 class Block(nn.Module):
     def __init__(self, ch, dil):
@@ -53,7 +53,7 @@ class ChanTCN(nn.Module):
         return self.head(h).squeeze(1)
 
 model = ChanTCN().to(DEVICE)
-print("параметров:", sum(p.numel() for p in model.parameters()), flush=True)
+print("parameters:", sum(p.numel() for p in model.parameters()), flush=True)
 EPOCHS = 10
 opt = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
 sched = torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=EPOCHS)
@@ -121,5 +121,5 @@ for epoch in range(EPOCHS):
     sched.step()
     auc = validate()
     torch.save(model.state_dict(), "tcn_chan_s1.pt")
-    print(f"эпоха {epoch}: loss {total/len(batches):.4f}, TS-AUC фолд-0 {auc:.4f}  [{time.time()-t0:.0f}s]", flush=True)
-print("готово", flush=True)
+    print(f"epoch {epoch}: loss {total/len(batches):.4f}, TS-AUC fold 0 {auc:.4f}  [{time.time()-t0:.0f}s]", flush=True)
+print("done", flush=True)

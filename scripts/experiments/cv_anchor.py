@@ -1,4 +1,4 @@
-"""031 (фолд-0): якорный вид поверх 186 — ранкер и смесь."""
+"""031 (fold 0): anchor view on top of 186 — ranker and blend."""
 import sys, time
 sys.path.insert(0, "repo/src")
 import numpy as np
@@ -30,6 +30,6 @@ sig = 1.0 / (1.0 + np.exp(-sc))
 clf = np.load("oof_cfg5.npy")[va].astype("float64")
 solo = ts_auc(sc, yf, sf)
 mix = ts_auc(0.6 * sig + 0.4 * clf, yf, sf)
-print(f"236 каналов (186+якорь), ранкер-600: соло {solo:.4f}, смесь {mix:.4f} "
-      f"(эталоны 0.6016 / 0.6045)", flush=True)
-print(f"всего {time.time()-t0:.0f}s", flush=True)
+print(f"236 channels (186+anchor), ranker-600: alone {solo:.4f}, blend {mix:.4f} "
+      f"(references 0.6016 / 0.6045)", flush=True)
+print(f"total {time.time()-t0:.0f}s", flush=True)

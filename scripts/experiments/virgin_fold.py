@@ -1,4 +1,4 @@
-"""056: спектр на нетронутом фолде 2 — честная проверка переносимости."""
+"""056: the spectrum on the untouched fold 2 — an honest transfer check."""
 import sys, time
 sys.path.insert(0, "repo/src")
 import numpy as np
@@ -14,7 +14,7 @@ X200 = np.hstack(base_mats + [np.load("SPEC14.npy")])
 y = np.load("Y40.npy"); g = np.load("G40.npy"); s = np.load("S40.npy")
 assignment = split_by_series(g, folds=5, seed=0)
 
-VAL = 2  # фолд, на который мы никогда не смотрели
+VAL = 2  # the fold we have never looked at
 tr, va = assignment != VAL, assignment == VAL
 yf, sf = y[va], s[va]
 
@@ -39,11 +39,11 @@ def run(X, tag):
     c.fit(X[tr], y[tr], sample_weight=step_weights(s[tr]))
     pc = c.predict_proba(X[va])[:, 1]
     sig = 1.0 / (1.0 + np.exp(-sc))
-    print(f"{tag}: ранкер {ts_auc(sc, yf, sf):.4f}, классификатор {ts_auc(pc, yf, sf):.4f}, "
-          f"пара {ts_auc(0.7*sig + 0.3*pc, yf, sf):.4f}  [{time.time()-t0:.0f}s]", flush=True)
+    print(f"{tag}: ranker {ts_auc(sc, yf, sf):.4f}, classifier {ts_auc(pc, yf, sf):.4f}, "
+          f"pair {ts_auc(0.7*sig + 0.3*pc, yf, sf):.4f}  [{time.time()-t0:.0f}s]", flush=True)
     return ts_auc(0.7*sig + 0.3*pc, yf, sf)
 
-a = run(X186, "186 каналов (без спектра), фолд-2")
-b = run(X200, "200 каналов (со спектром), фолд-2")
-print(f"РАЗНИЦА на нетронутом фолде: {b - a:+.4f}", flush=True)
-print(f"всего {time.time()-t0:.0f}s", flush=True)
+a = run(X186, "186 channels (without spectrum), fold 2")
+b = run(X200, "200 channels (with spectrum), fold 2")
+print(f"DIFFERENCE on the untouched fold: {b - a:+.4f}", flush=True)
+print(f"total {time.time()-t0:.0f}s", flush=True)

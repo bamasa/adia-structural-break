@@ -49,7 +49,7 @@ for a, b in zip(a_starts, a_bounds[1:]):
         seg = np.asarray(AW[a:b]) if KIND == "w" else np.hstack([np.asarray(AX[a:b]), np.asarray(AW[a:b])])
         aug.append((((seg - mu) / sd).astype("float32"), AY[a:b].astype("float32"), sid))
 del AW, AY
-print(f"вход {N_IN}, оригинал {len(orig)}, аугментация {len(aug)} [{time.time()-t0:.0f}s]", flush=True)
+print(f"input {N_IN}, originals {len(orig)}, augmentation {len(aug)} [{time.time()-t0:.0f}s]", flush=True)
 
 class Block(nn.Module):
     def __init__(self, ch, dil):
@@ -127,21 +127,21 @@ os.makedirs(OUTDIR, exist_ok=True)
 fold2_rows = [orig[i] for i in range(len(orig)) if orig_fold[i] == 2]
 pool_orig = [orig[i] for i in range(len(orig)) if orig_fold[i] != 2]
 pool_sid = [int(g[starts[i]]) for i in range(len(orig)) if orig_fold[i] != 2]
-# После пробы d0 (холдаут 0.6543 -> фолд-2 0.5875) diff-члены из очереди
-# убраны: они не переносятся, а стоят по 4.4 часа каждый.
+# After the d0 probe (holdout 0.6543 -> fold 2 0.5875) the diff members were removed
+# from the queue: they do not transfer, and cost 4.4 hours each.
 JOBS = [(KIND, i, False) for i in MEMBERS]
 for tag, member, use_diffs in JOBS:
     path = f"{OUTDIR}/member_{tag}{member}.pt"
     if os.path.exists(path):
         continue
-    seed = 51000 + member  # те же сиды, что p0–p2: парное сравнение
+    seed = 51000 + member  # the same seeds as p0–p2: paired comparison
     rng = np.random.default_rng(seed)
     torch.manual_seed(seed)
     idx = rng.permutation(len(pool_orig))
     hold_n = int(0.08 * len(pool_orig))
-    train_set = list(pool_orig) + [(f, lab) for f, lab, sid in aug]  # 082: без холдаута
+    train_set = list(pool_orig) + [(f, lab) for f, lab, sid in aug]  # 082: no holdout
     rng.shuffle(train_set)
-    print(f"  член {tag}{member}: обучение {len(train_set)} рядов, холдаута нет", flush=True)
+    print(f"  member {tag}{member}: training on {len(train_set)} series, no holdout", flush=True)
     rng.shuffle(train_set)
     model = ChanTCN(3 * N_IN if use_diffs else N_IN).to(DEVICE)
     opt = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
@@ -162,7 +162,7 @@ for tag, member, use_diffs in JOBS:
         sched.step()
         if epoch == 9:
             f2 = holdout_auc(model, fold2_rows, use_diffs)
-            print(f"    член {tag}{member} эпоха {epoch}: фолд-2 {f2:.4f}  [{time.time()-t0:.0f}s]", flush=True)
+            print(f"    member {tag}{member} epoch {epoch}: fold 2 {f2:.4f}  [{time.time()-t0:.0f}s]", flush=True)
             # fold-2 logits of this member, in row order, for the blend caches
             model.eval(); sc = []
             with torch.no_grad():
@@ -173,5 +173,5 @@ for tag, member, use_diffs in JOBS:
                        f"{OUTDIR}/member_{tag}{member}_epoch{epoch}.pt")
             best = (f2, {k: v.cpu().clone() for k, v in model.state_dict().items()})
     torch.save(best[1], path)
-    print(f"last-сеть {tag}{member}: фолд-2 на последней эпохе {best[0]:.4f}  [{time.time()-t0:.0f}s]", flush=True)
+    print(f"last net {tag}{member}: fold 2 at the last epoch {best[0]:.4f}  [{time.time()-t0:.0f}s]", flush=True)
 print("done", flush=True)

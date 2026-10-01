@@ -1,8 +1,8 @@
-"""109b: что меняется в 40% «невидимых» сломов — широкий скрин статистик до/после.
+"""109b: what changes in the 40% of "invisible" breaks — a wide screen of before/after statistics.
 
-Берём ряды фолда-2, где слом не меняет среднее, дисперсию, AR(1) и эксцесс (окна 300),
-и ищем, какая статистика их всё-таки различает. Контроль — ряды без слома, разрезанные
-в случайной точке: любая статистика шумит, значимо только превышение над контролем.
+We take the fold-2 series where the break does not change the mean, variance, AR(1) or kurtosis (windows of 300),
+and look for a statistic that still tells them apart. Control: series without a break, cut
+at a random point: any statistic is noisy, only the excess over the control is significant.
 """
 import os, sys, numpy as np, pandas as pd
 WIN = int(os.environ.get("WIN", "300"))
@@ -50,8 +50,8 @@ for a in starts:
         A, B = stats(pre), stats(post)
         ctl.append({k: B[k] - A[k] for k in A})
 I, C = pd.DataFrame(inv), pd.DataFrame(ctl)
-print(f"окно {WIN}: «невидимых» сломов {len(I)}, контрольных разрезов: {len(C)}\n")
-print(f"{'статистика':12s} {'σ слом':>8s} {'σ контр':>8s} {'отношение':>10s} {'доля >2σ контр':>16s}")
+print(f"window {WIN}: \"invisible\" breaks {len(I)}, control cuts: {len(C)}\n")
+print(f"{'statistic':12s} {'σ break':>8s} {'σ ctrl':>8s} {'ratio':>10s} {'share >2σ ctrl':>16s}")
 res = []
 for c in I.columns:
     sb, sc = I[c].std(), C[c].std()

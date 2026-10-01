@@ -9,4 +9,4 @@ s39 = np.where(sf < 100, 0.55 * base + 0.25 * mass + 0.20 * fq, 0.50 * base + 0.
 Dtr, Dte = D[tr], D[te]; del D
 p = lgb.LGBMClassifier(n_estimators=1500, learning_rate=0.015, num_leaves=31, colsample_bytree=0.5, subsample=0.8, subsample_freq=1, min_child_samples=300, verbose=-1, n_jobs=8).fit(Dtr, y[tr]).predict_proba(Dte)[:, 1]
 np.save("fold2_clf_white_slow.npy", p)
-print(f"отбелённый член (пересобранная матрица, шаг без обрезки): соло {ts_auc(p, yf, sf):.4f} | #39 {ts_auc(s39, yf, sf):.4f} | " + " | ".join(f"доля {w:.2f}: {ts_auc((1 - w) * s39 + w * p, yf, sf):.4f}" for w in (0.25, 0.30, 0.35)) + f" [{time.time()-t0:.0f}s]", flush=True)
+print(f"whitened member (rebuilt matrix, step without clipping): alone {ts_auc(p, yf, sf):.4f} | #39 {ts_auc(s39, yf, sf):.4f} | " + " | ".join(f"weight {w:.2f}: {ts_auc((1 - w) * s39 + w * p, yf, sf):.4f}" for w in (0.25, 0.30, 0.35)) + f" [{time.time()-t0:.0f}s]", flush=True)

@@ -1,4 +1,4 @@
-"""#075: каналы против матриц (200 + 6 BOCPD), скорость, прогон."""
+"""#075: channels versus matrices (200 + 6 BOCPD), speed, end-to-end run."""
 import importlib.util, sys, time
 import numpy as np, pandas as pd
 spec = importlib.util.spec_from_file_location("sub", "repo/submissions/080-pool24/main.py")

@@ -1,9 +1,9 @@
-"""075: diff-сети на аугментированных данных — последняя непроверенная комбинация.
+"""075: diff nets on augmented data — the last untested combination.
 
-Аугментация дошла только до plain-сетей (рекорд 0.6473), diff-архитектура
-(600 входов) училась только на чистых данных (максимум 0.6178). Разности
-считаются по-рядно при сборке батча — память не растёт втрое.
-Kill: члены не сильнее лучших plain-членов на своих холдаутах."""
+Augmentation only reached the plain nets (record 0.6473); the diff architecture
+(600 inputs) was trained only on clean data (maximum 0.6178). The differences
+are computed per series while assembling the batch — memory does not triple.
+Kill: members no stronger than the best plain members on their holdouts."""
 import sys, time, os
 sys.path.insert(0, "repo/src")
 import numpy as np
@@ -24,26 +24,26 @@ starts = np.flatnonzero(np.concatenate([[True], g[1:] != g[:-1]]))
 bounds = np.append(starts, len(g))
 mu = np.load("mu200.npy"); sd = np.load("sd200.npy")
 
-# Оригинальные ряды (фолд-2 держим в стороне — он линейка).
+# Original series (fold 2 is kept aside — it is the yardstick).
 orig, orig_fold = [], []
 for a, b in zip(starts, bounds[1:]):
     orig.append((((X[a:b] - mu) / sd), y[a:b].astype("float32")))
     orig_fold.append(int(assignment[a]))
 del X
 
-# Аугментированные псевдоряды.
+# Augmented pseudo-series.
 AX = np.load("AUG_X.npy"); AY = np.load("AUG_Y.npy"); AG = np.load("AUG_G.npy")
 a_starts = np.flatnonzero(np.concatenate([[True], AG[1:] != AG[:-1]]))
 a_bounds = np.append(a_starts, len(AG))
 aug = []
 for a, b in zip(a_starts, a_bounds[1:]):
     sid = int(AG[a]) - 100000
-    # псевдоряд наследует фолд родителя; фолд-2 исключаем
+    # a pseudo-series inherits its parent's fold; fold 2 is excluded
     aug.append((((AX[a:b] - mu) / sd), AY[a:b].astype("float32"), sid))
 del AX, AY
 fold_by_sid = {int(g[a]): int(assignment[a]) for a in starts}
 aug = [(f, lab) for f, lab, sid in aug if fold_by_sid.get(sid, 0) != 2]
-print(f"оригинал {len(orig)}, аугментация {len(aug)} [{time.time()-t0:.0f}s]", flush=True)
+print(f"original {len(orig)}, augmentation {len(aug)} [{time.time()-t0:.0f}s]", flush=True)
 
 class Block(nn.Module):
     def __init__(self, ch, dil):
@@ -151,5 +151,5 @@ for member in range(6):
         if a > best[0]:
             best = (a, {k: v.cpu().clone() for k, v in model.state_dict().items()})
     torch.save(best[1], path)
-    print(f"aug-diff-сеть {member}: холдаут {best[0]:.4f}  [{time.time()-t0:.0f}s]", flush=True)
+    print(f"aug-diff-net {member}: holdout {best[0]:.4f}  [{time.time()-t0:.0f}s]", flush=True)
 print("done", flush=True)

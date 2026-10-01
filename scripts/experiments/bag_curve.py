@@ -1,4 +1,4 @@
-"""046: кривая масштабирования пачки — 12/24/48/72 члена на фолдах 0 и 1."""
+"""046: bag scaling curve — 12/24/48/72 members on folds 0 and 1."""
 import sys, time
 sys.path.insert(0, "repo/src")
 import numpy as np, torch
@@ -64,15 +64,15 @@ def fold_scores(model, f):
     return np.concatenate([out[a] for a, b in sorted(folds_rows[f])])
 
 sigs = {0: [], 1: []}
-# старые 24 (ch64/6dils)
+# old 24 (ch64/6dils)
 for m in range(24):
     model = ChanTCN().to(DEVICE)
     model.load_state_dict(torch.load(f"net_bag_mac/member_{m}.pt", map_location=DEVICE))
     model.eval()
     for f in (0, 1):
         sigs[f].append(1.0 / (1.0 + np.exp(-fold_scores(model, f).astype("float64"))))
-print(f"старые 24 прогнаны [{time.time()-t0:.0f}s]", flush=True)
-# новые 48 (конфиг в чекпоинте)
+print(f"old 24 run [{time.time()-t0:.0f}s]", flush=True)
+# new 48 (config in the checkpoint)
 for m in range(48):
     ck = torch.load(f"net_bag_mac/grow_{m}.pt", map_location=DEVICE)
     model = ChanTCN(**ck["cfg"]).to(DEVICE)
@@ -81,14 +81,14 @@ for m in range(48):
     for f in (0, 1):
         sigs[f].append(1.0 / (1.0 + np.exp(-fold_scores(model, f).astype("float64"))))
     if m % 12 == 11:
-        print(f"  новые {m+1}/48 [{time.time()-t0:.0f}s]", flush=True)
+        print(f"  new {m+1}/48 [{time.time()-t0:.0f}s]", flush=True)
 
 for f in (0, 1):
     mset = assignment == f
     yf, sf = y[mset], s[mset]
     for n in (12, 24, 48, 72):
         ens = np.mean(sigs[f][:n], axis=0)
-        print(f"фолд {f}, {n} членов: {ts_auc(ens, yf, sf):.4f}", flush=True)
+        print(f"fold {f}, {n} members: {ts_auc(ens, yf, sf):.4f}", flush=True)
     np.save(f"bag72_fold{f}.npy", np.mean(sigs[f], axis=0))
     np.save(f"bag72_members_f{f}.npy", np.stack(sigs[f]).astype("float32"))
 
@@ -100,5 +100,5 @@ trees = 0.7 * bag_r + 0.3 * clf
 for n in (12, 72):
     ens = np.mean(sigs[0][:n], axis=0)
     for w in (0.7, 0.8):
-        print(f"ансамбль {n} членов, вес {w}: фолд-0 {ts_auc((1-w)*trees + w*ens, yf, sf):.4f} (эталон #21: 0.6201)", flush=True)
-print(f"всего {time.time()-t0:.0f}s", flush=True)
+        print(f"ensemble of {n} members, weight {w}: fold 0 {ts_auc((1-w)*trees + w*ens, yf, sf):.4f} (reference #21: 0.6201)", flush=True)
+print(f"total {time.time()-t0:.0f}s", flush=True)

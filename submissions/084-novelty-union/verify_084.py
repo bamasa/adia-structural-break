@@ -1,4 +1,4 @@
-"""#084: каналы против матриц (206 + 90 + 100 + 20), скорость, прогон."""
+"""#084: channels against the matrices (206 + 90 + 100 + 20), speed, a full pass."""
 import importlib.util, sys, time
 import numpy as np, pandas as pd
 spec = importlib.util.spec_from_file_location("sub", "repo/submissions/084-novelty-union/main.py")

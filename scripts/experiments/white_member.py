@@ -15,14 +15,14 @@ Dtr, Dte = D[tr], D[te]; del D
 res = {}
 for name, prm in teachers.items():
     p = lgb.LGBMClassifier(**prm).fit(Dtr, y[tr]).predict_proba(Dte)[:, 1]; res[name] = p; np.save(f"fold2_clf_white_{name}.npy", p)
-    print(f"отбелённый член ({name}): соло {ts_auc(p, yf, sf):.4f} | Spearman с #39 {sp(p, s39):.3f}, с ядром {sp(p, base):.3f}, с массой {sp(p, mass):.3f}, с частотным {sp(p, fq):.3f}, с зависимостью {sp(p, dep):.3f} [{time.time()-t0:.0f}s]", flush=True)
+    print(f"whitened member ({name}): alone {ts_auc(p, yf, sf):.4f} | Spearman with #39 {sp(p, s39):.3f}, with the core {sp(p, base):.3f}, with mass {sp(p, mass):.3f}, with frequency {sp(p, fq):.3f}, with dependence {sp(p, dep):.3f} [{time.time()-t0:.0f}s]", flush=True)
 p = res["slow"] if ts_auc(res["slow"], yf, sf) >= ts_auc(res["medium"], yf, sf) else res["medium"]
 print(f"#39: {ts_auc(s39, yf, sf):.4f} | #40: {ts_auc(s40, yf, sf):.4f}")
 for w in (0.15, 0.25, 0.35, 0.45, 0.55):
-    print(f"  #39 + отбелённый доля {w:.2f}: {ts_auc((1 - w) * s39 + w * p, yf, sf):.4f} | #40 + доля {w:.2f}: {ts_auc((1 - w) * s40 + w * p, yf, sf):.4f}", flush=True)
-print("--- по диапазонам шагов: #39 -> #39 + 0.35·отбелённый ---")
+    print(f"  #39 + whitened share {w:.2f}: {ts_auc((1 - w) * s39 + w * p, yf, sf):.4f} | #40 + share {w:.2f}: {ts_auc((1 - w) * s40 + w * p, yf, sf):.4f}", flush=True)
+print("--- by step range: #39 -> #39 + 0.35·whitened ---")
 for a, b in ((0, 30), (30, 100), (100, 300), (300, 700), (700, 3000)):
-    m = (sf >= a) & (sf < b); print(f"  шаги {a}-{b}: {ts_auc(s39[m], yf[m], sf[m]):.4f} -> {ts_auc(0.65 * s39[m] + 0.35 * p[m], yf[m], sf[m]):.4f} (член сам {ts_auc(p[m], yf[m], sf[m]):.4f})")
-print("--- без ядра: только члены ---")
-print(f"  масса+частота+связка+зависимость+отбелённый (равные доли): {ts_auc((mass + fq + un + dep + p) / 5, yf, sf):.4f}")
-print(f"готово [{time.time()-t0:.0f}s]", flush=True)
+    m = (sf >= a) & (sf < b); print(f"  steps {a}-{b}: {ts_auc(s39[m], yf[m], sf[m]):.4f} -> {ts_auc(0.65 * s39[m] + 0.35 * p[m], yf[m], sf[m]):.4f} (member alone {ts_auc(p[m], yf[m], sf[m]):.4f})")
+print("--- without the core: members only ---")
+print(f"  mass+frequency+union+dependence+whitened (equal shares): {ts_auc((mass + fq + un + dep + p) / 5, yf, sf):.4f}")
+print(f"done [{time.time()-t0:.0f}s]", flush=True)

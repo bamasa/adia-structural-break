@@ -1,10 +1,10 @@
-"""124: многооконный спектр — второе сырьё вне инженерного конвейера.
+"""124: multi-window spectrum — a second raw source outside the engineered pipeline.
 
-SPEC14 в основном наборе считает спектр на одном окне (SPEC_NFFT) по геометрической
-сетке шагов. Здесь та же массовость по окнам, что дала прирост в 114, но над
-частотной областью: на окнах 32/64/128/256 точек — мощность в 6 логарифмических
-полосах относительно истории (в сигмах исторического разброса), спектральная
-энтропия и центроид. 4 окна x 8 = 32 канала. FFT на каждом шаге, O(W log W).
+SPEC14 in the main set computes the spectrum on a single window (SPEC_NFFT) over a geometric
+grid of steps. Here we use the same mass of windows that gave the gain in 114, but over
+the frequency domain: on windows of 32/64/128/256 points — power in 6 logarithmic
+bands relative to the history (in sigmas of the historical spread), spectral
+entropy and centroid. 4 windows x 8 = 32 channels. FFT at every step, O(W log W).
 python build_mspec.py <shard> <n> | merge <n> | test
 """
 import sys, time, os, numpy as np
@@ -33,7 +33,7 @@ def mspec_channels(hist, online):
     n = len(zo); out = np.zeros((n, NCH), dtype="float32")
     edges = {w: band_edges(w) for w in WINS}
     ref = {}
-    for w in WINS:                                   # исторический профиль: среднее и разброс по непересекающимся окнам
+    for w in WINS:                                   # historical profile: mean and spread over non-overlapping windows
         segs = [spec_feats(zh[i:i + w], edges[w]) for i in range(0, len(zh) - w + 1, w)]
         S = np.array(segs); ref[w] = (S.mean(0), S.std(0) + 1e-3)
     full = np.concatenate([zh[-max(WINS):], zo])
@@ -53,7 +53,7 @@ if __name__ == "__main__":
             return x
         hist = ar(0.0, 2000); online = np.concatenate([ar(0.0, 300), ar(0.7, 300)])
         t0 = time.time(); o = mspec_channels(hist, online); dt = (time.time() - t0) / len(online) * 1000
-        print(f"каналов {o.shape[1]}, {dt:.3f} мс/шаг; смена спектра (белый -> AR 0.7): нижняя полоса/окно128 {o[250:300,16].mean():+.2f} -> {o[450:600,16].mean():+.2f}, центроид {o[250:300,23].mean():+.2f} -> {o[450:600,23].mean():+.2f}")
+        print(f"{o.shape[1]} channels, {dt:.3f} ms/step; spectrum change (white -> AR 0.7): lower band/window128 {o[250:300,16].mean():+.2f} -> {o[450:600,16].mean():+.2f}, centroid {o[250:300,23].mean():+.2f} -> {o[450:600,23].mean():+.2f}")
         sys.exit(0)
     if sys.argv[1] == "merge":
         n = int(sys.argv[2]); parts = [np.load(f"{PARTS}/part_{i}.npz", allow_pickle=True) for i in range(n)]
@@ -76,7 +76,7 @@ if __name__ == "__main__":
         if sid % n_shards != shard: continue
         hist, online = series[sid]; k = len(online) - (b - a)
         sids.append(gid); arrs.append(mspec_channels(np.concatenate([hist, online[:k]]), online[k:]))
-        if len(sids) % 300 == 0: print(f"шард {shard}: {len(sids)} псевдорядов, {time.time()-t0:.0f}s", flush=True)
+        if len(sids) % 300 == 0: print(f"shard {shard}: {len(sids)} pseudo-series, {time.time()-t0:.0f}s", flush=True)
     os.makedirs(PARTS, exist_ok=True)
     np.savez(f"{PARTS}/part_{shard}.npz", sids=np.array(sids), arrs=np.array(arrs, dtype=object), allow_pickle=True)
-    print(f"шард {shard} готов {time.time()-t0:.0f}s: {len(sids)} рядов", flush=True)
+    print(f"shard {shard} done {time.time()-t0:.0f}s: {len(sids)} series", flush=True)

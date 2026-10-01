@@ -1,6 +1,6 @@
-"""099t: явные двухвыборочные тесты история vs префикс / окно, потоково: KS, Манн–Уитни (AUC-форма), Левен (по |x - медиана|), Флигнер-подобный (ранги |x - медиана|).
-Каналы (8): KS_prefix, MW_prefix, Levene_prefix, Fligner_prefix, KS_win100, MW_win100, Levene_win100, Fligner_win100.
-Реализация через 64 квантильных бина истории: O(бины) на шаг.
+"""099t: explicit two-sample tests history vs prefix / window, streaming: KS, Mann–Whitney (AUC form), Levene (on |x - median|), Fligner-like (ranks of |x - median|).
+Channels (8): KS_prefix, MW_prefix, Levene_prefix, Fligner_prefix, KS_win100, MW_win100, Levene_win100, Fligner_win100.
+Implemented via 64 quantile bins of the history: O(bins) per step.
 """
 import sys, time, os, numpy as np
 NB = 64; WIN = 100
@@ -11,13 +11,13 @@ def tests(hist, online):
     hb = np.searchsorted(edges, h); ph = np.bincount(hb, minlength=NB) / len(h); Fh = np.cumsum(ph)
     med = np.median(h); dev_h = np.abs(h - med); dedges = np.quantile(dev_h, np.linspace(0, 1, NB + 1)[1:-1])
     pdh = np.bincount(np.searchsorted(dedges, dev_h), minlength=NB) / len(h); Fdh = np.cumsum(pdh); mean_dev_h = dev_h.mean()
-    # Манн–Уитни в форме AUC: P(x_online > x_hist) ≈ сумма по бинам p_o[b]·(F_h[b-1] + 0.5·p_h[b])
+    # Mann–Whitney in AUC form: P(x_online > x_hist) ≈ sum over bins p_o[b]·(F_h[b-1] + 0.5·p_h[b])
     mw_w = np.concatenate([[0.0], Fh[:-1]]) + 0.5 * ph; mwd_w = np.concatenate([[0.0], Fdh[:-1]]) + 0.5 * pdh
     def stats(cnt, dcnt, dsum, n):
         p = cnt / n; F = np.cumsum(p)
         ks = np.abs(F - Fh).max(); mw = (p * mw_w).sum() - 0.5
-        lev = (dsum / n) / (mean_dev_h + 1e-12) - 1.0                  # Левен: отношение средних |x - med|
-        pd_ = dcnt / n; fl = (pd_ * mwd_w).sum() - 0.5                  # Флигнер-подобный: MW на |x - med|
+        lev = (dsum / n) / (mean_dev_h + 1e-12) - 1.0                  # Levene: ratio of mean |x - med|
+        pd_ = dcnt / n; fl = (pd_ * mwd_w).sum() - 0.5                  # Fligner-like: MW on |x - med|
         return ks, mw, lev, fl
     n = len(online); out = np.empty((n, 8), dtype="float32")
     cp = np.zeros(NB); cd = np.zeros(NB); dsum = 0.0; wb, wd, wdv = [], [], []
@@ -35,7 +35,7 @@ if __name__ == "__main__":
         rng = np.random.default_rng(0); hist = rng.normal(0, 1, 2000)
         online = np.concatenate([rng.normal(0, 1, 400), rng.normal(0.3, 1.3, 400)])
         t0 = time.time(); o = tests(hist, online); dt = (time.time() - t0) / len(online) * 1000
-        print("тест (сдвиг 0.3σ + дисперсия ×1.3 на шаге 400): окно до/после — " + ", ".join(f"{n} {o[300:400,4+i].mean():+.3f}->{o[450:550,4+i].mean():+.3f}" for i, n in enumerate(("KS", "MW", "Levene", "Fligner"))) + f"; {dt:.3f} мс/шаг")
+        print("test (shift 0.3σ + variance ×1.3 at step 400): window before/after — " + ", ".join(f"{n} {o[300:400,4+i].mean():+.3f}->{o[450:550,4+i].mean():+.3f}" for i, n in enumerate(("KS", "MW", "Levene", "Fligner"))) + f"; {dt:.3f} ms/step")
         sys.exit(0)
     if sys.argv[1] == "merge":
         n = int(sys.argv[2]); parts = [np.load(f"{PARTS}/part_{i}.npz", allow_pickle=True) for i in range(n)]
@@ -55,4 +55,4 @@ if __name__ == "__main__":
         sids.append(int(sid)); arrs.append(tests(hist, online))
     os.makedirs(PARTS, exist_ok=True)
     np.savez(f"{PARTS}/part_{shard}.npz", sids=np.array(sids), arrs=np.array(arrs, dtype=object), allow_pickle=True)
-    print(f"шард {shard} готов {time.time()-t0:.0f}s: {len(sids)} рядов", flush=True)
+    print(f"shard {shard} done {time.time()-t0:.0f}s: {len(sids)} series", flush=True)

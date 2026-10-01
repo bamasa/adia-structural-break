@@ -1,4 +1,4 @@
-"""Финальный ранкер для посылки: все данные + аугментация, конфиг 63/0.5."""
+"""Final ranker for the submission: all data + augmentation, config 63/0.5."""
 import sys, time, os
 sys.path.insert(0, "repo/src")
 import numpy as np, joblib
@@ -13,7 +13,7 @@ y = np.load("Y40.npy"); s = np.load("S40.npy")
 AX = np.load("AUG_X.npy"); AY = np.load("AUG_Y.npy"); AS = np.load("AUG_S.npy")
 Xa = np.vstack([X, AX]); ya = np.concatenate([y, AY]); sa = np.concatenate([s, AS])
 del X, AX
-print(f"строк: {len(ya):,} [{time.time()-t0:.0f}s]", flush=True)
+print(f"rows: {len(ya):,} [{time.time()-t0:.0f}s]", flush=True)
 
 rng = np.random.default_rng(0)
 MAXQ = 8000
@@ -35,4 +35,4 @@ r = lgb.LGBMRanker(
 r.fit(Xa[order], ya[order], group=sizes)
 os.makedirs("resources070", exist_ok=True)
 joblib.dump(r, "resources070/rank_aug.joblib")
-print(f"готово {time.time()-t0:.0f}s", flush=True)
+print(f"done {time.time()-t0:.0f}s", flush=True)

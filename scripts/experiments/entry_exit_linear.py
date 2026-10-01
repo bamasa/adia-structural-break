@@ -1,4 +1,4 @@
-"""092b: обучаемый верификатор над траекториями счетов (деревья и сети) — CV по рядам внутри фолда-2."""
+"""092b: a trainable verifier over score trajectories (trees and nets) — CV by series within fold 2."""
 import sys, numpy as np, lightgbm as lgb
 sys.path.insert(0, "repo/src")
 from structural_break.combiners import split_by_series, ts_auc
@@ -24,9 +24,9 @@ def traj_feats(x):
 F = np.empty((len(base), 3 * 11 + 1))
 for a, b in zip(starts, bounds[1:]):
     F[a:b] = np.hstack([traj_feats(base[a:b]), traj_feats(trees[a:b]), traj_feats(net[a:b]), (trees[a:b] - net[a:b])[:, None]])
-print(f"признаков {F.shape[1]}, строк {len(F)}; база {ts_auc(base, yf, sf):.4f}", flush=True)
+print(f"features {F.shape[1]}, rows {len(F)}; base {ts_auc(base, yf, sf):.4f}", flush=True)
 
-# CV по рядам внутри фолда-2 (5 частей)
+# CV by series within fold 2 (5 parts)
 series_ids = gf[starts]; rng = np.random.default_rng(0); part_of = {int(sid): i % 5 for i, sid in enumerate(rng.permutation(series_ids))}
 part = np.array([part_of[int(v)] for v in gf])
 
@@ -37,11 +37,11 @@ for k in range(5):
     tr, te = part != k, part == k
     sc = StandardScaler().fit(F[tr]); m = LogisticRegression(C=0.1, max_iter=300).fit(sc.transform(F[tr]), yf[tr])
     oof[te] = m.decision_function(sc.transform(F[te]))
-print(f"линейный верификатор (34 признака траекторий): OOF {ts_auc(oof, yf, sf):.4f} | смесь рангами 0.5 с базой {ts_auc(0.5*base + 0.5/(1+np.exp(-oof)), yf, sf):.4f}", flush=True)
-# только текущие счета трёх источников (контроль линейности)
+print(f"linear verifier (34 trajectory features): OOF {ts_auc(oof, yf, sf):.4f} | rank blend 0.5 with the base {ts_auc(0.5*base + 0.5/(1+np.exp(-oof)), yf, sf):.4f}", flush=True)
+# only the current scores of the three sources (linearity control)
 oof = np.zeros(len(base)); cols = [0, 11, 22, 33]
 for k in range(5):
     tr, te = part != k, part == k
     sc = StandardScaler().fit(F[tr][:, cols]); m = LogisticRegression(C=0.1, max_iter=300).fit(sc.transform(F[tr][:, cols]), yf[tr])
     oof[te] = m.decision_function(sc.transform(F[te][:, cols]))
-print(f"контроль: линейная смесь текущих счетов (деревья, сети, разность): {ts_auc(oof, yf, sf):.4f}")
+print(f"control: linear blend of the current scores (trees, nets, difference): {ts_auc(oof, yf, sf):.4f}")
