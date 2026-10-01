@@ -43,6 +43,7 @@ submissions. The platform moved eight times, each time for a different reason:
 | 0.6056 | #39 | a frequency member and a gated frequency+novelty union — +0.0046 on the fold, +0.0008 in the cloud |
 | **0.6186** | **#41** | the whitened stream as a member: AR(p) by BIC, a conditional scale and the innovation ECDF fitted on the history, ninety statistics on the normal scores — +0.0118 on the fold, +0.0130 in the cloud; rank 222 |
 | **0.6277** | **#44** | the member rebuilt: history context, a bag of two per-step rankers, three trajectory networks over the whitened channels — +0.0070 on the fold, +0.0091 in the cloud |
+| **0.6299** | **#45** | a pool of three trajectory networks reading the core's channels and the whitened ones together — +0.0013 on the fold, +0.0022 in the cloud; **the final selection** |
 
 **#44 reads 0.6277 in the cloud** (#41: 0.6186, rank 222). It came from the two surveys of
 27 September — what the leaders build, and what the generator actually
@@ -52,10 +53,11 @@ with a ninety-channel battery on the normal scores. +0.0118 on fold 2,
 +0.0130 on the platform. Before it, the two weaker members of #39 had
 transferred at a sixth of their fold gain; the rule since then is that a
 member ships only when it is strong on its own (0.57+, this one 0.615)
-with a fold-2 gain above 0.003. **#44 is Selected** (fold 2 0.6439; #43 is an identical copy; #42 was
-never run). **#45**, #44 with a pool of three networks that read the
-core's channels and the whitened ones together (fold 2 0.6452), was
-pushed on the morning of the deadline for the last cloud run.
+with a fold-2 gain above 0.003. **#45 is the final selection: 0.6299 in the cloud**, about rank 160 of
+1,716 (#44 0.6277; #43 is an identical copy of #44; #42 was never run).
+It is #44 with a pool of three networks that read the core's channels
+and the whitened ones together, pushed and run on the morning of the
+deadline.
 
 Everything else measured on the untouched fold since #28 — more or other
 data, capacity, schedule, loss, input, verifiers, stacking in the winners'
@@ -101,7 +103,7 @@ Full history with hypotheses and kill conditions: [`docs/experiments.md`](docs/e
 | 005 | LightGBM over 40 channels: + multi-scale receptive fields (6 EWMA windows, 5–200 obs) + retrospective confirm/cancel verdicts | 0.5648 | 0.5146 | cloud |
 | 006 | + a learned dilated-convolution channel (721 parameters, dilations 1/4/16, inline weights, numpy forward) | **0.5682** | 0.5146 | cloud (resubmitted once: json.loads without import json, hidden locally by a stale __pycache__) |
 
-Current standing: #44 at 0.6277 in the cloud (about rank 150); the board's top is 0.680, rank 50 is 0.642 (27 September). See "Where it stands" above.
+Final standing (1 October 2026): **#45 at 0.6299 in the cloud, about rank 160 of 1,716**; the board's top is 0.680, rank 50 is 0.642. See "Where it stands" above.
 
 | — | 007: window classifier on 313k augmented cuts | 0.5627 vs 0.5682 | **killed by pre-stated condition**: window AUC nearly doubled (0.5315 → 0.5687), yet as channels it dilutes the combiner — better in isolation, redundant in ensemble |
 | 008 | + nine reverting channels: each detector's current statistic beside its peak, so a false alarm can be recanted | **0.5719** vs 0.5662, better on all 5 folds | cloud |
@@ -249,7 +251,7 @@ Current standing: #44 at 0.6277 in the cloud (about rank 150); the board's top i
 | 157a-c | the screen of 30 September: AR order by AIC / fixed 12; Huber-fitted AR + MAD scale; a per-step MLP learner | all within ±0.0005 of 0.6439 in the blend | closed |
 | 157d-f | short-window early statistics; odds on the conditional stream + one-sided CUSUM; a bag of six whitened readers and three rankers | −0.0015 / +0.0024 alone; blend within ±0.0005 in every case | the plateau of 30 September is firm; closed |
 | 157g | a Student-t PIT (df by likelihood) instead of the empirical CDF | 0.6184 vs 0.6188 alone; blend 0.6440 | closed |
-| 152a | trajectory networks over the core's 200 and the whitened 111 together, lean loader | **0.6227 as a pool** (strongest networks); blend 0.6452 vs 0.6439 | **shipped as #45** at a tenth |
+| 152a | trajectory networks over the core's 200 and the whitened 111 together, lean loader | **0.6227 as a pool** (strongest networks); blend 0.6452 vs 0.6439 | **shipped as #45: cloud 0.6299, the final selection** |
 | 158 | networks over the whitened innovation stream itself (5 channels) | 0.5932 as a pool, Spearman 0.05 with the other pools; +0.0005 | not shipped; recorded for the next edition |
 | — | #25: broken upload, do not run | — | a `channels[:186]` slice survived the spectral upgrade; the push followed the check with `;` instead of `&&` |
 

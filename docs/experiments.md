@@ -3756,3 +3756,25 @@ the whitened ranker: a different reading, and a weak one. +0.0005 at a
 twentieth on top of #45's recipe. Not shipped — it would need the
 library to expose the stream itself, and the gain does not buy that
 change on the last morning. Recorded for the next edition.
+
+---
+
+## #45 in the cloud: 0.6299 — the final selection
+
+From 0.6277 (#44) to **0.6299**: +0.0022 on the platform against
++0.0013 on fold 2. The joint-input networks transferred, as every strong
+member has. Selected for the final evaluation on the afternoon of the
+deadline, 1 October 2026.
+
+| submission | fold 2 | cloud | fold Δ | cloud Δ |
+|---|---|---|---|---|
+| #39 | 0.6251 | 0.6056 | | |
+| #41 | 0.6369 | 0.6186 | +0.0118 | +0.0130 |
+| #44 | 0.6439 | 0.6277 | +0.0070 | +0.0091 |
+| #45 | 0.6452 | 0.6299 | +0.0013 | +0.0022 |
+
+Five weeks: 0.5877 at the first network blend, 0.6299 at the close.
+The last five days alone added +0.0243 in the cloud, all of it from one
+idea found by reading what the leaders built and what the generator
+makes — whitening the stream properly — and from three builds of the
+member on top of it. Rank about 160 of 1,716 at the close.
