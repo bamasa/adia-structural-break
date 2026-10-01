@@ -9,11 +9,14 @@ choice never saw.
 The metric everywhere is Time-Stratified AUC (TS-AUC): at each online step, an
 ordinary AUC across all series alive at that step, weight-averaged by the
 number of positive-negative pairs. Two consequences drive every design choice:
-only the *ordering between series at the same step* matters, and early steps —
-where almost no evidence exists — weigh as much as late ones.
+only the *ordering between series at the same step* matters, and the weight
+sits where both classes are populated (12% below step 100, 83% on steps
+100–700 — see the table under 083), so early evidence counts but is not
+the whole game.
 
 Reference points: random = 0.50, the organisers' EWMA baseline = 0.5170 locally,
-public leaderboard top ≈ 0.652, tail of the ranked field ≈ 0.62–0.63.
+public leaderboard top ≈ 0.652 and tail of the ranked field ≈ 0.62–0.63 as of
+August 2026 (by the close on 1 October the top read 0.680 and rank 50 read 0.642).
 
 ---
 

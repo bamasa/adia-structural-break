@@ -1,34 +1,20 @@
-"""Two ways of turning nine detector channels into one score.
+"""Fold assignment by series and the competition metric.
 
-The detectors each answer "has this stream departed from its history" in their
-own way. Nine answers arrive per step and one number must be submitted, so
-something has to combine them. Submission 001 assumed the maximum -- trust
-whoever shouts loudest -- which is a guess, and ten thousand labelled series is
-enough evidence to replace a guess with a measurement.
+``split_by_series`` puts every row of a series into the same fold, so a model
+is never scored on moments it was fitted on: consecutive steps of one series
+are near-duplicates, and a row-wise split would turn validation into
+memorisation. Fold 2, seed 0, is the project's ruler.
 
-Two combiners, deliberately different in what they can express:
+``ts_auc`` is the time-stratified AUC exactly as the platform scores it: at
+each step an ordinary AUC across every series alive there, averaged with
+weights equal to the number of positive-negative pairs; steps with one class
+contribute nothing; tied scores are midranked, as
+``sklearn.metrics.roc_auc_score`` does.
 
-**Weighted** fits one coefficient per channel and adds them up. A channel is
-worth the same everywhere: useful when it is useful, ignored when it is not,
-but never conditional on what the other channels are saying. Logistic
-regression on the logit of each score, so the combination stays a probability
-and the coefficients stay readable -- a negative one says a channel is
-*anti*-informative, which is worth knowing.
-
-**Boosted** fits gradient-boosted trees, so the weight of a channel depends on
-the others. It can express "the CUSUM matters when the dispersion channel is
-quiet, and not otherwise", which the weighted form cannot say at all.
-
-The first is the honest baseline for the second. If the trees do not beat the
-line, their extra freedom bought nothing but variance -- an outcome this project
-has measured before and should expect again.
-
-Validation
-----------
-Both are scored the same way: fit on four fifths of the *series*, score on the
-fifth, never splitting a series across the boundary. Consecutive steps of one
-series are near-duplicates, so a random split of rows would put the same moment
-on both sides and turn validation into memorisation.
+``step_weights``, ``Weighted``, ``Boosted`` and ``cross_validate`` are the two
+early combiners of the detector channels (logistic regression on the logit
+scale, gradient-boosted trees) and their fold loop; the experiment scripts of
+that stage still import them.
 """
 
 from __future__ import annotations
@@ -36,6 +22,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 import numpy as np
+from scipy.stats import rankdata
 
 
 def logit(p: np.ndarray, epsilon: float = 1e-6) -> np.ndarray:
@@ -73,7 +60,9 @@ def ts_auc(scores: np.ndarray, labels: np.ndarray, steps: np.ndarray) -> float:
 
     At each step, an ordinary AUC across every series alive there, averaged with
     weights equal to the number of positive-negative pairs available. Steps with
-    only one class contribute nothing, which is most of the very late ones.
+    only one class contribute nothing, which is most of the very late ones. Ties
+    are midranked (the Mann-Whitney form of ``sklearn.metrics.roc_auc_score``),
+    so a step whose scores are all equal contributes 0.5.
     """
     weighted = total = 0.0
     for step in np.unique(steps):
@@ -83,7 +72,7 @@ def ts_auc(scores: np.ndarray, labels: np.ndarray, steps: np.ndarray) -> float:
         negatives = int(len(y) - positives)
         if positives == 0 or negatives == 0:
             continue
-        ranks = scores[mask].argsort().argsort() + 1
+        ranks = rankdata(scores[mask], method="average")
         auc = (ranks[y == 1].sum() - positives * (positives + 1) / 2) / (
             positives * negatives
         )

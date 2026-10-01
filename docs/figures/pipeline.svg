@@ -34,7 +34,8 @@
 <text x="850.0" y="174" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2937">Independent members</text>
 <text x="850.0" y="194" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11.5" fill="#6b7280">mass battery (90 statistics)</text>
 <text x="850.0" y="210" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11.5" fill="#6b7280">frequency/dependence + novelty</text>
-<text x="850.0" y="226" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11.5" fill="#6b7280">3 TCNs over 200 + 111 channels</text>
+<text x="850.0" y="226" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11.5" fill="#6b7280">joint TCNs over 200 + 111 channels</text>
+<text x="850.0" y="242" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11.5" fill="#6b7280">(a reader of both streams)</text>
 <rect x="1000" y="150" width="160" height="110" rx="10" fill="#ecfeff" stroke="#1f2937" stroke-width="1.5"/>
 <text x="1080.0" y="174" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2937">Hand blend</text>
 <text x="1080.0" y="194" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11.5" fill="#6b7280">shares read on an</text>

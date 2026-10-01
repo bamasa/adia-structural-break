@@ -161,7 +161,7 @@ hygiene item is not recorded as tested.
 
 The journal is written by the assistant and records the owner's decisions where
 they set the course. The owner set the targets the journal works toward (the
-0.65 target in the README's cloud-calibration row; "the target is fold-2 0.617;
+0.65 target recorded in the cloud-calibration row of docs/experiment_table.md; "the target is fold-2 0.617;
 nothing is submitted until it is met", 067–068), ran the platform side — the
 cloud runs and their budget (15 hours a week; "five cloud runs a day are the
 only ruler that cannot be burnt"; at #39, "room for two or three more runs
@@ -191,14 +191,17 @@ for #1; about 330 with 004). From #18 on, every move of the project's best:
 | 0.6048 | #37 | the network pool doubled to twenty-four (120) |
 | 0.6056 | #39 | the frequency/dependence member and the gated frequency+novelty union (131b, 140c) |
 | 0.6186 | #41 | the whitened stream as a member (145), from the two surveys |
+| 0.6277 | #44 | the whitened member rebuilt: history context, a bag of two rankers, three networks over the whitened channels (152, 153) |
+| 0.6299 | #45 | three networks reading the core's 200 channels and the whitened 111 together (152a) — the final selection |
 
 Readings that did not move it, each answering one question: #19 0.5877 (nine
 models, fold-0 tuned), #20 0.5846 (nets alone), #21 0.5810 (twelve-net bag),
 #22 0.5876 (heavy members), #24 0.5853 (trees alone), #29 0.5996 (nets on all
 data), #31 0.6000 (blend toward trees), #32 0.5991 (self-normalisation), #33
-0.5991 (wide classifier). No cloud number is recorded for #34, #35, #38 and
-#40; #42 (fold 2 0.6405) and #44 (0.6439; #43 is an identical copy) are
-awaiting theirs.
+0.5991 (wide classifier), #35 0.6009 (a variant of #30). #34, #38, #40 and
+#42 were never run; #43 is an identical copy of #44. The final selection is
+#45 at 0.6299; the organisers' out-of-sample evaluation follows at the end
+of October 2026.
 
 ## 6. What did not work
 

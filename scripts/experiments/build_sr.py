@@ -5,37 +5,15 @@ with a mixture over the grid. log R_t = L_t + logcumsumexp_{tau<=t}(-L_{tau-1}),
 per-point log likelihood ratios; fully vectorised per series. 22 channels.
 python build_sr.py <shard> <n> | merge <n>"""
 import sys, time, os, numpy as np
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from build_white import fit_history, normal_scores_online
-VAR_UP = (1.25, 1.5, 2.0, 3.0, 5.0); VAR_DOWN = (0.7, 0.5); MEANS = (0.3, 0.6, 1.0); PHIS = (0.2, 0.4)
-NCH = len(VAR_UP) + len(VAR_DOWN) + 2 * len(MEANS) + 2 * len(PHIS) + 4
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "src"))
+from structural_break import white_batch as _batch
+from structural_break.white_batch import log_sr  # noqa: F401
+from structural_break.white import SR_VAR_UP as VAR_UP, SR_VAR_DOWN as VAR_DOWN, SR_MEANS as MEANS, SR_PHIS as PHIS, SR_CHANNELS as NCH  # noqa: F401
 OUT = os.environ.get("SR_OUT", "SR22"); PARTS = f"{OUT.lower()}_parts"
 
-def log_sr(ell):
-    """log Shiryaev-Roberts statistic from per-point log likelihood ratios."""
-    L = np.cumsum(ell); Lprev = np.concatenate([[0.0], L[:-1]])
-    return L + np.logaddexp.accumulate(-Lprev)
-
 def sr_channels(hist, online):
-    h = np.asarray(hist, float); mu, sd = h.mean(), h.std() + 1e-12; zh = (h - mu) / sd; zo = (np.asarray(online, float) - mu) / sd
-    fit = fit_history(zh); _, n, _ = normal_scores_online(fit, zh, zo)      # the unconditional normal scores
-    prev = np.concatenate([[fit["nhu"][-1]], n[:-1]])
-    T = len(n); out = np.zeros((T, NCH), dtype="float32"); c = 0; fam = {}
-    for v in VAR_UP + VAR_DOWN:
-        ell = -0.5 * np.log(v) - 0.5 * n ** 2 * (1.0 / v - 1.0); out[:, c] = log_sr(ell); c += 1
-    fam["var_up"] = out[:, :len(VAR_UP)].copy(); fam["var_down"] = out[:, len(VAR_UP):c].copy()
-    for d in MEANS:
-        for sign in (1.0, -1.0):
-            ell = sign * d * n - 0.5 * d * d; out[:, c] = log_sr(ell); c += 1
-    fam["mean"] = out[:, c - 2 * len(MEANS):c].copy()
-    for phi in PHIS:
-        for sign in (1.0, -1.0):
-            p = sign * phi; ell = -0.5 * np.log(1 - p * p) - 0.5 * ((n - p * prev) ** 2 / (1 - p * p) - n ** 2); out[:, c] = log_sr(ell); c += 1
-    fam["dep"] = out[:, c - 2 * len(PHIS):c].copy()
-    for key in ("var_up", "var_down", "mean", "dep"):
-        F = fam[key]; out[:, c] = np.logaddexp.reduce(F, axis=1) - np.log(F.shape[1]); c += 1   # equal-weight mixture over the grid
-    assert c == NCH
-    return np.clip(np.nan_to_num(out), -50, 200)
+    """The Shiryaev-Roberts channels of one series as float32, as the SR22 matrix stores them."""
+    return _batch.sr_channels(hist, online).astype("float32")
 
 if __name__ == "__main__":
     if sys.argv[1] == "merge":

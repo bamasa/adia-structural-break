@@ -21,7 +21,7 @@ geometric cadence. The conditional stream -- sharper for mean and dependence
 when the history is heteroskedastic, blind to scale by construction -- adds
 mean and dependence extras, and the conditional scale process itself is
 read against its history level. Plus the step index: ninety channels
-(experiment 145: 0.6088 alone, +0.0107 to the blend on fold 2).
+(experiment 145: 0.6150 alone, +0.0118 to the blend on fold 2).
 
 With ``odds=True`` the Shiryaev-Roberts odds of 147 ride along: twenty-one
 more channels, one hundred and eleven in all.

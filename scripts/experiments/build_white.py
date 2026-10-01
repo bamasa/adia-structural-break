@@ -12,154 +12,28 @@ geometric cadence -- all on the unconditional stream (history innovation varianc
 where scale breaks stay visible; mean/dependence/test extras on the conditional stream;
 the conditional scale process against its history level; and the step index. 90 channels.
 python build_white.py <shard> <n> | merge <n> | test
+
+The computation lives in the library, structural_break.white_batch; this script is the
+command-line builder of the WHITE90 matrix and re-exports the batch functions under their
+old names for the sibling scripts (build_sr, build_histctx, build_whitez, build_wstream,
+build_white_tpit).
 """
 import sys, time, os, numpy as np
-from scipy.signal import lfilter
-from scipy.special import ndtri, ndtr
-PMAX = 12; LAMBDAS = (0.90, 0.94, 0.97, 0.99, 1.0); DRIFT = 0.25
-LAGS = (1, 2, 3, 5, 10); PORT = 10; DYADIC = (8, 16, 32, 64, 128, 256, 512, 1024); TESTW = (32, 64, 128, 256, 512)
-NFULL = 8 + len(LAGS) * 2 + 1 + 2 + 7 + 3 * len(DYADIC) + 3 + 3 * (len(TESTW) + 1) + 3   # 76 on the unconditional stream
-NCH = NFULL + 10 + 3 + 1                                                                     # + conditional extras, scale process, step
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "src"))
+from structural_break import white_batch as _batch
+from structural_break.white_batch import ewma, cusum_peak, fit_history, normal_scores_online, one_sample_tests, _battery  # noqa: F401
+from structural_break.white import (WHITE_PMAX as PMAX, WHITE_LAMBDAS as LAMBDAS, WHITE_DRIFT as DRIFT, WHITE_LAGS as LAGS,  # noqa: F401
+                                    WHITE_PORT as PORT, WHITE_DYADIC as DYADIC, WHITE_TESTW as TESTW, WHITE_FULL as NFULL,
+                                    WHITE_CHANNELS as NCH)
 OUT = os.environ.get("WHITE_OUT", "WHITE90"); PARTS = f"{OUT.lower()}_parts"
 
-def ewma(a, alpha, init=0.0):
-    return lfilter([alpha], [1, -(1 - alpha)], a, zi=[(1 - alpha) * init])[0]
-
-def cusum_peak(a, drift=DRIFT):
-    cp = np.concatenate([[0.0], np.cumsum(a - drift)]); cm = np.concatenate([[0.0], np.cumsum(-a - drift)])
-    return np.maximum(cp[1:] - np.minimum.accumulate(cp)[1:], cm[1:] - np.minimum.accumulate(cm)[1:])
-
-def fit_history(h):
-    """AR order by BIC on a common sample, conditional-scale lambda by quasi-likelihood, innovation ECDF."""
-    n = len(h); y = h[PMAX:]; best = (np.inf, 0, np.zeros(0))
-    for p in range(0, PMAX + 1):
-        if p == 0:
-            e = y; coef = np.zeros(0)
-        else:
-            X = np.column_stack([h[PMAX - j - 1: n - j - 1] for j in range(p)]); coef = np.linalg.lstsq(X, y, rcond=None)[0]; e = y - X @ coef
-        bic = len(e) * np.log((e ** 2).mean() + 1e-12) + p * np.log(len(e))
-        if bic < best[0]: best = (bic, p, coef)
-    p, coef = best[1], best[2]
-    e = h[p:] - (np.column_stack([h[p - j - 1: n - j - 1] for j in range(p)]) @ coef if p else 0.0)
-    e2 = e ** 2; v0 = max(float(e2.mean()), 1e-12); bestl = (-np.inf, 1.0, np.full(len(e), v0))
-    for lam in LAMBDAS:
-        s2 = np.full(len(e), v0) if lam >= 1.0 else np.concatenate([[v0], ewma(e2[:-1], 1 - lam, init=v0)])
-        s2 = np.maximum(s2, 1e-12); ql = -0.5 * np.sum(np.log(s2) + e2 / s2)
-        if np.isfinite(ql) and ql > bestl[0]: bestl = (ql, lam, s2)
-    lam, s2 = bestl[1], bestl[2]
-    def scores(u, su): return ndtri(np.clip((np.searchsorted(su, u) + 0.5) / (len(su) + 1), 1e-6, 1 - 1e-6))
-    uc = e / np.sqrt(s2); suc = np.sort(uc); uu = e / np.sqrt(v0); suu = np.sort(uu)
-    l = np.log(s2 / v0)
-    return dict(p=p, coef=coef, lam=lam, s2_last=float(lam * s2[-1] + (1 - lam) * e2[-1]) if lam < 1.0 else float(v0), v0=float(v0),
-                suc=suc, suu=suu, nhc=scores(uc, suc), nhu=scores(uu, suu), lm=float(l.mean()), ls=float(l.std()) + 1e-6)
-
-def normal_scores_online(fit, h, zo):
-    p, coef, lam = fit["p"], fit["coef"], fit["lam"]
-    full = np.concatenate([h[-PMAX:], zo]); m = len(full)
-    e = full[PMAX:] - (np.column_stack([full[PMAX - j - 1: m - j - 1] for j in range(p)]) @ coef if p else 0.0)
-    e2 = e ** 2
-    if lam >= 1.0: s2 = np.full(len(e), fit["v0"])
-    else: s2 = np.concatenate([[fit["s2_last"]], ewma(e2[:-1], 1 - lam, init=fit["s2_last"])])
-    def scores(u, su): return np.clip(ndtri(np.clip((np.searchsorted(su, u) + 0.5) / (len(su) + 1), 1e-6, 1 - 1e-6)), -4.5, 4.5)
-    return scores(e / np.sqrt(s2), fit["suc"]), scores(e / np.sqrt(fit["v0"]), fit["suu"]), (np.log(s2 / fit["v0"]) - fit["lm"]) / fit["ls"]
-
-def one_sample_tests(w):
-    """KS, Cramer-von Mises and Anderson-Darling of a window against N(0,1)."""
-    x = np.sort(w); m = len(x); F = ndtr(x); i = np.arange(1, m + 1)
-    ks = np.sqrt(m) * max((i / m - F).max(), (F - (i - 1) / m).max())
-    cvm = 1.0 / (12 * m) + ((F - (2 * i - 1) / (2 * m)) ** 2).sum()
-    Fc = np.clip(F, 1e-10, 1 - 1e-10)
-    ad = -m - ((2 * i - 1) * (np.log(Fc) + np.log(1 - Fc[::-1]))).sum() / m
-    return ks, cvm, ad
-
-def _battery(n_on, nh, out, c):
-    """The full battery on one normal-score stream, written into out[:, c:]; returns the next column."""
-    T = len(n_on)
-    tail = nh[-1024:]; ext = np.concatenate([tail, n_on]); off = len(tail)   # extended stream: history scores then online
-    n = n_on
-    # mean
-    out[:, 0] = cusum_peak(n); out[:, 1] = ewma(n, 0.02); out[:, 2] = ewma(n, 0.005); out[:, 3] = np.cumsum(n) / np.sqrt(np.arange(1, T + 1))
-    # scale
-    q = (n ** 2 - 1) / np.sqrt(2); out[:, 4] = cusum_peak(q); out[:, 5] = ewma(q, 0.02); out[:, 6] = ewma(q, 0.005)
-    out[:, 7] = (np.cumsum(n ** 2) / np.arange(1, T + 1) - 1) * np.sqrt(np.arange(1, T + 1) / 2); c = 8
-    # dependence
-    port = []
-    for k in range(1, PORT + 1):
-        a = ext[off:] * ext[off - k: len(ext) - k]; port.append(ewma(a, 0.01))
-        if k in LAGS:
-            out[:, c] = cusum_peak(a); out[:, c + 1] = port[-1]; c += 2
-    out[:, c] = 199 * (np.stack(port) ** 2).sum(0); c += 1
-    # volatility clustering, against the history's own level
-    ah = np.abs(nh); mh, sh = (ah[1:] * ah[:-1]).mean(), (ah[1:] * ah[:-1]).std() + 1e-9
-    a = (np.abs(ext[off:]) * np.abs(ext[off - 1: len(ext) - 1]) - mh) / sh; out[:, c] = cusum_peak(a); out[:, c + 1] = ewma(a, 0.01); c += 2
-    # shape and tails, against the history's own frequencies
-    out[:, c] = ewma(n ** 3, 0.01); out[:, c + 1] = ewma(n ** 4 - 3, 0.01)
-    for j, ev in enumerate(((np.abs(n) > 2.5, np.abs(nh) > 2.5), (np.abs(n) > 1.5, np.abs(nh) > 1.5), (np.abs(n) < 0.3, np.abs(nh) < 0.3))):
-        out[:, c + 2 + j] = ewma(ev[0].astype(float) - ev[1].mean(), 0.01)
-    sc = (np.sign(ext[off:]) != np.sign(ext[off - 1: len(ext) - 1])).astype(float); out[:, c + 5] = ewma(sc - (np.sign(nh[1:]) != np.sign(nh[:-1])).mean(), 0.01)
-    out[:, c + 6] = ewma(np.abs(n) - np.abs(nh).mean(), 0.01); c += 7
-    # GLR over dyadic windows on the extended stream
-    C1 = np.concatenate([[0.0], np.cumsum(ext)]); C2 = np.concatenate([[0.0], np.cumsum(ext ** 2)]); Cx = np.concatenate([[0.0], np.cumsum(ext[1:] * ext[:-1])])
-    idx = np.arange(off, off + T) + 1     # exclusive end index into cumsums
-    stats = {"mean": [], "scale": [], "dep": []}
-    for m in DYADIC:
-        lo = np.maximum(idx - m, 0); me = idx - lo          # the window is the last m values, or all there are
-        s1 = C1[idx] - C1[lo]; s2 = C2[idx] - C2[lo]; sx = Cx[idx - 1] - Cx[np.maximum(lo - 1, 0)]
-        var = np.maximum(s2 / me, 1e-6); r1 = np.clip(sx / np.maximum(s2, 1e-9), -0.99, 0.99)
-        g_mean = np.abs(s1) / np.sqrt(me); g_scale = 0.5 * me * (var - 1 - np.log(var)); g_dep = -0.5 * me * np.log(1 - r1 ** 2)
-        stats["mean"].append(g_mean); stats["scale"].append(g_scale); stats["dep"].append(g_dep)
-        out[:, c] = g_mean; out[:, c + 1] = g_scale; out[:, c + 2] = g_dep; c += 3
-    for key in ("mean", "scale", "dep"):
-        out[:, c] = np.max(np.stack(stats[key]), 0); c += 1
-    # distribution tests at the geometric cadence, held between
-    cur = np.zeros(3 * (len(TESTW) + 1) + 3); nxt = 1
-    for t in range(T):
-        if t + 1 >= nxt:
-            nxt = max(nxt + 1, int(nxt * 1.12)); vals = []
-            for W in TESTW:
-                vals.extend(one_sample_tests(ext[off + t + 1 - W: off + t + 1]))
-            vals.extend(one_sample_tests(n[:t + 1]) if t + 1 >= 8 else (0.0, 0.0, 0.0))
-            v = np.array(vals); cur = np.concatenate([v, v.reshape(-1, 3).max(0)])
-        out[t, c: c + len(cur)] = cur
-    c += len(cur)
-    return c
-
 def white_channels(hist, online):
-    h = np.asarray(hist, float); mu, sd = h.mean(), h.std() + 1e-12; zh = (h - mu) / sd; zo = (np.asarray(online, float) - mu) / sd
-    fit = fit_history(zh); n_c, n_u, lz = normal_scores_online(fit, zh, zo)
-    T = len(zo); out = np.zeros((T, NCH), dtype="float32")
-    c = _battery(n_u, fit["nhu"], out, 0)
-    assert c == NFULL, (c, NFULL)
-    # The conditional stream: sharper for mean and dependence when the history is heteroskedastic,
-    # blind to scale by construction (the scale estimate adapts), so no scale statistics on it.
-    nh = fit["nhc"]; tail = nh[-1024:]; ext = np.concatenate([tail, n_c]); off = len(tail); n = n_c
-    out[:, c] = cusum_peak(n); out[:, c + 1] = ewma(n, 0.02); c += 2
-    port = []
-    for k in range(1, PORT + 1):
-        a = ext[off:] * ext[off - k: len(ext) - k]; port.append(ewma(a, 0.01))
-        if k in (1, 2, 5): out[:, c] = cusum_peak(a); c += 1
-    out[:, c] = 199 * (np.stack(port) ** 2).sum(0); c += 1
-    C1 = np.concatenate([[0.0], np.cumsum(ext)]); C2 = np.concatenate([[0.0], np.cumsum(ext ** 2)]); Cx = np.concatenate([[0.0], np.cumsum(ext[1:] * ext[:-1])])
-    idx = np.arange(off, off + T) + 1; gm, gd = [], []
-    for m in DYADIC:
-        lo = np.maximum(idx - m, 0); me = idx - lo; s1 = C1[idx] - C1[lo]; s2 = C2[idx] - C2[lo]; sx = Cx[idx - 1] - Cx[np.maximum(lo - 1, 0)]
-        r1 = np.clip(sx / np.maximum(s2, 1e-9), -0.99, 0.99); gm.append(np.abs(s1) / np.sqrt(me)); gd.append(-0.5 * me * np.log(1 - r1 ** 2))
-    out[:, c] = np.max(np.stack(gm), 0); out[:, c + 1] = np.max(np.stack(gd), 0); c += 2
-    cur = np.zeros(2); nxt = 1
-    for t in range(T):
-        if t + 1 >= nxt:
-            nxt = max(nxt + 1, int(nxt * 1.12)); ks, ad = [], []
-            for W in TESTW:
-                k_, _, a_ = one_sample_tests(ext[off + t + 1 - W: off + t + 1]); ks.append(k_); ad.append(a_)
-            cur = np.array([max(ks), max(ad)])
-        out[t, c: c + 2] = cur
-    c += 2
-    # The scale process itself: a persistent shift of the conditional variance against the history's level.
-    out[:, c] = lz; out[:, c + 1] = ewma(lz, 0.02); out[:, c + 2] = cusum_peak(lz); c += 3
-    out[:, c] = np.arange(T); c += 1
-    assert c == NCH, (c, NCH)
-    out[:, :-1] = np.clip(out[:, :-1], -60, 60)          # the step index stays as it is
-    return np.nan_to_num(out)
+    """The 90 channels of one series as float32, as the WHITE90 matrix stores them.
+
+    The history fit and the online scoring are read from this module's namespace at call
+    time, so a script that replaces them here (157e, build_white_tpit) is honoured.
+    """
+    return _batch.white_channels(hist, online, fit=fit_history, online_scores=normal_scores_online).astype("float32")
 
 if __name__ == "__main__":
     if sys.argv[1] == "test":

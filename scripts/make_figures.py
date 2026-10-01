@@ -56,7 +56,7 @@ svg.append(box(250, 230, 200, 130, "The whitened stream", "AR(p) by BIC, conditi
 svg.append(box(500, 40, 200, 90, "Core trees", "LightGBM ranker (augmented)\nand classifier, per step"))
 svg.append(box(500, 150, 200, 90, "Core networks", "24 dilated causal TCNs\nover channel trajectories"))
 svg.append(box(500, 260, 200, 110, "Whitened member", "two per-step rankers + classifier\n(0.63 alone on the fold)\n3 TCNs over whitened channels"))
-svg.append(box(750, 150, 200, 110, "Independent members", "mass battery (90 statistics)\nfrequency/dependence + novelty\n3 TCNs over 200 + 111 channels"))
+svg.append(box(750, 150, 200, 110, "Independent members", "mass battery (90 statistics)\nfrequency/dependence + novelty\njoint TCNs over 200 + 111 channels\n(a reader of both streams)"))
 svg.append(box(1000, 150, 160, 110, "Hand blend", "shares read on an\nuntouched fold\n→ score in [0, 1]", fill="#ecfeff", stroke=INK))
 svg += [arrow(200, 125, 250, 125), arrow(200, 125, 250, 295), arrow(450, 110, 500, 90), arrow(450, 130, 500, 195), arrow(450, 295, 500, 310),
         arrow(450, 140, 750, 200), arrow(450, 290, 750, 215), arrow(700, 85, 1000, 190), arrow(700, 195, 1000, 200), arrow(700, 315, 1000, 215), arrow(950, 205, 1000, 205)]
