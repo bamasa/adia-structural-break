@@ -123,7 +123,7 @@ To rebuild the full workspace from the competition data and reproduce a fold-2 n
 
     git clone https://github.com/bamasa/adia-structural-break && cd adia-structural-break
     pip install -r requirements.txt
-    PYTHONPATH=src python -m unittest discover -s tests -v     # 23 tests, under 5 s
+    PYTHONPATH=src python -m unittest discover -s tests -v     # 34 tests, under 10 s
     PYTHONPATH=src python scripts/make_figures.py              # the figures above, from synthetic series
 
     pip install .          # or: pip install git+https://github.com/bamasa/adia-structural-break

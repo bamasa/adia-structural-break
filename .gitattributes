@@ -1,0 +1,2 @@
+# Keep language statistics honest: the inspection notebook is documentation, not the code base.
+*.ipynb linguist-documentation=true
