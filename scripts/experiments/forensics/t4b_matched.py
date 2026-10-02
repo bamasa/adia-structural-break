@@ -77,7 +77,7 @@ def compare(name, b, c):
 b_inv = df[(df.is_break == 1) & df.invisible]; c_inv = df[(df.is_break == 0) & df.invisible]
 compare("INVISIBLE (rule) breaks vs INVISIBLE controls, post_len>=30", b_inv, c_inv)
 compare("INVISIBLE breaks vs INVISIBLE controls, post_len>=200", b_inv[b_inv.post_len >= 200], c_inv[c_inv.post_len >= 200])
-f2 = pd.read_csv("/Users/organist/projects/adia-structural-break/fold2_break_kinds.csv"); inv353 = set(f2[f2.kind == "none evident"].sid)
+f2 = pd.read_csv("fold2_break_kinds.csv"); inv353 = set(f2[f2.kind == "none evident"].sid)
 compare("INV353 breaks vs INVISIBLE controls (all)", df[(df.is_break == 1) & df.id.isin(inv353)], c_inv)
 b_vis = df[(df.is_break == 1) & ~df.invisible]; c_vis = df[(df.is_break == 0) & ~df.invisible]
 compare("VISIBLE (rule) breaks vs VISIBLE controls", b_vis, c_vis)

@@ -6,7 +6,7 @@ Outputs (in this folder): values.npy (float32), offsets.npy (int64), meta.csv
 import os, sys, time
 import numpy as np, pandas as pd, pyarrow.parquet as pq
 
-D = "/Users/organist/projects/adia-structural-break/structural-break-real-time-test/data/"
+D = "structural-break-real-time-test/data/"   # relative to the workspace root, where the scripts run
 OUT = os.path.dirname(os.path.abspath(__file__))
 
 t0 = time.time()

@@ -22,7 +22,9 @@ rm -rf "$ROOT/submissions/$SUB/resources"
 ln -s "../../../$(basename "$RESOURCES")" "$ROOT/submissions/$SUB/resources"
 cd "$WORK"
 "$PY" "$ROOT/scripts/assemble_submission.py" "$ROOT/submissions/$SUB/main.py" "$INTERFACE" "$META"
-cp "$ROOT/submissions/078-two-classifiers/requirements.txt" "$ROOT/submissions/$SUB/"
+# The platform requirements: the shared file when it exists, else the 078 copy every submission carried.
+if [ -f "$ROOT/submissions/requirements.txt" ]; then REQ="$ROOT/submissions/requirements.txt"; else REQ="$ROOT/submissions/078-two-classifiers/requirements.txt"; fi
+cp "$REQ" "$ROOT/submissions/$SUB/requirements.txt"
 VERIFY="$(dirname "$INTERFACE")/verify_$(basename "$INTERFACE" | sed 's/interface_//')"
 if [ -f "$VERIFY" ]; then "$PY" "$VERIFY"; else echo "no verifier next to the interface — refusing to ship" >&2; exit 2; fi
 cp "$ROOT/submissions/$SUB/main.py" "$CRUNCH_WS/main.py"

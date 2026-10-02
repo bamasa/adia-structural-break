@@ -1,5 +1,6 @@
-cd /Users/organist/projects/adia-structural-break
-S=/private/tmp/claude-501/-Users-organist-Desktop-----------memory-done/ad651606-b3ba-471c-a6ae-a0ef2dadc33a/scratchpad
+HERE="$(cd "$(dirname "$0")" && pwd)"
+cd "$HERE/../../.."                       # the workspace: the repository's parent directory
+S="${S:-$HERE}"                           # where the companion tcn_* scripts live (a scratch folder when first run)
 for d in 1 2 3 4; do
   .venv/bin/python $S/tcn_folddrop$d.py > tcn_fd$d.log 2>&1
 done

@@ -1,0 +1,12 @@
+# The library itself needs only numpy and scipy; the rest reproduces the models, networks and figures.
+numpy==2.5.2
+scipy==1.18.1
+lightgbm==4.7.0
+scikit-learn==1.9.0
+pandas==2.3.3
+joblib==1.5.3
+torch==2.13.0
+matplotlib==3.11.1
+pillow==12.3.0
+# pandas.read_parquet in the matrix builders (scripts/experiments/build_*.py) needs a parquet engine.
+pyarrow==25.0.1

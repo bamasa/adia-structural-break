@@ -118,6 +118,9 @@ Networks over the whitened innovation stream itself (158, +0.0005 so far), a fol
 
 ## Try it in two minutes (no competition data needed)
 
+To rebuild the full workspace from the competition data and reproduce a fold-2 number (0.6452 for the final blend), follow [docs/reproduce.md](docs/reproduce.md): pinned versions, the build order of every matrix, and the one command sequence that ends in the score.
+
+
     git clone https://github.com/bamasa/adia-structural-break && cd adia-structural-break
     pip install -r requirements.txt
     PYTHONPATH=src python -m unittest discover -s tests -v     # 23 tests, under 5 s

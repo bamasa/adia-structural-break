@@ -13,10 +13,10 @@ from __future__ import annotations
 
 import re
 import sys
+from pathlib import Path
 
 #: Channels the mass battery emits (src/structural_break/mass.py).
 MASS_CHANNELS_CONST = 90
-from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "src" / "structural_break"
