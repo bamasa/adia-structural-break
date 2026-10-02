@@ -47,19 +47,49 @@ def arrow(x1, y1, x2, y2):
     return f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="{MUTED}" stroke-width="1.6" marker-end="url(#a)"/>'
 head = '<defs><marker id="a" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#6b7280"/></marker></defs>'
 
-svg = [f'<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="420" viewBox="0 0 1180 420" font-family="Helvetica, Arial, sans-serif">', head,
-       f'<rect width="1180" height="420" fill="white"/>',
-       f'<text x="20" y="34" font-size="18" font-weight="700" fill="{INK}">The shipped ensemble (#45): one score per step, from six readers of the same stream</text>']
-svg.append(box(20, 70, 180, 110, "The series", "history 1,000–5,000 points\nonline part, one point at a time\nz-scored on the history", fill="#f9fafb", stroke=MUTED))
-svg.append(box(250, 60, 200, 130, "206 streaming channels", "CUSUM, Page–Hinkley, variance ratio\nmulti-scale, retrospective scans\nforecaster error, spectra, BOCPD", ))
-svg.append(box(250, 230, 200, 130, "The whitened stream", "AR(p) by BIC, conditional scale,\ninnovation ECDF → normal scores\n90 statistics + 21 SR odds + context"))
-svg.append(box(500, 40, 200, 90, "Core trees", "LightGBM ranker (augmented)\nand classifier, per step"))
-svg.append(box(500, 150, 200, 90, "Core networks", "24 dilated causal TCNs\nover channel trajectories"))
-svg.append(box(500, 260, 200, 110, "Whitened member", "two per-step rankers + classifier\n(0.63 alone on the fold)\n3 TCNs over whitened channels"))
-svg.append(box(750, 150, 200, 110, "Independent members", "mass battery (90 statistics)\nfrequency/dependence + novelty\njoint TCNs over 200 + 111 channels\n(a reader of both streams)"))
-svg.append(box(1000, 150, 160, 110, "Hand blend", "shares read on an\nuntouched fold\n→ score in [0, 1]", fill="#ecfeff", stroke=INK))
-svg += [arrow(200, 125, 250, 125), arrow(200, 125, 250, 295), arrow(450, 110, 500, 90), arrow(450, 130, 500, 195), arrow(450, 295, 500, 310),
-        arrow(450, 140, 750, 200), arrow(450, 290, 750, 215), arrow(700, 85, 1000, 190), arrow(700, 195, 1000, 200), arrow(700, 315, 1000, 215), arrow(950, 205, 1000, 205)]
+# The ensemble diagram: three columns (inputs, readers, blend), smooth connectors that never cross a box,
+# one colour per input stream, and each reader's share of the final blend (from step 100 on, #45).
+STREAM_A, STREAM_B = "#0f766e", "#b45309"
+def curve(x1, y1, x2, y2, color, width=1.8):
+    dx = (x2 - x1) * 0.5
+    return (f'<path d="M {x1} {y1} C {x1 + dx} {y1}, {x2 - dx} {y2}, {x2 - 6} {y2}" fill="none" stroke="{color}" '
+            f'stroke-width="{width}" stroke-linecap="round" marker-end="url(#m{color[1:]})"/>')
+def marker(color):
+    return (f'<marker id="m{color[1:]}" markerWidth="8" markerHeight="8" refX="2" refY="4" orient="auto" markerUnits="strokeWidth">'
+            f'<path d="M0,0 L0,8 L7,4 z" fill="{color}"/></marker>')
+def card(x, y, w, h, title, lines, fill, stroke, share=None):
+    out = [f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="12" fill="{fill}" stroke="{stroke}" stroke-width="1.6"/>',
+           f'<text x="{x + 16}" y="{y + 26}" font-size="15" font-weight="700" fill="{INK}">{title}</text>']
+    for i, line in enumerate(lines):
+        out.append(f'<text x="{x + 16}" y="{y + 47 + 17 * i}" font-size="12.5" fill="{MUTED}">{line}</text>')
+    if share:
+        out.append(f'<rect x="{x + w - 62}" y="{y + 11}" width="50" height="22" rx="11" fill="{stroke}"/>'
+                   f'<text x="{x + w - 37}" y="{y + 26.5}" text-anchor="middle" font-size="12" font-weight="700" fill="white">{share}</text>')
+    return "\n".join(out)
+W, H = 1180, 560
+svg = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" font-family="-apple-system, Segoe UI, Helvetica, Arial, sans-serif">',
+       "<defs>" + marker(STREAM_A) + marker(STREAM_B) + marker(MUTED) + "</defs>",
+       f'<rect width="{W}" height="{H}" rx="16" fill="white"/>',
+       f'<text x="32" y="44" font-size="20" font-weight="700" fill="{INK}">The shipped ensemble (#45): one score per step, from five readers of two streams</text>',
+       f'<text x="32" y="68" font-size="13" fill="{MUTED}">Badges: each reader&#8217;s share of the final blend from step 100 on. Colour: which stream a reader is built on.</text>']
+svg.append(card(32, 232, 190, 112, "The series", ["history: 1,000–5,000 points", "online: one point at a time", "z-scored on the history"], "#f9fafb", MUTED))
+svg.append(card(290, 120, 260, 128, "Streaming channels", ["206 channels: CUSUM, Page–Hinkley,", "variance ratios, multi-scale,", "retrospective scans, spectra, BOCPD,", "mass / frequency / novelty batteries"], "#f0fdfa", STREAM_A))
+svg.append(card(290, 330, 260, 128, "The whitened stream", ["AR(p) by BIC, conditional scale,", "innovation ECDF → normal scores;", "90 statistics, 21 Shiryaev–Roberts", "odds, 8 history constants"], "#fffbeb", STREAM_B))
+readers = [("Core trees", ["LightGBM ranker + classifier, per step"], "#f0fdfa", STREAM_A, "11%"),
+           ("Core networks", ["24 dilated causal TCNs over trajectories"], "#f0fdfa", STREAM_A, "13%"),
+           ("Independent members", ["mass battery; frequency + novelty"], "#f0fdfa", STREAM_A, "24%"),
+           ("Whitened member", ["2 per-step rankers + classifier, 3 TCNs"], "#fffbeb", STREAM_B, "42%"),
+           ("Joint networks", ["3 TCNs reading both streams together"], "#f8fafc", "#475569", "10%")]
+RX, RW, RH, R0, RG = 640, 330, 70, 96, 18
+centers = []
+for i, (title, lines, fill, stroke, share) in enumerate(readers):
+    y = R0 + i * (RH + RG); svg.append(card(RX, y, RW, RH, title, lines, fill, stroke, share)); centers.append(y + RH / 2)
+svg.append(card(1020, 236, 140, 104, "Hand blend", ["shares read on", "an untouched fold", "→ score in [0, 1]"], "#ecfeff", INK))
+svg += [curve(222, 288, 290, 184, MUTED), curve(222, 288, 290, 394, MUTED)]
+for i in (0, 1, 2): svg.append(curve(550, 184, RX, centers[i], STREAM_A))
+svg.append(curve(550, 394, RX, centers[3], STREAM_B))
+svg += [curve(550, 200, RX, centers[4] - 8, STREAM_A), curve(550, 410, RX, centers[4] + 8, STREAM_B)]
+for c in centers: svg.append(curve(RX + RW, c, 1020, 288 + (c - 288) * 0.22, MUTED, 1.5))
 svg.append('</svg>'); (OUT / "pipeline.svg").write_text("\n".join(svg))
 
 svg = [f'<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="300" viewBox="0 0 1180 300" font-family="Helvetica, Arial, sans-serif">', head,
