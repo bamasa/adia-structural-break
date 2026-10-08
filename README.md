@@ -1,6 +1,6 @@
 # adia-structural-break
 
-**Real-time structural-break detection in time series — my entry to the [ADIA Lab Structural Break Challenge, Real-Time Edition](https://hub.crunchdao.com/competitions/structural-break-real-time) (CrunchDAO).** Closed the submission phase at **0.6299 TS-AUC — about rank 160 of 1,716 registered participants on the public leaderboard (781 live models; leader 0.680)**; the organisers' out-of-sample ranking is due at the end of October 2026. The repository holds the solution and the complete research record: 158 logged experiments, run by me directing an LLM coding assistant as the research team.
+**Real-time structural-break detection in time series — my entry to the [ADIA Lab Structural Break Challenge, Real-Time Edition](https://hub.crunchdao.com/competitions/structural-break-real-time) (CrunchDAO).** Closed the submission phase at **0.6299 TS-AUC — rank 149 of 1,730 participants on the public leaderboard as of 8 October 2026 (top 9%; 810 live models; leader 0.717)**; the organisers' out-of-sample ranking is due at the end of October 2026. The repository holds the solution and the complete research record: 158 logged experiments, run by me directing an LLM coding assistant as the research team.
 
 *Solo entry · August–October 2026 · Python, NumPy, SciPy, LightGBM, PyTorch · sequential change-point detection, learning to rank, streaming inference, LLM-agent research workflows · MIT licence*
 
